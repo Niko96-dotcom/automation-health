@@ -1,19 +1,31 @@
 .DS_Store
+.AppleDouble
+.LSOverride
 
 # SwiftPM
 .build/
 .swiftpm/
-Package.resolved
 
 # Local app packaging
 dist/
 
 # Xcode and macOS user state
 DerivedData/
+xcuserdata/
 *.xcuserstate
 *.xcuserdata/
+*.xcodeproj/xcuserdata/
 *.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
 
 # Logs and local scratch
 *.log
 *.tmp
+.env
+.env.*
+!.env.example
+
+# Editor state
+.idea/
+.vscode/
+*.swp

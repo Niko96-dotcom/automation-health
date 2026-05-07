@@ -1,0 +1,27 @@
+name: Feature Request
+description: Suggest an improvement or new scheduler source.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What workflow or visibility gap would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the behavior you want.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Add examples, scheduler details, or alternatives considered.
+    validations:
+      required: false

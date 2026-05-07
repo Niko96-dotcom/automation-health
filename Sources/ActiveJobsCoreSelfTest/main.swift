@@ -52,8 +52,8 @@ func testParsesEnabledHermesCronJobsWithLatestOutput() throws {
 
     expect(jobs.map(\.name) == ["daily-ft-bookmarks-to-eigenwiki"], "Hermes enabled job names")
     expect(jobs.first?.schedule == "0 9 * * *", "Hermes schedule")
-    expect(jobs.first?.lastRunDescription == "2026-05-07 09:19", "Hermes last run")
-    expect(jobs.first?.nextRunDescription == "2026-05-08 09:00", "Hermes next run")
+    expectDatesEqual(jobs.first?.lastRun, isoDate("2026-05-07T09:19:34.169510+02:00"), "Hermes last run")
+    expectDatesEqual(jobs.first?.nextRun, isoDate("2026-05-08T09:00:00+02:00"), "Hermes next run")
     expect(jobs.first?.lastStatus == "ok", "Hermes status")
     expect(jobs.first?.definition == "Run the daily Field Theory bookmark pipeline.", "Hermes prompt definition")
     expect(jobs.first?.lastRunDetails == "latest run report", "Hermes latest output")
@@ -177,6 +177,29 @@ func expect(_ condition: @autoclosure () -> Bool, _ message: String) {
     guard condition() else {
         fatalError("Expectation failed: \(message)")
     }
+}
+
+func expectDatesEqual(_ actual: Date?, _ expected: Date, _ message: String) {
+    guard let actual else {
+        fatalError("Expectation failed: \(message)")
+    }
+
+    expect(abs(actual.timeIntervalSince1970 - expected.timeIntervalSince1970) < 0.001, message)
+}
+
+func isoDate(_ value: String) -> Date {
+    let fractionalISOFormatter = ISO8601DateFormatter()
+    fractionalISOFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    if let date = fractionalISOFormatter.date(from: value) {
+        return date
+    }
+
+    let plainISOFormatter = ISO8601DateFormatter()
+    plainISOFormatter.formatOptions = [.withInternetDateTime]
+    guard let date = plainISOFormatter.date(from: value) else {
+        fatalError("Could not parse date: \(value)")
+    }
+    return date
 }
 
 private final class TemporaryFixture {

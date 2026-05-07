@@ -1,0 +1,38 @@
+name: Bug Report
+description: Report a reproducible problem in Automation Health.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps To Reproduce
+      placeholder: |
+        1. Open Automation Health
+        2. Select ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include macOS version, Swift/Xcode version if building locally, and scheduler source involved.
+      placeholder: macOS 14.x, Xcode 16.x, launchd or Hermes cron
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs Or Screenshots
+      render: text
+    validations:
+      required: false

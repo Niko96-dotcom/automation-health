@@ -18,6 +18,14 @@ The scanner normalizes each source into a shared `ScheduledJob` model with sourc
 
 From the repo root:
 
+Run the full local workflow gate:
+
+```sh
+./script/ci.sh
+```
+
+Build all package products:
+
 ```sh
 swift build
 ```
@@ -25,7 +33,7 @@ swift build
 Run the self-test executable:
 
 ```sh
-swift run ActiveJobsCoreSelfTest
+./script/test.sh
 ```
 
 Build a local `.app` bundle in `dist/` and open it:
@@ -38,6 +46,13 @@ Build, open, and verify the app process starts:
 
 ```sh
 ./script/build_and_run.sh --verify
+```
+
+Developer shortcuts are also available through `make`:
+
+```sh
+make test
+make run
 ```
 
 ## Products
@@ -54,3 +69,7 @@ Build, open, and verify the app process starts:
 - Health summaries are heuristic and based on available last-run, next-run, and status fields.
 
 See [docs/scheduled-job-sources.md](docs/scheduled-job-sources.md) for source-specific details.
+
+## Development
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/development.md](docs/development.md) for the local workflow, pull request checklist, and CI details.
