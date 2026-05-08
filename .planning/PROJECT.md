@@ -26,7 +26,7 @@ Users can quickly understand and navigate the health of their local scheduled au
 
 v1.0 completed 3 phases, 8 plans, and 19/19 scoped requirements. The milestone archive lives in `.planning/milestones/`, and the living roadmap is collapsed to the shipped milestone summary.
 
-The repository CI gate passes after Phase 6's inventory model and deterministic source work. Phase 4 added public repository health files, privacy-safe templates, public scanner docs, a rerunnable privacy scrub checklist, a neutral bundle identifier, and synthetic scanner fixtures. Phase 5 added the Pulse Calendar icon source art, deterministic local icon generation, and local `.app` bundle icon integration. Phase 6 added confidence/origin modeling, scan notes, cron coverage, and registered Shortcuts/Automator inventory.
+The repository CI gate passes after Phase 7's candidate discovery and manual record work. Phase 4 added public repository health files, privacy-safe templates, public scanner docs, a rerunnable privacy scrub checklist, a neutral bundle identifier, and synthetic scanner fixtures. Phase 5 added the Pulse Calendar icon source art, deterministic local icon generation, and local `.app` bundle icon integration. Phase 6 added confidence/origin modeling, scan notes, cron coverage, and registered Shortcuts/Automator inventory. Phase 7 added bounded Candidate script discovery, app-owned Manual records, and shared inventory presentation for confidence/origin/search/detail.
 
 ## Requirements
 
@@ -51,10 +51,11 @@ The repository CI gate passes after Phase 6's inventory model and deterministic 
 - [x] Source-independent confidence and origin model fields exist below the view layer - shipped in Phase 6.
 - [x] Cron, Shortcuts, and Automator inventory sources are covered by injected fixtures and scan notes - shipped in Phase 6.
 - [x] Scanner additions remain read-only and report source limitations without view-layer IO - shipped in Phase 6.
+- [x] Candidate script discovery and app-only manual records are available through bounded, read-only flows - shipped in Phase 7.
+- [x] Candidate and Manual records participate in shared inventory, search, sidebar, selection, and detail presentation - shipped in Phase 7.
 
 ### Active
 
-- [ ] Candidate script discovery and app-only manual records are available through bounded, read-only flows.
 - [ ] Sidebar sections are collapsible and can be grouped/sorted by more useful categories than raw scheduler source.
 - [ ] The sidebar focus treatment matches the app's dark navigation surface while preserving keyboard accessibility.
 
@@ -106,6 +107,8 @@ The relevant current ownership boundaries are:
 | Generate icon assets locally from committed source art | Built-in macOS `sips` and `iconutil` keep the app icon pipeline deterministic without secrets, network access, signing, notarization, or new dependencies. | Shipped in Phase 5 |
 | Return scanner jobs with source notes | Missing tools, unreadable locations, and evidence limitations need to be visible even when a scanner returns no jobs. | Shipped in Phase 6 |
 | Treat Shortcuts and Automator as registered inventory | Listing registered automations is not schedule evidence, so these sources use Registered confidence and no next-run claims. | Shipped in Phase 6 |
+| Treat script discoveries as Candidate records | File presence is possible automation evidence, not schedule evidence, so Candidate scripts use Candidate confidence and no run/next-run claims. | Shipped in Phase 7 |
+| Keep Manual records app-owned | Users can track automations the scanner cannot prove, but only through Automation Health's own Application Support JSON. | Shipped in Phase 7 |
 
 ## Evolution
 
@@ -125,4 +128,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-08 after Phase 6 completion*
+*Last updated: 2026-05-08 after Phase 7 completion*

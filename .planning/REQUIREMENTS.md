@@ -37,15 +37,15 @@ Requirements for making Automation Health publishable as an open-source project 
 - [x] **DISC-03**: User can see local cron jobs where readable, including per-user crontab entries and supported readable system cron files.
 - [x] **DISC-04**: User can see registered Shortcuts inventory where the `shortcuts` command is available, without treating listed shortcuts as proven scheduled jobs.
 - [x] **DISC-05**: User can see Automator workflows or app-visible workflow files where readable, labeled by confidence according to available evidence.
-- [ ] **DISC-06**: User can see bounded candidate script discoveries from common user locations, labeled as candidates rather than scheduled jobs.
+- [x] **DISC-06**: User can see bounded candidate script discoveries from common user locations, labeled as candidates rather than scheduled jobs.
 - [x] **DISC-07**: User can see source-specific scan notes when permissions, missing tools, unreadable files, or confidence limits prevent complete discovery.
-- [ ] **DISC-08**: User can search and inspect broader inventory records through the same sidebar/detail flow as existing launchd and Hermes cron jobs.
+- [x] **DISC-08**: User can search and inspect broader inventory records through the same sidebar/detail flow as existing launchd and Hermes cron jobs.
 
 ### Manual Records
 
-- [ ] **MAN-01**: User can add a manual automation record for an automation the scanner cannot discover automatically.
-- [ ] **MAN-02**: User can edit or remove app-only manual records without modifying real scheduled jobs or script files.
-- [ ] **MAN-03**: Manual records persist locally and are clearly identified as user-added app records in search, grouping, and detail views.
+- [x] **MAN-01**: User can add a manual automation record for an automation the scanner cannot discover automatically.
+- [x] **MAN-02**: User can edit or remove app-only manual records without modifying real scheduled jobs or script files.
+- [x] **MAN-03**: Manual records persist locally and are clearly identified as user-added app records in search, grouping, and detail views.
 
 ### Sidebar Organization And Focus
 
@@ -61,7 +61,7 @@ Requirements for making Automation Health publishable as an open-source project 
 
 - [x] **QUAL-01**: The app remains read-only with respect to real scheduled jobs, scheduler files, scripts, and third-party automation systems.
 - [x] **QUAL-02**: Scanner additions are covered by focused self-tests with injected paths or command runners rather than live machine state.
-- [ ] **QUAL-03**: Broad candidate discovery has documented performance bounds, ignore rules, and failure behavior.
+- [x] **QUAL-03**: Broad candidate discovery has documented performance bounds, ignore rules, and failure behavior.
 - [ ] **QUAL-04**: Existing launchd, Hermes cron, search, selection, and refresh behavior continue to pass the local CI gate.
 - [x] **QUAL-05**: Public documentation explains that Automation Health provides broad best-effort inventory, not a guarantee that every automation on every Mac has been found.
 
@@ -118,12 +118,12 @@ Which phases cover which requirements. Updated during roadmap creation and v1.1 
 | DISC-03 | Phase 6 | Complete |
 | DISC-04 | Phase 6 | Complete |
 | DISC-05 | Phase 6 | Complete |
-| DISC-06 | Phase 7 | Pending |
+| DISC-06 | Phase 7 | Complete |
 | DISC-07 | Phase 6 | Complete |
-| DISC-08 | Phase 7 | Pending |
-| MAN-01 | Phase 7 | Pending |
-| MAN-02 | Phase 7 | Pending |
-| MAN-03 | Phase 7 | Pending |
+| DISC-08 | Phase 7 | Complete |
+| MAN-01 | Phase 7 | Complete |
+| MAN-02 | Phase 7 | Complete |
+| MAN-03 | Phase 7 | Complete |
 | SIDE-01 | Phase 8 | Pending |
 | SIDE-02 | Phase 8 | Pending |
 | SIDE-03 | Phase 8 | Pending |
@@ -133,7 +133,7 @@ Which phases cover which requirements. Updated during roadmap creation and v1.1 
 | SIDE-07 | Phase 8 | Pending |
 | QUAL-01 | Phase 6 | Complete |
 | QUAL-02 | Phase 6 | Complete |
-| QUAL-03 | Phase 7 | Pending |
+| QUAL-03 | Phase 7 | Complete |
 | QUAL-04 | Phase 9 | Pending |
 | QUAL-05 | Phase 4 | Complete |
 
