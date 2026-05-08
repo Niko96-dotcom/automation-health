@@ -32,13 +32,13 @@ Requirements for making Automation Health publishable as an open-source project 
 
 ### Broad Automation Inventory
 
-- [ ] **DISC-01**: User can distinguish Scheduled, Registered, Candidate, and Manual automation records through a source-independent confidence model.
-- [ ] **DISC-02**: User can distinguish user-authored, third-party app, system, and unknown automation origins independently from scheduler source.
-- [ ] **DISC-03**: User can see local cron jobs where readable, including per-user crontab entries and supported readable system cron files.
-- [ ] **DISC-04**: User can see registered Shortcuts inventory where the `shortcuts` command is available, without treating listed shortcuts as proven scheduled jobs.
-- [ ] **DISC-05**: User can see Automator workflows or app-visible workflow files where readable, labeled by confidence according to available evidence.
+- [x] **DISC-01**: User can distinguish Scheduled, Registered, Candidate, and Manual automation records through a source-independent confidence model.
+- [x] **DISC-02**: User can distinguish user-authored, third-party app, system, and unknown automation origins independently from scheduler source.
+- [x] **DISC-03**: User can see local cron jobs where readable, including per-user crontab entries and supported readable system cron files.
+- [x] **DISC-04**: User can see registered Shortcuts inventory where the `shortcuts` command is available, without treating listed shortcuts as proven scheduled jobs.
+- [x] **DISC-05**: User can see Automator workflows or app-visible workflow files where readable, labeled by confidence according to available evidence.
 - [ ] **DISC-06**: User can see bounded candidate script discoveries from common user locations, labeled as candidates rather than scheduled jobs.
-- [ ] **DISC-07**: User can see source-specific scan notes when permissions, missing tools, unreadable files, or confidence limits prevent complete discovery.
+- [x] **DISC-07**: User can see source-specific scan notes when permissions, missing tools, unreadable files, or confidence limits prevent complete discovery.
 - [ ] **DISC-08**: User can search and inspect broader inventory records through the same sidebar/detail flow as existing launchd and Hermes cron jobs.
 
 ### Manual Records
@@ -59,8 +59,8 @@ Requirements for making Automation Health publishable as an open-source project 
 
 ### Quality And Regression Safety
 
-- [ ] **QUAL-01**: The app remains read-only with respect to real scheduled jobs, scheduler files, scripts, and third-party automation systems.
-- [ ] **QUAL-02**: Scanner additions are covered by focused self-tests with injected paths or command runners rather than live machine state.
+- [x] **QUAL-01**: The app remains read-only with respect to real scheduled jobs, scheduler files, scripts, and third-party automation systems.
+- [x] **QUAL-02**: Scanner additions are covered by focused self-tests with injected paths or command runners rather than live machine state.
 - [ ] **QUAL-03**: Broad candidate discovery has documented performance bounds, ignore rules, and failure behavior.
 - [ ] **QUAL-04**: Existing launchd, Hermes cron, search, selection, and refresh behavior continue to pass the local CI gate.
 - [x] **QUAL-05**: Public documentation explains that Automation Health provides broad best-effort inventory, not a guarantee that every automation on every Mac has been found.
@@ -113,13 +113,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VIS-02 | Phase 5 | Complete |
 | VIS-03 | Phase 5 | Complete |
 | VIS-04 | Phase 9 | Pending |
-| DISC-01 | Phase 6 | Pending |
-| DISC-02 | Phase 6 | Pending |
-| DISC-03 | Phase 6 | Pending |
-| DISC-04 | Phase 6 | Pending |
-| DISC-05 | Phase 6 | Pending |
+| DISC-01 | Phase 6 | Complete |
+| DISC-02 | Phase 6 | Complete |
+| DISC-03 | Phase 6 | Complete |
+| DISC-04 | Phase 6 | Complete |
+| DISC-05 | Phase 6 | Complete |
 | DISC-06 | Phase 7 | Pending |
-| DISC-07 | Phase 6 | Pending |
+| DISC-07 | Phase 6 | Complete |
 | DISC-08 | Phase 7 | Pending |
 | MAN-01 | Phase 7 | Pending |
 | MAN-02 | Phase 7 | Pending |
@@ -131,19 +131,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SIDE-05 | Phase 8 | Pending |
 | SIDE-06 | Phase 8 | Pending |
 | SIDE-07 | Phase 8 | Pending |
-| QUAL-01 | Phase 6 | Pending |
-| QUAL-02 | Phase 6 | Pending |
+| QUAL-01 | Phase 6 | Complete |
+| QUAL-02 | Phase 6 | Complete |
 | QUAL-03 | Phase 7 | Pending |
 | QUAL-04 | Phase 9 | Pending |
 | QUAL-05 | Phase 4 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 36 total
-- Satisfied: 12
-- Pending: 24
+- Satisfied: 20
+- Pending: 16
 - Mapped to phases: 36
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after milestone gap planning*
+*Last updated: 2026-05-08 after Phase 6 completion*

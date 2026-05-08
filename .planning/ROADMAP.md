@@ -17,7 +17,7 @@ Milestone v1.1 makes Automation Health ready to publish as a clean open-source G
 
 - [x] **Phase 4: Open Source Foundation And Privacy Scrub** - Prepare public repository materials, GitHub workflow hygiene, and privacy guardrails.
 - [x] **Phase 5: Visual Identity And Icon Pipeline** - Prompt, generate, and package a polished app icon and deterministic visual asset workflow.
-- [ ] **Phase 6: Inventory Model And Deterministic Sources** - Add confidence/origin modeling and deterministic scanner expansion for scheduler-backed or registered automations.
+- [x] **Phase 6: Inventory Model And Deterministic Sources** - Add confidence/origin modeling and deterministic scanner expansion for scheduler-backed or registered automations.
 - [ ] **Phase 7: Candidate Discovery And Manual Records** - Add bounded script-candidate discovery plus app-only manual records for uncovered automations.
 - [ ] **Phase 8: Sidebar Grouping, Collapse, And Focus Polish** - Add collapsible sections, better grouping modes, and screenshot-driven focus treatment.
 - [ ] **Phase 9: Publication Verification And Docs Polish** - Verify CI, documentation, screenshots/assets, and public-ready release posture.
@@ -87,13 +87,13 @@ Cross-cutting constraints:
 
 Plans:
 **Wave 1**
-- [ ] 06-01: Extend core models and presentation adapters with confidence, origin, and scan-note concepts.
+- [x] 06-01: Extend core models and presentation adapters with confidence, origin, and scan-note concepts.
 
 **Wave 2 *(blocked on Wave 1 completion)***
-- [ ] 06-02: Add cron scanner coverage with fixture-driven self-tests.
+- [x] 06-02: Add cron scanner coverage with fixture-driven self-tests.
 
 **Wave 3 *(blocked on Wave 2 completion)***
-- [ ] 06-03: Add Shortcuts and Automator inventory scanners with best-effort failure handling.
+- [x] 06-03: Add Shortcuts and Automator inventory scanners with best-effort failure handling.
 
 Cross-cutting constraints:
 - Inventory scanners remain read-only: no edit, remove, install, run, view, sign, or execute commands are introduced for cron, Shortcuts, or Automator sources.
@@ -176,7 +176,7 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 |-------|----------------|--------|-----------|
 | 4. Open Source Foundation And Privacy Scrub | 3/3 | Complete | 2026-05-08 |
 | 5. Visual Identity And Icon Pipeline | 2/2 | Complete | 2026-05-08 |
-| 6. Inventory Model And Deterministic Sources | 0/3 | Pending | — |
+| 6. Inventory Model And Deterministic Sources | 3/3 | Complete | 2026-05-08 |
 | 7. Candidate Discovery And Manual Records | 0/3 | Pending | — |
 | 8. Sidebar Grouping, Collapse, And Focus Polish | 0/3 | Pending | — |
 | 9. Publication Verification And Docs Polish | 0/2 | Pending | — |
@@ -198,13 +198,13 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | VIS-02 | Phase 5 | Complete |
 | VIS-03 | Phase 5 | Complete |
 | VIS-04 | Phase 9 | Pending |
-| DISC-01 | Phase 6 | Pending |
-| DISC-02 | Phase 6 | Pending |
-| DISC-03 | Phase 6 | Pending |
-| DISC-04 | Phase 6 | Pending |
-| DISC-05 | Phase 6 | Pending |
+| DISC-01 | Phase 6 | Complete |
+| DISC-02 | Phase 6 | Complete |
+| DISC-03 | Phase 6 | Complete |
+| DISC-04 | Phase 6 | Complete |
+| DISC-05 | Phase 6 | Complete |
 | DISC-06 | Phase 7 | Pending |
-| DISC-07 | Phase 6 | Pending |
+| DISC-07 | Phase 6 | Complete |
 | DISC-08 | Phase 7 | Pending |
 | MAN-01 | Phase 7 | Pending |
 | MAN-02 | Phase 7 | Pending |
@@ -216,8 +216,8 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | SIDE-05 | Phase 8 | Pending |
 | SIDE-06 | Phase 8 | Pending |
 | SIDE-07 | Phase 8 | Pending |
-| QUAL-01 | Phase 6 | Pending |
-| QUAL-02 | Phase 6 | Pending |
+| QUAL-01 | Phase 6 | Complete |
+| QUAL-02 | Phase 6 | Complete |
 | QUAL-03 | Phase 7 | Pending |
 | QUAL-04 | Phase 9 | Pending |
 | QUAL-05 | Phase 4 | Complete |
