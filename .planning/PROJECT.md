@@ -10,6 +10,16 @@ The shipped v1.0 sidebar now behaves like a more polished navigation surface: vi
 
 Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
 
+## Current Milestone: v1.1 Open Source Readiness and Broad Inventory
+
+**Goal:** Make Automation Health ready to publish as a clean open-source GitHub project while expanding discovery beyond the current machine-specific scheduler slice and polishing the sidebar experience.
+
+**Target features:**
+- Public GitHub readiness: license, security/support/community files, README/docs/workflows, and privacy scrub so personal local details are not leaked.
+- Image-generated visual identity: use `imagegen` for app/public assets, with at least a polished app icon and a deterministic packaging path.
+- Broad automation inventory: add deterministic scanner coverage, confidence-labeled candidate discoveries, and manual app-only records for automations the scanner cannot prove.
+- Sidebar organization polish: app-matched focus styling, collapsible categories, and grouping/sorting options that separate source from ownership, health, trigger type, and confidence.
+
 ## Current State
 
 **Shipped version:** v1.0 Sidebar Navigation on 2026-05-08
@@ -39,23 +49,23 @@ The repository CI gate passes after the milestone audit fix to `JobHumanizer.rel
 
 ### Active
 
-No active requirements remain. The next milestone should start with `$gsd-new-milestone` so requirements are defined fresh before new roadmap work begins.
+- [ ] Publishable open-source repository materials and workflows exist without personal local data leaks.
+- [ ] Visual identity assets are generated and integrated, starting with a polished macOS app icon.
+- [ ] Automation discovery distinguishes proven scheduled jobs, registered automations, candidate scripts, and manual records.
+- [ ] Sidebar sections are collapsible and can be grouped/sorted by more useful categories than raw scheduler source.
+- [ ] The sidebar focus treatment matches the app's dark navigation surface while preserving keyboard accessibility.
 
 ### Out of Scope
 
 - Editing, enabling, disabling, deleting, or creating scheduled jobs - the app remains read-only.
-- Adding new scheduler sources - v1.0 improved navigation and organization over existing scanned jobs.
-- Persisted custom grouping preferences - source-based grouping was sufficient for v1.0 sidebar cleanup.
-- A full design-system rewrite - v1.0 stayed localized to the existing sidebar and presentation boundary.
+- Claiming perfect discovery of every possible automation on every Mac - v1.1 should label confidence and limitations honestly.
+- Broad unbounded filesystem indexing - candidate discovery must be bounded, transparent, and performance-conscious.
+- Uploading or sharing local scan data - publishing work must avoid leaking personal paths, hostnames, outputs, or job details.
+- A full design-system rewrite - v1.1 should polish the existing native SwiftUI app rather than replace the app shell.
 
 ## Next Milestone Goals
 
-Candidate directions for the next milestone, to be confirmed through fresh requirements:
-
-- Alternate grouping modes such as health state or schedule type.
-- Collapsible sidebar sections or persisted sidebar preferences.
-- Broader keyboard shortcuts for refresh, reveal output, and focus movement.
-- Additional scheduler/source coverage if the product focus shifts beyond navigation.
+This section is superseded by the active v1.1 milestone above.
 
 ## Context
 
@@ -86,6 +96,9 @@ The relevant current ownership boundaries are:
 | Use compact source headers with trailing counts | This keeps categories scannable without adding badges, collapse controls, or new grouping modes. | Shipped in v1.0 |
 | Keep the app read-only | The product value is safe inspection of local automations, not administration. | Preserved in v1.0 |
 | Compute relative run labels from the supplied reference date | Tests and UI adapters can pass deterministic dates, so humanized labels should not depend on the wall-clock day when `relativeTo` is provided. | Fixed during v1.0 audit |
+| Use confidence labels for broad discovery | A script or registered tool can be automation-like without being a proven scheduled job, so the UI should distinguish scheduled, registered, candidate, and manual records. | Planned for v1.1 |
+| Separate scheduler source from ownership/origin | launchd can contain Apple jobs, third-party app updaters, and user-authored scripts, so grouping by source alone is not enough for v1.1. | Planned for v1.1 |
+| Require a privacy scrub before GitHub publication | Public repo materials must not expose local usernames, hostnames, real job output, personal bundle identifiers, or private paths. | Planned for v1.1 |
 
 ## Evolution
 
@@ -105,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-08 after v1.0 milestone completion*
+*Last updated: 2026-05-08 after v1.1 milestone start*
