@@ -76,4 +76,4 @@ Signed and notarized distribution remains out of scope for this milestone.
 
 - The generated `.app` bundle is written to `dist/`, which is ignored by git.
 - SwiftPM build output is written to `.build/`, which is ignored by git.
-- The app bundle identifier is configured in `script/build_and_run.sh`.
+- The app bundle identifier is `org.automationhealth.AutomationHealth`.

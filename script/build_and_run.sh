@@ -4,7 +4,7 @@ set -euo pipefail
 MODE="${1:-run}"
 APP_NAME="AutomationHealth"
 DISPLAY_NAME="Automation Health"
-BUNDLE_ID="com.niko.AutomationHealth"
+BUNDLE_ID="org.automationhealth.AutomationHealth"
 MIN_SYSTEM_VERSION="14.0"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
