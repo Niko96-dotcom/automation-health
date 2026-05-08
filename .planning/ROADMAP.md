@@ -15,7 +15,7 @@ Milestone v1.1 makes Automation Health ready to publish as a clean open-source G
 - Integer phases (4, 5, 6): Planned milestone work continuing from v1.0.
 - Decimal phases (6.1, 6.2): Urgent insertions if needed.
 
-- [ ] **Phase 4: Open Source Foundation And Privacy Scrub** - Prepare public repository materials, GitHub workflow hygiene, and privacy guardrails.
+- [x] **Phase 4: Open Source Foundation And Privacy Scrub** - Prepare public repository materials, GitHub workflow hygiene, and privacy guardrails.
 - [ ] **Phase 5: Visual Identity And Icon Pipeline** - Prompt, generate, and package a polished app icon and deterministic visual asset workflow.
 - [ ] **Phase 6: Inventory Model And Deterministic Sources** - Add confidence/origin modeling and deterministic scanner expansion for scheduler-backed or registered automations.
 - [ ] **Phase 7: Candidate Discovery And Manual Records** - Add bounded script-candidate discovery plus app-only manual records for uncovered automations.
@@ -45,7 +45,7 @@ Plans:
 - [x] 04-02: Rewrite README and source docs around privacy, scanner limits, architecture, and open-source contribution flow.
 
 **Wave 3 *(blocked on Wave 2 completion)***
-- [ ] 04-03: Add and apply the privacy scrub checklist to public docs, fixtures, and examples.
+- [x] 04-03: Add and apply the privacy scrub checklist to public docs, fixtures, and examples.
 
 ### Phase 5: Visual Identity And Icon Pipeline
 **Goal**: The app has a polished generated icon and a repeatable asset path suitable for local builds and public docs.
@@ -162,7 +162,7 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 4. Open Source Foundation And Privacy Scrub | 0/3 | Pending | — |
+| 4. Open Source Foundation And Privacy Scrub | 3/3 | Complete | 2026-05-08 |
 | 5. Visual Identity And Icon Pipeline | 0/2 | Pending | — |
 | 6. Inventory Model And Deterministic Sources | 0/3 | Pending | — |
 | 7. Candidate Discovery And Manual Records | 0/3 | Pending | — |
@@ -173,15 +173,15 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OSS-01 | Phase 4 | Pending |
-| OSS-02 | Phase 4 | Pending |
-| OSS-03 | Phase 4 | Pending |
-| OSS-04 | Phase 4 | Pending |
-| OSS-05 | Phase 4 | Pending |
-| OSS-06 | Phase 4 | Pending |
-| PRIV-01 | Phase 4 | Pending |
-| PRIV-02 | Phase 4 | Pending |
-| PRIV-03 | Phase 4 | Pending |
+| OSS-01 | Phase 4 | Complete |
+| OSS-02 | Phase 4 | Complete |
+| OSS-03 | Phase 4 | Complete |
+| OSS-04 | Phase 4 | Complete |
+| OSS-05 | Phase 4 | Complete |
+| OSS-06 | Phase 4 | Complete |
+| PRIV-01 | Phase 4 | Complete |
+| PRIV-02 | Phase 4 | Complete |
+| PRIV-03 | Phase 4 | Complete |
 | VIS-01 | Phase 5 | Pending |
 | VIS-02 | Phase 5 | Pending |
 | VIS-03 | Phase 5 | Pending |
@@ -208,7 +208,7 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | QUAL-02 | Phase 6 | Pending |
 | QUAL-03 | Phase 7 | Pending |
 | QUAL-04 | Phase 9 | Pending |
-| QUAL-05 | Phase 4 | Pending |
+| QUAL-05 | Phase 4 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 36 total

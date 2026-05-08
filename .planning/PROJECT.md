@@ -26,7 +26,7 @@ Users can quickly understand and navigate the health of their local scheduled au
 
 v1.0 completed 3 phases, 8 plans, and 19/19 scoped requirements. The milestone archive lives in `.planning/milestones/`, and the living roadmap is collapsed to the shipped milestone summary.
 
-The repository CI gate passes after the milestone audit fix to `JobHumanizer.relativeRunDescription(for:relativeTo:)`, which now computes today/tomorrow/yesterday labels relative to the supplied reference date.
+The repository CI gate passes after Phase 4's open-source readiness work. Phase 4 added public repository health files, privacy-safe templates, public scanner docs, a rerunnable privacy scrub checklist, a neutral bundle identifier, and synthetic scanner fixtures.
 
 ## Requirements
 
@@ -46,10 +46,10 @@ The repository CI gate passes after the milestone audit fix to `JobHumanizer.rel
 - [x] The visual sidebar treatment remains compact, native-feeling, and consistent with the existing macOS SwiftUI app - shipped in v1.0.
 - [x] Filtered no-result searches show a non-selectable inline sidebar empty state - shipped in v1.0.
 - [x] The full local CI gate passes for the shipped milestone - shipped in v1.0.
+- [x] Publishable open-source repository materials and workflows exist without personal local data leaks - shipped in Phase 4.
 
 ### Active
 
-- [ ] Publishable open-source repository materials and workflows exist without personal local data leaks.
 - [ ] Visual identity assets are generated and integrated, starting with a polished macOS app icon.
 - [ ] Automation discovery distinguishes proven scheduled jobs, registered automations, candidate scripts, and manual records.
 - [ ] Sidebar sections are collapsible and can be grouped/sorted by more useful categories than raw scheduler source.
@@ -98,7 +98,7 @@ The relevant current ownership boundaries are:
 | Compute relative run labels from the supplied reference date | Tests and UI adapters can pass deterministic dates, so humanized labels should not depend on the wall-clock day when `relativeTo` is provided. | Fixed during v1.0 audit |
 | Use confidence labels for broad discovery | A script or registered tool can be automation-like without being a proven scheduled job, so the UI should distinguish scheduled, registered, candidate, and manual records. | Planned for v1.1 |
 | Separate scheduler source from ownership/origin | launchd can contain Apple jobs, third-party app updaters, and user-authored scripts, so grouping by source alone is not enough for v1.1. | Planned for v1.1 |
-| Require a privacy scrub before GitHub publication | Public repo materials must not expose local usernames, hostnames, real job output, personal bundle identifiers, or private paths. | Planned for v1.1 |
+| Require a privacy scrub before GitHub publication | Public repo materials must not expose local usernames, hostnames, real job output, personal bundle identifiers, or private paths. | Shipped in Phase 4 |
 
 ## Evolution
 
@@ -118,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-08 after v1.1 milestone start*
+*Last updated: 2026-05-08 after Phase 4 completion*

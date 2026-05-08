@@ -10,18 +10,18 @@ Requirements for making Automation Health publishable as an open-source project 
 
 ### Open Source Readiness
 
-- [ ] **OSS-01**: User can read a public-ready README that explains what Automation Health does, what it scans, known limitations, privacy expectations, build steps, and contribution entry points.
-- [ ] **OSS-02**: Contributor can find license, security, support, code of conduct, and contribution guidance in standard GitHub-recognized locations.
-- [ ] **OSS-03**: Contributor can use issue and pull request templates that ask for relevant macOS, scanner, verification, and privacy information without requesting sensitive local output.
-- [ ] **OSS-04**: Maintainer can rely on GitHub Actions to run the same local `./script/ci.sh` gate used before pull requests.
-- [ ] **OSS-05**: Contributor can understand the scanner architecture and add a new scanner without reading SwiftUI view code.
-- [ ] **OSS-06**: User can understand the current unsigned/local distribution status and any release/build limitations before installing or running the app.
+- [x] **OSS-01**: User can read a public-ready README that explains what Automation Health does, what it scans, known limitations, privacy expectations, build steps, and contribution entry points.
+- [x] **OSS-02**: Contributor can find license, security, support, code of conduct, and contribution guidance in standard GitHub-recognized locations.
+- [x] **OSS-03**: Contributor can use issue and pull request templates that ask for relevant macOS, scanner, verification, and privacy information without requesting sensitive local output.
+- [x] **OSS-04**: Maintainer can rely on GitHub Actions to run the same local `./script/ci.sh` gate used before pull requests.
+- [x] **OSS-05**: Contributor can understand the scanner architecture and add a new scanner without reading SwiftUI view code.
+- [x] **OSS-06**: User can understand the current unsigned/local distribution status and any release/build limitations before installing or running the app.
 
 ### Privacy And Publication Safety
 
-- [ ] **PRIV-01**: Maintainer can run or follow a publication privacy scrub that checks docs, fixtures, screenshots, sample output, bundle identifiers, usernames, hostnames, and paths for personal data.
-- [ ] **PRIV-02**: Public examples and tests use synthetic automation names, paths, and output instead of real local job details.
-- [ ] **PRIV-03**: User can see clear documentation of what each scanner reads, whether it shells out, and what data remains local.
+- [x] **PRIV-01**: Maintainer can run or follow a publication privacy scrub that checks docs, fixtures, screenshots, sample output, bundle identifiers, usernames, hostnames, and paths for personal data.
+- [x] **PRIV-02**: Public examples and tests use synthetic automation names, paths, and output instead of real local job details.
+- [x] **PRIV-03**: User can see clear documentation of what each scanner reads, whether it shells out, and what data remains local.
 
 ### Visual Identity
 
@@ -63,7 +63,7 @@ Requirements for making Automation Health publishable as an open-source project 
 - [ ] **QUAL-02**: Scanner additions are covered by focused self-tests with injected paths or command runners rather than live machine state.
 - [ ] **QUAL-03**: Broad candidate discovery has documented performance bounds, ignore rules, and failure behavior.
 - [ ] **QUAL-04**: Existing launchd, Hermes cron, search, selection, and refresh behavior continue to pass the local CI gate.
-- [ ] **QUAL-05**: Public documentation explains that Automation Health provides broad best-effort inventory, not a guarantee that every automation on every Mac has been found.
+- [x] **QUAL-05**: Public documentation explains that Automation Health provides broad best-effort inventory, not a guarantee that every automation on every Mac has been found.
 
 ## Future Requirements
 
@@ -100,15 +100,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OSS-01 | Phase 4 | Pending |
-| OSS-02 | Phase 4 | Pending |
-| OSS-03 | Phase 4 | Pending |
-| OSS-04 | Phase 4 | Pending |
-| OSS-05 | Phase 4 | Pending |
-| OSS-06 | Phase 4 | Pending |
-| PRIV-01 | Phase 4 | Pending |
-| PRIV-02 | Phase 4 | Pending |
-| PRIV-03 | Phase 4 | Pending |
+| OSS-01 | Phase 4 | Complete |
+| OSS-02 | Phase 4 | Complete |
+| OSS-03 | Phase 4 | Complete |
+| OSS-04 | Phase 4 | Complete |
+| OSS-05 | Phase 4 | Complete |
+| OSS-06 | Phase 4 | Complete |
+| PRIV-01 | Phase 4 | Complete |
+| PRIV-02 | Phase 4 | Complete |
+| PRIV-03 | Phase 4 | Complete |
 | VIS-01 | Phase 5 | Pending |
 | VIS-02 | Phase 5 | Pending |
 | VIS-03 | Phase 5 | Pending |
@@ -135,7 +135,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-02 | Phase 6 | Pending |
 | QUAL-03 | Phase 7 | Pending |
 | QUAL-04 | Phase 9 | Pending |
-| QUAL-05 | Phase 4 | Pending |
+| QUAL-05 | Phase 4 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 36 total
