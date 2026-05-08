@@ -19,14 +19,15 @@ Users can quickly understand and navigate the health of their local scheduled au
 - [x] The UI shows a searchable sidebar connected to a detail view for health, schedule, configuration, and latest output - existing.
 - [x] Refresh behavior preserves the selected job when possible and selects an available job after refresh - existing.
 - [x] Local build and self-test workflows exist through SwiftPM scripts and Makefile shortcuts - existing.
+- [x] The sidebar groups visible jobs by source with clear section headers and counts - validated in Phase 1.
+- [x] Search filtering preserves the same grouping model - validated in Phase 1.
 
 ### Active
 
 - [ ] The sidebar supports Up and Down arrow navigation across visible jobs.
 - [ ] Keyboard navigation skips non-job UI such as headers and footer controls.
 - [ ] Keyboard navigation keeps the selected row, detail view, and scroll position synchronized.
-- [ ] The sidebar groups visible jobs by source with clear section headers and counts.
-- [ ] Search filtering preserves the same grouping model and only navigates through visible filtered jobs.
+- [ ] Search filtering only navigates through visible filtered jobs.
 - [ ] The visual sidebar treatment remains compact, native-feeling, and consistent with the existing macOS SwiftUI app.
 
 ### Out of Scope
@@ -61,7 +62,7 @@ The user specifically asked to improve the left sidebar by supporting Up/Down ar
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Group sidebar jobs by source for v1 | Source is already available on every job, maps cleanly to current scanners, and keeps categories stable under search. | - Pending |
+| Group sidebar jobs by source for v1 | Source is already available on every job, maps cleanly to current scanners, and keeps categories stable under search. | Validated in Phase 1 |
 | Make Up/Down move selection through visible jobs | This matches common macOS sidebar/list behavior and keeps the detail pane aligned with keyboard navigation. | - Pending |
 | Keep section headers non-selectable | Headers should organize the list but not enter the job selection model. | - Pending |
 | Keep the app read-only | The product value is safe inspection of local automations, not administration. | - Pending |
@@ -84,4 +85,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-08 after initialization*
+*Last updated: 2026-05-08 after Phase 1 completion*

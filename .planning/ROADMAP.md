@@ -31,13 +31,13 @@ This milestone improves the existing Automation Health sidebar without changing 
 
 Plans:
 **Wave 1**
-- [ ] 01-01: Create grouped sidebar presentation data from visible `JobPresentation` values.
+- [x] 01-01: Create grouped sidebar presentation data from visible `JobPresentation` values.
 
 **Wave 2 *(blocked on Wave 1 completion)***
-- [ ] 01-02: Render source section headers and grouped rows in `SidebarView`.
+- [x] 01-02: Render source section headers and grouped rows in `SidebarView`.
 
 **Wave 3 *(blocked on Wave 2 completion)***
-- [ ] 01-03: Add focused validation for grouping behavior and stable ordering.
+- [x] 01-03: Add focused validation for grouping behavior and stable ordering.
 
 Cross-cutting constraints:
 - D-01: Source sections use `JobSource.allCases`, preserving launchd before Hermes cron.

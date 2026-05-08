@@ -18,15 +18,15 @@ Requirements for the sidebar navigation and organization milestone.
 
 ### Sidebar Organization
 
-- [ ] **ORG-01**: Sidebar jobs are grouped under clear section headers by job source.
-- [ ] **ORG-02**: Each source section header shows a human-readable source name and visible job count.
-- [ ] **ORG-03**: Source groups with zero visible jobs are hidden.
+- [x] **ORG-01**: Sidebar jobs are grouped under clear section headers by job source.
+- [x] **ORG-02**: Each source section header shows a human-readable source name and visible job count.
+- [x] **ORG-03**: Source groups with zero visible jobs are hidden.
 - [ ] **ORG-04**: Jobs keep their current display name, subtitle, health dot, and selection styling inside grouped sections.
-- [ ] **ORG-05**: Grouping preserves a stable order for sections and jobs so refreshes do not visually shuffle unrelated rows.
+- [x] **ORG-05**: Grouping preserves a stable order for sections and jobs so refreshes do not visually shuffle unrelated rows.
 
 ### Search And Filtering
 
-- [ ] **SRCH-01**: Sidebar search results remain grouped by source after filtering.
+- [x] **SRCH-01**: Sidebar search results remain grouped by source after filtering.
 - [ ] **SRCH-02**: Up and Down arrow navigation traverses only jobs visible under the current search query.
 - [ ] **SRCH-03**: When a search query produces no visible jobs, the sidebar communicates the empty state without a selectable placeholder row.
 - [ ] **SRCH-04**: Clearing search restores grouped navigation over the full visible job list.
@@ -35,7 +35,7 @@ Requirements for the sidebar navigation and organization milestone.
 
 - [ ] **QUAL-01**: The change preserves existing scan refresh behavior, including retaining the selected job after refresh when it still exists.
 - [ ] **QUAL-02**: The change preserves the read-only product boundary; sidebar interactions do not mutate scheduled jobs.
-- [ ] **QUAL-03**: Focused coverage or equivalent compile-time validation protects any extracted grouping or navigation helpers.
+- [x] **QUAL-03**: Focused coverage or equivalent compile-time validation protects any extracted grouping or navigation helpers.
 - [ ] **QUAL-04**: The local CI gate builds successfully after the sidebar changes.
 
 ## v2 Requirements
@@ -78,18 +78,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAV-04 | Phase 2 | Pending |
 | NAV-05 | Phase 2 | Pending |
 | NAV-06 | Phase 2 | Pending |
-| ORG-01 | Phase 1 | Pending |
-| ORG-02 | Phase 1 | Pending |
-| ORG-03 | Phase 1 | Pending |
+| ORG-01 | Phase 1 | Complete |
+| ORG-02 | Phase 1 | Complete |
+| ORG-03 | Phase 1 | Complete |
 | ORG-04 | Phase 3 | Pending |
-| ORG-05 | Phase 1 | Pending |
-| SRCH-01 | Phase 1 | Pending |
+| ORG-05 | Phase 1 | Complete |
+| SRCH-01 | Phase 1 | Complete |
 | SRCH-02 | Phase 2 | Pending |
 | SRCH-03 | Phase 3 | Pending |
 | SRCH-04 | Phase 2 | Pending |
 | QUAL-01 | Phase 2 | Pending |
 | QUAL-02 | Phase 2 | Pending |
-| QUAL-03 | Phase 1 | Pending |
+| QUAL-03 | Phase 1 | Complete |
 | QUAL-04 | Phase 3 | Pending |
 
 **Coverage:**
