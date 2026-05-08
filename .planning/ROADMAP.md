@@ -62,7 +62,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 05-01: Write the ChatGPT app icon prompt, generate/select the source image, and document the prompt/assets.
+- [x] 05-01: Write the ChatGPT app icon prompt, generate/select the source image, and document the prompt/assets.
 
 **Wave 2 *(blocked on Wave 1 completion)***
 - [ ] 05-02: Add icon asset generation and integrate the icon into the app bundle.
