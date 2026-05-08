@@ -69,7 +69,7 @@ Plans:
 - [x] 02-02: Wire sidebar focus and keyboard handling into the existing selection binding.
 
 **Wave 3 *(blocked on Wave 2 completion)***
-- [ ] 02-03: Add scroll-to-selection behavior and verify search/refresh interactions.
+- [x] 02-03: Add scroll-to-selection behavior and verify search/refresh interactions.
 
 Cross-cutting constraints:
 - D-01: When no visible row is selected, Down enters at the first visible job and Up enters at the last visible job.

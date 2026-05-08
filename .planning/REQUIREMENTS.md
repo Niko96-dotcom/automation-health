@@ -13,7 +13,7 @@ Requirements for the sidebar navigation and organization milestone.
 - [x] **NAV-02**: User can use the Up arrow while the sidebar is active to select the previous visible job.
 - [x] **NAV-03**: Keyboard navigation skips non-job UI such as section headers, the sidebar summary, and the scan footer.
 - [x] **NAV-04**: Keyboard navigation keeps the selected job row, detail view, and store selection id synchronized.
-- [ ] **NAV-05**: Keyboard navigation scrolls the newly selected visible job row into view when it is outside the current viewport.
+- [x] **NAV-05**: Keyboard navigation scrolls the newly selected visible job row into view when it is outside the current viewport.
 - [x] **NAV-06**: Keyboard navigation behaves predictably at the first and last visible job without clearing the current selection.
 
 ### Sidebar Organization
@@ -76,7 +76,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAV-02 | Phase 2 | Complete |
 | NAV-03 | Phase 2 | Complete |
 | NAV-04 | Phase 2 | Complete |
-| NAV-05 | Phase 2 | Pending |
+| NAV-05 | Phase 2 | Complete |
 | NAV-06 | Phase 2 | Complete |
 | ORG-01 | Phase 1 | Complete |
 | ORG-02 | Phase 1 | Complete |
