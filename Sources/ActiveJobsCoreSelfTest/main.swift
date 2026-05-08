@@ -3,6 +3,7 @@ import ActiveJobsCore
 
 try testParsesEnabledHermesCronJobsWithLatestOutput()
 try testParsesLaunchAgentCalendarSchedulesAndLogTail()
+try testJobSourceOrderMatchesSidebarGroupingContract()
 try testAggregatesAndSortsJobsByNextRunThenName()
 try testHumanizesSchedulesAndRunTimes()
 try testHealthSummaries()
@@ -102,6 +103,11 @@ func testParsesLaunchAgentCalendarSchedulesAndLogTail() throws {
     expect(jobs[0].definition.hasSuffix("/Library/LaunchAgents/com.user.downloads-cleanup.plist"), "LaunchAgent definition path")
     expect(jobs[0].lastRunDetails == "first line\nsecond line\nthird line", "LaunchAgent log")
     expect(jobs[0].source == .launchd, "LaunchAgent source")
+}
+
+func testJobSourceOrderMatchesSidebarGroupingContract() throws {
+    expect(JobSource.allCases == [.launchd, .hermesCron], "JobSource sidebar grouping order")
+    expect(JobSource.allCases.map(\.displayName) == ["launchd", "Hermes cron"], "JobSource sidebar titles")
 }
 
 func testAggregatesAndSortsJobsByNextRunThenName() throws {
