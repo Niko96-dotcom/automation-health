@@ -1,118 +1,15 @@
 # Roadmap: Automation Health
 
-## Overview
+## Milestones
 
-This milestone improves the existing Automation Health sidebar without changing the scanner layer or the read-only product boundary. The work starts by shaping grouped sidebar data from the current presentation model, then adds Finder-like keyboard navigation over visible jobs, and finishes with visual polish, empty states, and the local CI gate.
+- [x] **v1.0 Sidebar Navigation** - Phases 1-3 shipped 2026-05-08; 8 plans completed. Archives: [roadmap](milestones/v1.0-ROADMAP.md), [requirements](milestones/v1.0-REQUIREMENTS.md), [audit](milestones/v1.0-MILESTONE-AUDIT.md).
 
-## Phases
+## Current Status
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work.
-- Decimal phases (2.1, 2.2): Urgent insertions if needed.
+v1.0 is shipped. The next roadmap should be created through `$gsd-new-milestone` after fresh requirements are defined.
 
-- [x] **Phase 1: Sidebar Grouping Foundation** - Represent and render source-grouped visible jobs in the sidebar.
-- [x] **Phase 2: Keyboard Navigation** - Add Up/Down selection movement across visible jobs and keep scrolling/detail state synchronized.
-- [x] **Phase 3: Sidebar Polish And Verification** - Refine the grouped UI, empty state, and regression checks.
+## Next
 
-## Phase Details
-
-### Phase 1: Sidebar Grouping Foundation
-**Goal**: Visible sidebar jobs are grouped by source with stable section structure that works under search filtering.
-**Depends on**: Nothing (first phase)
-**Requirements**: [ORG-01, ORG-02, ORG-03, ORG-05, SRCH-01, QUAL-03]
-**UI hint**: yes
-**Success Criteria** (what must be TRUE):
-  1. User sees visible jobs grouped under source section headers.
-  2. Source headers show readable source names and visible counts.
-  3. Source sections with no visible jobs do not render.
-  4. Search results keep the same source-grouped structure.
-  5. Grouping logic is protected by focused coverage or an extracted helper that compiles cleanly.
-**Plans**: 3 plans
-
-Plans:
-**Wave 1**
-- [x] 01-01: Create grouped sidebar presentation data from visible `JobPresentation` values.
-
-**Wave 2 *(blocked on Wave 1 completion)***
-- [x] 01-02: Render source section headers and grouped rows in `SidebarView`.
-
-**Wave 3 *(blocked on Wave 2 completion)***
-- [x] 01-03: Add focused validation for grouping behavior and stable ordering.
-
-Cross-cutting constraints:
-- D-01: Source sections use `JobSource.allCases`, preserving launchd before Hermes cron.
-- D-02: Jobs inside each section preserve the incoming visible job order; no per-section sort.
-- D-03: Sources with zero visible jobs do not render headers or placeholder rows.
-- D-04: Source headers show a human-readable source name and visible count.
-- D-05: Grouped row subtitles omit the duplicated source name and focus on timing or schedule text.
-- D-06: Search filtering happens before grouping, so section counts reflect only visible filtered jobs.
-- D-07: The top sidebar summary count is derived from the same visible grouped data.
-
-### Phase 2: Keyboard Navigation
-**Goal**: Up and Down arrows move selection through the visible sidebar jobs and keep the detail pane and scroll position aligned.
-**Depends on**: Phase 1
-**Requirements**: [NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, NAV-06, SRCH-02, SRCH-04, QUAL-01, QUAL-02]
-**UI hint**: yes
-**Success Criteria** (what must be TRUE):
-  1. User can press Down to select the next visible job.
-  2. User can press Up to select the previous visible job.
-  3. Headers, summary text, empty states, and footer controls are skipped by keyboard navigation.
-  4. The detail view updates to the job selected by keyboard navigation.
-  5. Keyboard-selected rows scroll into view and boundary presses do not clear selection.
-**Plans**: 3 plans
-
-Plans:
-**Wave 1**
-- [x] 02-01: Define visible-job navigation behavior for previous, next, and boundary cases.
-
-**Wave 2 *(blocked on Wave 1 completion)***
-- [x] 02-02: Wire sidebar focus and keyboard handling into the existing selection binding.
-
-**Wave 3 *(blocked on Wave 2 completion)***
-- [x] 02-03: Add scroll-to-selection behavior and verify search/refresh interactions.
-
-Cross-cutting constraints:
-- D-01: When no visible row is selected, Down enters at the first visible job and Up enters at the last visible job.
-- D-02: Boundary presses clamp on the current first or last visible job; navigation must not wrap, clear selection, or move focus away.
-- D-03: A selected job hidden by search is treated like no visible selection for keyboard navigation.
-- D-04: Up/Down handling belongs to the focused sidebar row/list area.
-- D-05: The sidebar search field keeps native text-editing arrow behavior.
-- D-08: Search changes preserve the existing selection and detail pane until explicit Up/Down navigation or row choice.
-- D-09: If the selected job remains visible after search, it remains the navigation anchor.
-- D-10: Refresh preservation remains owned by `JobStore.refresh()`.
-- D-11: Refresh removal fallback remains the existing `JobStore.refresh()` first-job behavior.
-- D-14: Scroll-to-selection behavior applies only to keyboard-originated navigation, not mouse clicks, search changes, or refresh preservation.
-
-### Phase 3: Sidebar Polish And Verification
-**Goal**: The grouped sidebar looks clean, handles empty filtered results, and passes the local build/test gate.
-**Depends on**: Phase 2
-**Requirements**: [ORG-04, SRCH-03, QUAL-04]
-**UI hint**: yes
-**Success Criteria** (what must be TRUE):
-  1. User still sees each job row with its display name, subtitle, health dot, and selected styling.
-  2. User sees a clear sidebar empty state when search returns no visible jobs.
-  3. The sidebar remains compact and native-feeling at the current split-view width.
-  4. The repository local CI gate completes successfully.
-**Plans**: 2 plans
-
-Plans:
-**Wave 1**
-- [x] 03-01: Polish section header, row, and empty-state presentation.
-
-**Wave 2 *(blocked on Wave 1 completion)***
-- [x] 03-02: Run the local CI gate and perform a manual sidebar behavior check.
-
-Cross-cutting constraints:
-- D-03: Job rows keep display name, subtitle, health dot, and selected-row behavior after polish.
-- D-08: The filtered empty state is not selectable and Up/Down does nothing when there are no visible jobs.
-
-## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Sidebar Grouping Foundation | 3/3 | Complete | 2026-05-08 |
-| 2. Keyboard Navigation | 3/3 | Complete | 2026-05-08 |
-| 3. Sidebar Polish And Verification | 2/2 | Complete | 2026-05-08 |
+- Define the next milestone requirements.
+- Convert those requirements into the next roadmap.
+- Continue phase numbering from Phase 4.

@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: milestone_complete
+status: completed
 stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-05-08T11:26:48.681Z"
+last_updated: "2026-05-08T12:09:32.902Z"
 last_activity: 2026-05-08
 progress:
   total_phases: 3
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
-**Current focus:** Milestone complete — sidebar grouping, keyboard navigation, polish, and verification
+**Current focus:** Planning next milestone
 
 ## Current Position
 
 Phase: 03
 Plan: Not started
-Status: Milestone complete
+Status: v1.0 archived; ready for next milestone planning
 Last activity: 2026-05-08
 
 Progress: [██████████] 100%
@@ -73,11 +73,11 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+Run `$gsd-new-milestone` to define fresh requirements and create the next roadmap.
 
 ### Blockers/Concerns
 
-- Current worktree had pre-existing source changes when planning started; implementation should preserve unrelated user edits.
+- Current worktree has source changes outside the milestone archive commit. Preserve them unless the user asks to include or discard them.
 
 ## Deferred Items
 
