@@ -1,11 +1,16 @@
 import SwiftUI
 import ActiveJobsCore
 
+private enum SidebarFocusTarget: Hashable {
+    case jobList
+}
+
 struct SidebarView: View {
     let sections: [SidebarJobSection]
     @Binding var selectedJobID: String?
     let lastScannedDescription: String
     let isScanning: Bool
+    @FocusState private var focusedTarget: SidebarFocusTarget?
 
     private var visibleJobs: [SidebarJobSummary] {
         sections.flatMap(\.jobs)
@@ -42,7 +47,7 @@ struct SidebarView: View {
                                 job: job,
                                 isSelected: selectedJobID == job.id
                             ) {
-                                selectedJobID = job.id
+                                select(job)
                             }
                                 .equatable()
                         }
@@ -53,6 +58,11 @@ struct SidebarView: View {
             }
             .scrollContentBackground(.hidden)
             .background(.regularMaterial)
+            .accessibilityLabel("Automation list")
+            .focusable()
+            .focused($focusedTarget, equals: .jobList)
+            .onKeyPress(.downArrow) { navigate(.next) }
+            .onKeyPress(.upArrow) { navigate(.previous) }
 
             Divider()
 
@@ -75,6 +85,28 @@ struct SidebarView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
         }
+    }
+
+    private func select(_ job: SidebarJobSummary) {
+        selectedJobID = job.id
+        focusedTarget = .jobList
+    }
+
+    private func navigate(_ direction: SidebarNavigationDirection) -> KeyPress.Result {
+        guard focusedTarget == .jobList else {
+            return .ignored
+        }
+
+        guard let targetID = SidebarNavigation.targetJobID(in: visibleJobs, selectedJobID: selectedJobID, direction: direction) else {
+            return .ignored
+        }
+
+        if targetID == selectedJobID {
+            return .handled
+        }
+
+        selectedJobID = targetID
+        return .handled
     }
 }
 
