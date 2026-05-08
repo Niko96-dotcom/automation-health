@@ -30,9 +30,23 @@ This milestone improves the existing Automation Health sidebar without changing 
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
 - [ ] 01-01: Create grouped sidebar presentation data from visible `JobPresentation` values.
+
+**Wave 2 *(blocked on Wave 1 completion)***
 - [ ] 01-02: Render source section headers and grouped rows in `SidebarView`.
+
+**Wave 3 *(blocked on Wave 2 completion)***
 - [ ] 01-03: Add focused validation for grouping behavior and stable ordering.
+
+Cross-cutting constraints:
+- D-01: Source sections use `JobSource.allCases`, preserving launchd before Hermes cron.
+- D-02: Jobs inside each section preserve the incoming visible job order; no per-section sort.
+- D-03: Sources with zero visible jobs do not render headers or placeholder rows.
+- D-04: Source headers show a human-readable source name and visible count.
+- D-05: Grouped row subtitles omit the duplicated source name and focus on timing or schedule text.
+- D-06: Search filtering happens before grouping, so section counts reflect only visible filtered jobs.
+- D-07: The top sidebar summary count is derived from the same visible grouped data.
 
 ### Phase 2: Keyboard Navigation
 **Goal**: Up and Down arrows move selection through the visible sidebar jobs and keep the detail pane and scroll position aligned.
