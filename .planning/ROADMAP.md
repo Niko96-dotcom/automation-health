@@ -155,6 +155,13 @@ Plans:
 **Wave 3 *(blocked on Wave 2 completion)***
 - [ ] 08-03: Replace the sidebar focus treatment and verify keyboard accessibility against the screenshots.
 
+Cross-cutting constraints:
+- SwiftUI views must consume `JobStore`, `JobPresentation`, and sidebar presentation helpers; scanner IO and source inference stay below the view layer.
+- Grouping and collapse state remain in memory only for Phase 8; do not add `UserDefaults`, `@AppStorage`, JSON, files, or settings persistence.
+- Section headers are disclosure controls only; job rows remain the only selectable automation records and collapsing/searching must not silently change selection.
+- Trigger, confidence, origin, and source labels must preserve evidence boundaries and never imply registered, candidate, or manual records are proven scheduled jobs without direct schedule evidence.
+- The sidebar stays compact and native; do not introduce large cards, decorative redesign, oversized headers, or marketing-style layout.
+
 ### Phase 9: Publication Verification And Docs Polish
 **Goal**: The milestone is verified as public-ready with a clean privacy scrub, sanitized visuals, passing CI, and updated traceability.
 **Depends on**: Phase 8
