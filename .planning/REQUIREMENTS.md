@@ -96,7 +96,7 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+Which phases cover which requirements. Updated during roadmap creation and v1.1 audit gap-closure planning.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
@@ -144,6 +144,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 - Mapped to phases: 36
 - Unmapped: 0
 
+**Gap closure assignments from v1.1 audit:**
+- Phase 7 closes pending candidate discovery, manual record, broader inventory search/detail, and candidate discovery quality gaps.
+- Phase 8 closes pending sidebar grouping, collapse, ordering, origin separation, and focus accessibility gaps.
+- Phase 9 closes pending publication privacy, sanitized visual, final regression, and traceability gaps.
+
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after Phase 6 completion*
+*Last updated: 2026-05-08 after v1.1 audit gap-closure planning*

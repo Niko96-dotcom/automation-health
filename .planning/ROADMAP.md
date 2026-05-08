@@ -105,6 +105,7 @@ Cross-cutting constraints:
 **Goal**: Users can account for automations that are not proven scheduler jobs through bounded candidates and local manual records.
 **Depends on**: Phase 6
 **Requirements**: [DISC-06, DISC-08, MAN-01, MAN-02, MAN-03, QUAL-03]
+**Gap Closure**: Closes v1.1 audit gaps for missing candidate discovery, manual records, broader inventory search/detail integration, and candidate discovery performance bounds.
 **UI hint**: yes
 **Success Criteria** (what must be TRUE):
   1. Candidate script discovery scans only documented bounded locations and labels results as Candidate.
@@ -128,6 +129,7 @@ Plans:
 **Goal**: The sidebar becomes a richer navigation surface with collapsible categories, better grouping modes, and app-matched keyboard focus styling.
 **Depends on**: Phase 7
 **Requirements**: [SIDE-01, SIDE-02, SIDE-03, SIDE-04, SIDE-05, SIDE-06, SIDE-07]
+**Gap Closure**: Closes v1.1 audit gaps for collapsible sidebar sections, hidden-row keyboard navigation, grouping modes, stable grouped browsing, launchd origin separation, and accessible custom focus treatment.
 **UI hint**: yes
 **Success Criteria** (what must be TRUE):
   1. Users can collapse and expand groups while the selected detail remains coherent.
@@ -151,6 +153,7 @@ Plans:
 **Goal**: The milestone is verified as public-ready with a clean privacy scrub, sanitized visuals, passing CI, and updated traceability.
 **Depends on**: Phase 8
 **Requirements**: [PRIV-01, VIS-04, QUAL-04]
+**Gap Closure**: Closes v1.1 audit gaps for publication privacy scrub failures, sanitized public visuals, final CI/manual regression verification, and PRIV-01 traceability reconciliation.
 **UI hint**: yes
 **Success Criteria** (what must be TRUE):
   1. README/docs visuals are sanitized and aesthetically consistent with the new icon/app identity.
