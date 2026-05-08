@@ -7,6 +7,7 @@ private enum SidebarFocusTarget: Hashable {
 
 struct SidebarView: View {
     let sections: [SidebarJobSection]
+    let showsFilteredEmptyState: Bool
     @Binding var selectedJobID: String?
     let lastScannedDescription: String
     let isScanning: Bool

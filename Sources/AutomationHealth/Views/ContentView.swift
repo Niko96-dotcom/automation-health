@@ -14,6 +14,14 @@ struct ContentView: View {
         return store.jobs.filter { $0.searchText.contains(query) }
     }
 
+    private var hasSearchQuery: Bool {
+        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var showsFilteredEmptyState: Bool {
+        hasSearchQuery && filteredJobs.isEmpty
+    }
+
     private var sidebarSections: [SidebarJobSection] {
         SidebarJobSection.sections(for: filteredJobs)
     }
@@ -22,6 +30,7 @@ struct ContentView: View {
         NavigationSplitView {
             SidebarView(
                 sections: sidebarSections,
+                showsFilteredEmptyState: showsFilteredEmptyState,
                 selectedJobID: $store.selectedJobID,
                 lastScannedDescription: store.lastScannedDescription,
                 isScanning: store.isScanning
