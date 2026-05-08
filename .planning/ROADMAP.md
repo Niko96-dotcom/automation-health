@@ -16,7 +16,7 @@ Milestone v1.1 makes Automation Health ready to publish as a clean open-source G
 - Decimal phases (6.1, 6.2): Urgent insertions if needed.
 
 - [x] **Phase 4: Open Source Foundation And Privacy Scrub** - Prepare public repository materials, GitHub workflow hygiene, and privacy guardrails.
-- [ ] **Phase 5: Visual Identity And Icon Pipeline** - Prompt, generate, and package a polished app icon and deterministic visual asset workflow.
+- [x] **Phase 5: Visual Identity And Icon Pipeline** - Prompt, generate, and package a polished app icon and deterministic visual asset workflow.
 - [ ] **Phase 6: Inventory Model And Deterministic Sources** - Add confidence/origin modeling and deterministic scanner expansion for scheduler-backed or registered automations.
 - [ ] **Phase 7: Candidate Discovery And Manual Records** - Add bounded script-candidate discovery plus app-only manual records for uncovered automations.
 - [ ] **Phase 8: Sidebar Grouping, Collapse, And Focus Polish** - Add collapsible sections, better grouping modes, and screenshot-driven focus treatment.
@@ -27,7 +27,7 @@ Milestone v1.1 makes Automation Health ready to publish as a clean open-source G
 ### Phase 4: Open Source Foundation And Privacy Scrub
 **Goal**: The repository is structurally ready for public GitHub publication and has explicit privacy guidance before any public-facing assets are produced.
 **Depends on**: v1.0 completion
-**Requirements**: [OSS-01, OSS-02, OSS-03, OSS-04, OSS-05, OSS-06, PRIV-01, PRIV-02, PRIV-03, QUAL-05]
+**Requirements**: [OSS-01, OSS-02, OSS-03, OSS-04, OSS-05, OSS-06, PRIV-02, PRIV-03, QUAL-05]
 **UI hint**: no
 **Success Criteria** (what must be TRUE):
   1. README, CONTRIBUTING, security/support/community files, issue templates, and PR template are public-ready.
@@ -142,15 +142,16 @@ Plans:
 - [ ] 08-03: Replace the sidebar focus treatment and verify keyboard accessibility against the screenshots.
 
 ### Phase 9: Publication Verification And Docs Polish
-**Goal**: The milestone is verified as public-ready with sanitized visuals, passing CI, and updated traceability.
+**Goal**: The milestone is verified as public-ready with a clean privacy scrub, sanitized visuals, passing CI, and updated traceability.
 **Depends on**: Phase 8
-**Requirements**: [VIS-04, QUAL-04]
+**Requirements**: [PRIV-01, VIS-04, QUAL-04]
 **UI hint**: yes
 **Success Criteria** (what must be TRUE):
   1. README/docs visuals are sanitized and aesthetically consistent with the new icon/app identity.
-  2. `./script/ci.sh` passes with open-source docs, scanners, icon packaging, manual records, and sidebar changes.
-  3. Manual verification covers privacy scrub, broad inventory source notes, manual records, collapsible groups, grouping modes, and focus styling.
-  4. Requirements traceability is complete and the app remains read-only for real scheduled jobs.
+  2. The publication privacy scrub runs clean, including no personal namespace matches or local `.DS_Store` artifacts.
+  3. `./script/ci.sh` passes with open-source docs, scanners, icon packaging, manual records, and sidebar changes.
+  4. Manual verification covers privacy scrub, broad inventory source notes, manual records, collapsible groups, grouping modes, and focus styling.
+  5. Requirements traceability is complete and the app remains read-only for real scheduled jobs.
 **Plans**: 2 plans
 
 Plans:
@@ -168,7 +169,7 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 4. Open Source Foundation And Privacy Scrub | 3/3 | Complete | 2026-05-08 |
-| 5. Visual Identity And Icon Pipeline | 0/2 | Pending | — |
+| 5. Visual Identity And Icon Pipeline | 2/2 | Complete | 2026-05-08 |
 | 6. Inventory Model And Deterministic Sources | 0/3 | Pending | — |
 | 7. Candidate Discovery And Manual Records | 0/3 | Pending | — |
 | 8. Sidebar Grouping, Collapse, And Focus Polish | 0/3 | Pending | — |
@@ -184,12 +185,12 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | OSS-04 | Phase 4 | Complete |
 | OSS-05 | Phase 4 | Complete |
 | OSS-06 | Phase 4 | Complete |
-| PRIV-01 | Phase 4 | Complete |
+| PRIV-01 | Phase 9 | Pending |
 | PRIV-02 | Phase 4 | Complete |
 | PRIV-03 | Phase 4 | Complete |
-| VIS-01 | Phase 5 | Pending |
-| VIS-02 | Phase 5 | Pending |
-| VIS-03 | Phase 5 | Pending |
+| VIS-01 | Phase 5 | Complete |
+| VIS-02 | Phase 5 | Complete |
+| VIS-03 | Phase 5 | Complete |
 | VIS-04 | Phase 9 | Pending |
 | DISC-01 | Phase 6 | Pending |
 | DISC-02 | Phase 6 | Pending |

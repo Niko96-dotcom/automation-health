@@ -19,7 +19,7 @@ Requirements for making Automation Health publishable as an open-source project 
 
 ### Privacy And Publication Safety
 
-- [x] **PRIV-01**: Maintainer can run or follow a publication privacy scrub that checks docs, fixtures, screenshots, sample output, bundle identifiers, usernames, hostnames, and paths for personal data.
+- [ ] **PRIV-01**: Maintainer can run or follow a publication privacy scrub that checks docs, fixtures, screenshots, sample output, bundle identifiers, usernames, hostnames, and paths for personal data.
 - [x] **PRIV-02**: Public examples and tests use synthetic automation names, paths, and output instead of real local job details.
 - [x] **PRIV-03**: User can see clear documentation of what each scanner reads, whether it shells out, and what data remains local.
 
@@ -106,7 +106,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OSS-04 | Phase 4 | Complete |
 | OSS-05 | Phase 4 | Complete |
 | OSS-06 | Phase 4 | Complete |
-| PRIV-01 | Phase 4 | Complete |
+| PRIV-01 | Phase 9 | Pending |
 | PRIV-02 | Phase 4 | Complete |
 | PRIV-03 | Phase 4 | Complete |
 | VIS-01 | Phase 5 | Complete |
@@ -139,9 +139,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 - v1.1 requirements: 36 total
+- Satisfied: 12
+- Pending: 24
 - Mapped to phases: 36
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after roadmap creation*
+*Last updated: 2026-05-08 after milestone gap planning*
