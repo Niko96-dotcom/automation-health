@@ -71,6 +71,8 @@ Build the local app bundle:
 
 The generated bundle is written to `dist/AutomationHealth.app`.
 
+App icon assets are generated locally from committed source art; see docs/development.md for regeneration steps.
+
 ## Current Distribution Status
 
 Automation Health is currently distributed as source and built locally through `script/build_and_run.sh`. The generated `.app` is unsigned, unsandboxed, and not notarized.

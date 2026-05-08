@@ -46,6 +46,26 @@ Build, open, and verify that the app process starts:
 ./script/build_and_run.sh --verify
 ```
 
+## App Icon Assets
+
+The selected source PNG lives at `Assets/AppIcon/automation-health-icon-source.png`.
+
+Regenerate the local app icon assets from committed source art:
+
+```sh
+./script/generate_app_icon.sh
+```
+
+The generated icon files are `Assets/AppIcon/AutomationHealth.iconset/` and `Assets/AppIcon/AutomationHealth.icns`.
+
+Regeneration uses built-in macOS tools and requires no API key, secret, network access, signing, or notarization.
+
+Verify that the generated local app bundle contains and declares the icon:
+
+```sh
+./script/build_and_run.sh --verify
+```
+
 ## Package Layout
 
 - `Package.swift`: SwiftPM manifest.
