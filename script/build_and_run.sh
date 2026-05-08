@@ -16,6 +16,7 @@ APP_RESOURCES="$APP_CONTENTS/Resources"
 APP_BINARY="$APP_MACOS/$APP_NAME"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
 ICON_NAME="AutomationHealth"
+# AutomationHealth.icns is copied into Contents/Resources for CFBundleIconFile.
 ICON_SOURCE="$ROOT_DIR/Assets/AppIcon/automation-health-icon-source.png"
 ICON_FILE="$ROOT_DIR/Assets/AppIcon/$ICON_NAME.icns"
 ICON_SCRIPT="$ROOT_DIR/script/generate_app_icon.sh"
