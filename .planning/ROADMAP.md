@@ -42,7 +42,7 @@ Plans:
 - [x] 04-01: Add public repository health files and update GitHub templates/workflow docs.
 
 **Wave 2 *(blocked on Wave 1 completion)***
-- [ ] 04-02: Rewrite README and source docs around privacy, scanner limits, architecture, and open-source contribution flow.
+- [x] 04-02: Rewrite README and source docs around privacy, scanner limits, architecture, and open-source contribution flow.
 
 **Wave 3 *(blocked on Wave 2 completion)***
 - [ ] 04-03: Add and apply the privacy scrub checklist to public docs, fixtures, and examples.
