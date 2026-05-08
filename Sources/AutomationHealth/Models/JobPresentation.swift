@@ -1,7 +1,7 @@
 import Foundation
 import ActiveJobsCore
 
-struct JobPresentation: Identifiable, Hashable, Sendable {
+struct JobPresentation: Identifiable, Sendable {
     let job: ScheduledJob
     let id: String
     let displayName: String
@@ -30,5 +30,46 @@ struct JobPresentation: Identifiable, Hashable, Sendable {
             job.command ?? "",
             job.definition
         ].joined(separator: " ").lowercased()
+    }
+}
+
+struct SidebarJobSummary: Identifiable, Hashable, Sendable {
+    let id: String
+    let displayName: String
+    let subtitle: String
+    let healthKind: JobHealthKind
+
+    init(job: JobPresentation, includesSourceName: Bool = true) {
+        id = job.id
+        displayName = job.displayName
+        healthKind = job.health.kind
+
+        let detailText = job.job.nextRun != nil ? job.nextRunText : job.scheduleText
+        subtitle = includesSourceName ? "\(job.sourceName) • \(detailText)" : detailText
+    }
+}
+
+struct SidebarJobSection: Identifiable, Hashable, Sendable {
+    let id: JobSource
+    let source: JobSource
+    let title: String
+    let visibleCount: Int
+    let jobs: [SidebarJobSummary]
+
+    static func sections(for visibleJobs: [JobPresentation]) -> [SidebarJobSection] {
+        JobSource.allCases.compactMap { source in
+            let sourceJobs = visibleJobs.filter { $0.job.source == source }
+            guard !sourceJobs.isEmpty else {
+                return nil
+            }
+
+            return SidebarJobSection(
+                id: source,
+                source: source,
+                title: source.displayName,
+                visibleCount: sourceJobs.count,
+                jobs: sourceJobs.map { SidebarJobSummary(job: $0, includesSourceName: false) }
+            )
+        }
     }
 }
