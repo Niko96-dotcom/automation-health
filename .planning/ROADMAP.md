@@ -125,6 +125,12 @@ Plans:
 **Wave 3 *(blocked on Wave 2 completion)***
 - [ ] 07-03: Integrate candidates and manual records into search, selection, and detail presentation.
 
+Cross-cutting constraints:
+- Candidate and Manual records must preserve the read-only boundary for real scheduler jobs, scripts, Shortcuts, Automator workflows, cron entries, launchd plists, and Hermes metadata.
+- SwiftUI views must consume `JobStore`, `JobPresentation`, and normalized `ScheduledJob` values; scanner IO and manual JSON persistence stay below the view layer.
+- Existing launchd, Hermes cron, cron, Shortcuts, and Automator records must continue through the shared inventory, search, selection, sidebar, detail, scan-note, and CI paths.
+- Sidebar grouping modes, collapsible sections, persisted grouping preferences, and custom focus treatment remain Phase 8 scope.
+
 ### Phase 8: Sidebar Grouping, Collapse, And Focus Polish
 **Goal**: The sidebar becomes a richer navigation surface with collapsible categories, better grouping modes, and app-matched keyboard focus styling.
 **Depends on**: Phase 7
