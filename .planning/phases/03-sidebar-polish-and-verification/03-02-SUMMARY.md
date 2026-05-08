@@ -42,14 +42,14 @@ completed: 2026-05-08
 ## Accomplishments
 
 - Ran the repository CI gate.
-- Source-level sidebar contract checks pending.
+- Verified source-level sidebar contracts for row content, empty-state copy, search ownership, navigation source, and read-only boundaries.
 - Manual sidebar behavior check pending.
 
 ## Task Commits
 
 Each task is committed atomically:
 
-1. **Task 1: Run the local CI gate** - pending
+1. **Task 1: Run the local CI gate** - `74a743c` (test)
 2. **Task 2: Verify source-level sidebar contracts** - pending
 3. **Task 3: Perform and document the manual sidebar behavior check** - pending
 
@@ -95,7 +95,11 @@ None - no external service configuration required.
 
 ## Source-Level Sidebar Contract Checks
 
-Pending.
+- `grep -n "No matching automations\\|Try a different search\\.\\|HealthDot(kind: job.healthKind)\\|Text(job.displayName)\\|Text(job.subtitle)" Sources/AutomationHealth/Views/SidebarView.swift` found all required row and empty-state strings.
+- `Sources/AutomationHealth/Views/SidebarView.swift` still contains `sections.flatMap(\\.jobs)` as the visible job traversal source.
+- `Sources/AutomationHealth/Views/ContentView.swift` still contains `.searchable(text: $searchText, placement: .sidebar)`.
+- `Sources/AutomationHealth/Views/ContentView.swift` still contains `showsFilteredEmptyState`.
+- `Sources/AutomationHealth/Views/SidebarView.swift` contains no `FileManager`, `Data(contentsOf:)`, `Process`, `/bin/launchctl`, `launchctl`, `StandardOutPath`, or `StandardErrorPath`.
 
 ## Manual sidebar behavior check
 
@@ -104,7 +108,7 @@ Pending.
 ## Self-Check: PENDING
 
 - CI evidence recorded.
-- Source-level checks pending.
+- Source-level sidebar contract checks passed.
 - Manual behavior evidence pending.
 
 ## Next Phase Readiness
