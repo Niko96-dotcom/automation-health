@@ -47,7 +47,7 @@ Use synthetic values such as `/Users/example`, `example-daily-report`, and short
 
 Scanner behavior belongs in `Sources/ActiveJobsCore`. Add or update scanner types there, use injected paths or command runners where practical, and keep scanner IO out of SwiftUI views.
 
-When scanner behavior changes, update `ActiveJobsCoreSelfTest` with fixture-driven coverage and update the relevant documentation in `README.md` or `docs/`. Use the sanitized issue templates in `.github/ISSUE_TEMPLATE` when reporting bugs or source ideas.
+When scanner behavior changes, update `ActiveJobsCoreSelfTest` with fixture-driven coverage and update the relevant documentation in `README.md` or `docs/`. Follow `docs/scanner-extension-guide.md` for the adapter recipe. Use the sanitized issue templates in `.github/ISSUE_TEMPLATE` when reporting bugs or source ideas.
 
 ## Code Style
 

@@ -16,7 +16,7 @@ Location: `Sources/ActiveJobsCore`
 - `HermesCronScanner` reads Hermes cron metadata and latest markdown output.
 - Support helpers humanize schedules, parse flexible dates, and read short text snippets from output files.
 
-This layer is read-only and has no dependency on SwiftUI.
+This layer is read-only and has no dependency on SwiftUI. Scanner IO belongs here, not in app views. For the adapter path, see [docs/scanner-extension-guide.md](scanner-extension-guide.md).
 
 ## Presentation Layer
 
