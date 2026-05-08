@@ -26,7 +26,7 @@ Users can quickly understand and navigate the health of their local scheduled au
 
 v1.0 completed 3 phases, 8 plans, and 19/19 scoped requirements. The milestone archive lives in `.planning/milestones/`, and the living roadmap is collapsed to the shipped milestone summary.
 
-The repository CI gate passes after Phase 4's open-source readiness work. Phase 4 added public repository health files, privacy-safe templates, public scanner docs, a rerunnable privacy scrub checklist, a neutral bundle identifier, and synthetic scanner fixtures.
+The repository CI gate passes after Phase 5's visual identity work. Phase 4 added public repository health files, privacy-safe templates, public scanner docs, a rerunnable privacy scrub checklist, a neutral bundle identifier, and synthetic scanner fixtures. Phase 5 added the Pulse Calendar icon source art, deterministic local icon generation, and local `.app` bundle icon integration.
 
 ## Requirements
 
@@ -47,10 +47,10 @@ The repository CI gate passes after Phase 4's open-source readiness work. Phase 
 - [x] Filtered no-result searches show a non-selectable inline sidebar empty state - shipped in v1.0.
 - [x] The full local CI gate passes for the shipped milestone - shipped in v1.0.
 - [x] Publishable open-source repository materials and workflows exist without personal local data leaks - shipped in Phase 4.
+- [x] Visual identity assets are generated and integrated, starting with a polished macOS app icon - shipped in Phase 5.
 
 ### Active
 
-- [ ] Visual identity assets are generated and integrated, starting with a polished macOS app icon.
 - [ ] Automation discovery distinguishes proven scheduled jobs, registered automations, candidate scripts, and manual records.
 - [ ] Sidebar sections are collapsible and can be grouped/sorted by more useful categories than raw scheduler source.
 - [ ] The sidebar focus treatment matches the app's dark navigation surface while preserving keyboard accessibility.
@@ -99,6 +99,8 @@ The relevant current ownership boundaries are:
 | Use confidence labels for broad discovery | A script or registered tool can be automation-like without being a proven scheduled job, so the UI should distinguish scheduled, registered, candidate, and manual records. | Planned for v1.1 |
 | Separate scheduler source from ownership/origin | launchd can contain Apple jobs, third-party app updaters, and user-authored scripts, so grouping by source alone is not enough for v1.1. | Planned for v1.1 |
 | Require a privacy scrub before GitHub publication | Public repo materials must not expose local usernames, hostnames, real job output, personal bundle identifiers, or private paths. | Shipped in Phase 4 |
+| Use Pulse Calendar for the app icon | A graphite calendar tile with one green pulse communicates scheduled automations and health without text, screenshots, or private scheduler detail. | Shipped in Phase 5 |
+| Generate icon assets locally from committed source art | Built-in macOS `sips` and `iconutil` keep the app icon pipeline deterministic without secrets, network access, signing, notarization, or new dependencies. | Shipped in Phase 5 |
 
 ## Evolution
 
@@ -118,4 +120,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-08 after Phase 4 completion*
+*Last updated: 2026-05-08 after Phase 5 completion*
