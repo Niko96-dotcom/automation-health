@@ -9,12 +9,12 @@ Requirements for the sidebar navigation and organization milestone.
 
 ### Keyboard Navigation
 
-- [ ] **NAV-01**: User can use the Down arrow while the sidebar is active to select the next visible job.
-- [ ] **NAV-02**: User can use the Up arrow while the sidebar is active to select the previous visible job.
-- [ ] **NAV-03**: Keyboard navigation skips non-job UI such as section headers, the sidebar summary, and the scan footer.
-- [ ] **NAV-04**: Keyboard navigation keeps the selected job row, detail view, and store selection id synchronized.
+- [x] **NAV-01**: User can use the Down arrow while the sidebar is active to select the next visible job.
+- [x] **NAV-02**: User can use the Up arrow while the sidebar is active to select the previous visible job.
+- [x] **NAV-03**: Keyboard navigation skips non-job UI such as section headers, the sidebar summary, and the scan footer.
+- [x] **NAV-04**: Keyboard navigation keeps the selected job row, detail view, and store selection id synchronized.
 - [ ] **NAV-05**: Keyboard navigation scrolls the newly selected visible job row into view when it is outside the current viewport.
-- [ ] **NAV-06**: Keyboard navigation behaves predictably at the first and last visible job without clearing the current selection.
+- [x] **NAV-06**: Keyboard navigation behaves predictably at the first and last visible job without clearing the current selection.
 
 ### Sidebar Organization
 
@@ -27,14 +27,14 @@ Requirements for the sidebar navigation and organization milestone.
 ### Search And Filtering
 
 - [x] **SRCH-01**: Sidebar search results remain grouped by source after filtering.
-- [ ] **SRCH-02**: Up and Down arrow navigation traverses only jobs visible under the current search query.
+- [x] **SRCH-02**: Up and Down arrow navigation traverses only jobs visible under the current search query.
 - [ ] **SRCH-03**: When a search query produces no visible jobs, the sidebar communicates the empty state without a selectable placeholder row.
-- [ ] **SRCH-04**: Clearing search restores grouped navigation over the full visible job list.
+- [x] **SRCH-04**: Clearing search restores grouped navigation over the full visible job list.
 
 ### Quality And Regression Safety
 
 - [ ] **QUAL-01**: The change preserves existing scan refresh behavior, including retaining the selected job after refresh when it still exists.
-- [ ] **QUAL-02**: The change preserves the read-only product boundary; sidebar interactions do not mutate scheduled jobs.
+- [x] **QUAL-02**: The change preserves the read-only product boundary; sidebar interactions do not mutate scheduled jobs.
 - [x] **QUAL-03**: Focused coverage or equivalent compile-time validation protects any extracted grouping or navigation helpers.
 - [ ] **QUAL-04**: The local CI gate builds successfully after the sidebar changes.
 
@@ -72,23 +72,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV-01 | Phase 2 | Pending |
-| NAV-02 | Phase 2 | Pending |
-| NAV-03 | Phase 2 | Pending |
-| NAV-04 | Phase 2 | Pending |
+| NAV-01 | Phase 2 | Complete |
+| NAV-02 | Phase 2 | Complete |
+| NAV-03 | Phase 2 | Complete |
+| NAV-04 | Phase 2 | Complete |
 | NAV-05 | Phase 2 | Pending |
-| NAV-06 | Phase 2 | Pending |
+| NAV-06 | Phase 2 | Complete |
 | ORG-01 | Phase 1 | Complete |
 | ORG-02 | Phase 1 | Complete |
 | ORG-03 | Phase 1 | Complete |
 | ORG-04 | Phase 3 | Pending |
 | ORG-05 | Phase 1 | Complete |
 | SRCH-01 | Phase 1 | Complete |
-| SRCH-02 | Phase 2 | Pending |
+| SRCH-02 | Phase 2 | Complete |
 | SRCH-03 | Phase 3 | Pending |
-| SRCH-04 | Phase 2 | Pending |
+| SRCH-04 | Phase 2 | Complete |
 | QUAL-01 | Phase 2 | Pending |
-| QUAL-02 | Phase 2 | Pending |
+| QUAL-02 | Phase 2 | Complete |
 | QUAL-03 | Phase 1 | Complete |
 | QUAL-04 | Phase 3 | Pending |
 

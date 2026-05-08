@@ -63,7 +63,7 @@ Cross-cutting constraints:
 
 Plans:
 **Wave 1**
-- [ ] 02-01: Define visible-job navigation behavior for previous, next, and boundary cases.
+- [x] 02-01: Define visible-job navigation behavior for previous, next, and boundary cases.
 
 **Wave 2 *(blocked on Wave 1 completion)***
 - [ ] 02-02: Wire sidebar focus and keyboard handling into the existing selection binding.
