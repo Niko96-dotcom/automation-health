@@ -39,7 +39,7 @@ Milestone v1.1 makes Automation Health ready to publish as a clean open-source G
 
 Plans:
 **Wave 1**
-- [ ] 04-01: Add public repository health files and update GitHub templates/workflow docs.
+- [x] 04-01: Add public repository health files and update GitHub templates/workflow docs.
 
 **Wave 2 *(blocked on Wave 1 completion)***
 - [ ] 04-02: Rewrite README and source docs around privacy, scanner limits, architecture, and open-source contribution flow.
