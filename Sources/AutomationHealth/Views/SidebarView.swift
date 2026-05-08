@@ -42,6 +42,10 @@ struct SidebarView: View {
                         .padding(.horizontal, 8)
                         .padding(.bottom, 4)
 
+                        if showsFilteredEmptyState {
+                            FilteredSidebarEmptyState()
+                        }
+
                         ForEach(sections) { section in
                             SourceSectionHeader(section: section)
 
@@ -122,6 +126,23 @@ struct SidebarView: View {
 
         selectedJobID = targetID
         return .handled
+    }
+}
+
+private struct FilteredSidebarEmptyState: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("No matching automations")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.primary)
+
+            Text("Try a different search.")
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 24)
     }
 }
 
