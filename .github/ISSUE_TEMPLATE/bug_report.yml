@@ -25,14 +25,15 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Include macOS version, Swift/Xcode version if building locally, and scheduler source involved.
-      placeholder: macOS 14.x, Xcode 16.x, launchd or Hermes cron
+      description: Include macOS version, Swift/Xcode version if building locally, scheduler source involved, and whether all data is sanitized.
+      placeholder: macOS 14.x, Xcode 16.x, launchd or Hermes cron, sanitized examples only
     validations:
       required: false
   - type: textarea
     id: logs
     attributes:
       label: Relevant Logs Or Screenshots
+      description: Do not paste raw logs, screenshots, scheduler output, paths, hostnames, job names, tokens, or secrets. Provide sanitized snippets or summaries only.
       render: text
     validations:
       required: false

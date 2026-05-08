@@ -22,6 +22,6 @@ body:
     id: notes
     attributes:
       label: Notes
-      description: Add examples, scheduler details, or alternatives considered.
+      description: Add sanitized examples, scheduler details, or alternatives considered. Do not include raw local output, scheduler output, paths, hostnames, job names, tokens, or secrets.
     validations:
       required: false

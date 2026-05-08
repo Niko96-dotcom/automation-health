@@ -1,4 +1,4 @@
-name: CI
+name: Automation Health CI
 
 on:
   pull_request:
@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build-and-test:
-    name: SwiftPM
+    name: SwiftPM build and self-test
     runs-on: macos-latest
     timeout-minutes: 20
     env:
