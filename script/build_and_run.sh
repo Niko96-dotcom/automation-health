@@ -12,8 +12,13 @@ DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_MACOS="$APP_CONTENTS/MacOS"
+APP_RESOURCES="$APP_CONTENTS/Resources"
 APP_BINARY="$APP_MACOS/$APP_NAME"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
+ICON_NAME="AutomationHealth"
+ICON_SOURCE="$ROOT_DIR/Assets/AppIcon/automation-health-icon-source.png"
+ICON_FILE="$ROOT_DIR/Assets/AppIcon/$ICON_NAME.icns"
+ICON_SCRIPT="$ROOT_DIR/script/generate_app_icon.sh"
 
 cd "$ROOT_DIR"
 
@@ -22,10 +27,15 @@ pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 swift build
 BUILD_BINARY="$(swift build --show-bin-path)/$APP_NAME"
 
+if [[ ! -f "$ICON_SOURCE" || ! -f "$ICON_FILE" || "$ICON_SOURCE" -nt "$ICON_FILE" || "$ICON_SCRIPT" -nt "$ICON_FILE" ]]; then
+  "$ICON_SCRIPT"
+fi
+
 rm -rf "$APP_BUNDLE"
-mkdir -p "$APP_MACOS"
+mkdir -p "$APP_MACOS" "$APP_RESOURCES"
 cp "$BUILD_BINARY" "$APP_BINARY"
 chmod +x "$APP_BINARY"
+cp "$ICON_FILE" "$APP_RESOURCES/$ICON_NAME.icns"
 
 cat >"$INFO_PLIST" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -40,6 +50,8 @@ cat >"$INFO_PLIST" <<PLIST
   <string>$DISPLAY_NAME</string>
   <key>CFBundleDisplayName</key>
   <string>$DISPLAY_NAME</string>
+  <key>CFBundleIconFile</key>
+  <string>$ICON_NAME.icns</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>LSMinimumSystemVersion</key>
