@@ -197,6 +197,7 @@ private struct SidebarJobRow: View, Equatable {
     let job: SidebarJobSummary
     let isSelected: Bool
     let select: () -> Void
+    @State private var isHovered = false
 
     var body: some View {
         Button(action: select) {
@@ -219,13 +220,18 @@ private struct SidebarJobRow: View, Equatable {
             .padding(.horizontal, 8)
             .frame(maxWidth: .infinity, minHeight: 38, alignment: .leading)
             .contentShape(Rectangle())
-            .background(selectionBackground, in: RoundedRectangle(cornerRadius: 6))
+            .background(rowBackground, in: RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.plain)
+        .onHover { isHovered = $0 }
     }
 
-    private var selectionBackground: Color {
-        isSelected ? Color.accentColor.opacity(0.18) : .clear
+    private var rowBackground: Color {
+        if isSelected {
+            return Color.accentColor.opacity(0.18)
+        }
+
+        return isHovered ? Color.primary.opacity(0.06) : .clear
     }
 
     nonisolated static func == (lhs: SidebarJobRow, rhs: SidebarJobRow) -> Bool {
