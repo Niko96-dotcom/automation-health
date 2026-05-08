@@ -66,8 +66,14 @@ Build, open, and verify that the app process starts:
 - Add or update self-test coverage when scanner, parsing, presentation, or workflow behavior changes.
 - Update `README.md` or `docs/` when commands, architecture, supported sources, or limitations change.
 
+## Local App Bundle Status
+
+`script/build_and_run.sh` generates `dist/AutomationHealth.app` for local development. The generated bundle is unsigned, unsandboxed, and not notarized.
+
+Signed and notarized distribution remains out of scope for this milestone.
+
 ## Notes
 
 - The generated `.app` bundle is written to `dist/`, which is ignored by git.
 - SwiftPM build output is written to `.build/`, which is ignored by git.
-- The app bundle identifier is `com.niko.AutomationHealth`.
+- The app bundle identifier is configured in `script/build_and_run.sh`.
