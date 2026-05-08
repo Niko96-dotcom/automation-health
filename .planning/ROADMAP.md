@@ -65,7 +65,7 @@ Plans:
 - [x] 05-01: Write the ChatGPT app icon prompt, generate/select the source image, and document the prompt/assets.
 
 **Wave 2 *(blocked on Wave 1 completion)***
-- [ ] 05-02: Add icon asset generation and integrate the icon into the app bundle.
+- [x] 05-02: Add icon asset generation and integrate the icon into the app bundle.
 
 Cross-cutting constraints:
 - Selected source art remains the stable input at `Assets/AppIcon/automation-health-icon-source.png`.

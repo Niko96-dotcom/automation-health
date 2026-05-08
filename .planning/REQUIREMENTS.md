@@ -26,8 +26,8 @@ Requirements for making Automation Health publishable as an open-source project 
 ### Visual Identity
 
 - [x] **VIS-01**: Maintainer can use a Codex-authored, copy-paste-ready ChatGPT image prompt to generate at least one polished app icon source image; API/CLI generation remains optional for paid reproducible runs.
-- [ ] **VIS-02**: User sees the generated icon integrated into the local macOS app bundle instead of the default/blank app identity.
-- [ ] **VIS-03**: Maintainer can regenerate app icon assets deterministically from committed source art using a documented local script or build step.
+- [x] **VIS-02**: User sees the generated icon integrated into the local macOS app bundle instead of the default/blank app identity.
+- [x] **VIS-03**: Maintainer can regenerate app icon assets deterministically from committed source art using a documented local script or build step.
 - [ ] **VIS-04**: Public README/docs visuals use sanitized, aesthetically consistent screenshots or assets that do not expose personal local automations.
 
 ### Broad Automation Inventory
@@ -110,8 +110,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRIV-02 | Phase 4 | Complete |
 | PRIV-03 | Phase 4 | Complete |
 | VIS-01 | Phase 5 | Complete |
-| VIS-02 | Phase 5 | Pending |
-| VIS-03 | Phase 5 | Pending |
+| VIS-02 | Phase 5 | Complete |
+| VIS-03 | Phase 5 | Complete |
 | VIS-04 | Phase 9 | Pending |
 | DISC-01 | Phase 6 | Pending |
 | DISC-02 | Phase 6 | Pending |
