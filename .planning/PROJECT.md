@@ -25,10 +25,13 @@ Users can quickly understand and navigate the health of their local scheduled au
 - [x] Keyboard navigation skips non-job UI such as headers and footer controls - validated in Phase 2.
 - [x] Keyboard navigation keeps the selected row, detail view, and scroll position synchronized - validated in Phase 2.
 - [x] Search filtering only navigates through visible filtered jobs - validated in Phase 2.
+- [x] The visual sidebar treatment remains compact, native-feeling, and consistent with the existing macOS SwiftUI app - validated in Phase 3.
+- [x] Filtered no-result searches show a non-selectable inline sidebar empty state - validated in Phase 3.
+- [x] Local Phase 3 verification evidence covers source checks and a manual sidebar behavior pass - validated in Phase 3.
 
 ### Active
 
-- [ ] The visual sidebar treatment remains compact, native-feeling, and consistent with the existing macOS SwiftUI app.
+No active v1 sidebar requirements remain in this milestone.
 
 ### Out of Scope
 
@@ -65,7 +68,8 @@ The user specifically asked to improve the left sidebar by supporting Up/Down ar
 | Group sidebar jobs by source for v1 | Source is already available on every job, maps cleanly to current scanners, and keeps categories stable under search. | Validated in Phase 1 |
 | Make Up/Down move selection through visible jobs | This matches common macOS sidebar/list behavior and keeps the detail pane aligned with keyboard navigation. | Validated in Phase 2 |
 | Keep section headers non-selectable | Headers should organize the list but not enter the job selection model. | Validated in Phase 2 |
-| Keep the app read-only | The product value is safe inspection of local automations, not administration. | - Pending |
+| Use compact source headers with trailing counts | This keeps categories scannable without adding badges, collapse controls, or new grouping modes. | Validated in Phase 3 |
+| Keep the app read-only | The product value is safe inspection of local automations, not administration. | Validated through Phase 3 |
 
 ## Evolution
 
@@ -85,4 +89,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-08 after Phase 2 completion*
+*Last updated: 2026-05-08 after Phase 3 completion*
