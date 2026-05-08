@@ -92,8 +92,14 @@ Plans:
 **Wave 2 *(blocked on Wave 1 completion)***
 - [ ] 06-02: Add cron scanner coverage with fixture-driven self-tests.
 
-**Wave 3 *(blocked on Wave 1 completion)***
+**Wave 3 *(blocked on Wave 2 completion)***
 - [ ] 06-03: Add Shortcuts and Automator inventory scanners with best-effort failure handling.
+
+Cross-cutting constraints:
+- Inventory scanners remain read-only: no edit, remove, install, run, view, sign, or execute commands are introduced for cron, Shortcuts, or Automator sources.
+- Source-specific scan notes report missing tools, permission limits, unreadable paths, and confidence limits without failing the whole inventory refresh.
+- New scanner behavior must be covered with injected command runners or fixture paths, not live local machine automation state.
+- Confidence and origin labels are evidence-based and source-independent; registered sources do not claim schedule evidence unless a scanner proves it.
 
 ### Phase 7: Candidate Discovery And Manual Records
 **Goal**: Users can account for automations that are not proven scheduler jobs through bounded candidates and local manual records.
