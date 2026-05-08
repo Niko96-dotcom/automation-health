@@ -7,3 +7,4 @@ cd "$ROOT_DIR"
 export TZ="${TZ:-Europe/Berlin}"
 
 swift run ActiveJobsCoreSelfTest
+./script/test_app_icon.sh
