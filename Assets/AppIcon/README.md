@@ -40,10 +40,10 @@ The selected original source PNG must be saved at `Assets/AppIcon/automation-hea
 
 ## Selection Notes
 
-- Selected variant: TBD
-- Small-size legibility: TBD
-- Metaphor check: TBD
-- Privacy check: TBD
+- Selected variant: Variant 2
+- Small-size legibility: The dark calendar silhouette and single bright pulse line remain distinct at Dock and Finder sizes because the design avoids tiny rows, labels, and dense internal detail.
+- Metaphor check: The image reads as a rounded graphite calendar tile with one green pulse line across it, matching the Pulse Calendar concept.
+- Privacy check: no text, no private data, no screenshots, no local paths, no terminal output, and no real scheduler details.
 
 ## Privacy Check
 
