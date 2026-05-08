@@ -21,7 +21,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
-**Current focus:** Phase 05 — visual-identity-and-icon-pipeline
+**Current focus:** Phase 6 - Inventory Model And Deterministic Sources
 
 ## Current Position
 
@@ -75,7 +75,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-Execute Phase 5 with `$gsd-execute-phase 5`.
+Discuss Phase 6 with `$gsd-discuss-phase 6`.
 
 ### Blockers/Concerns
 
