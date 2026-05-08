@@ -21,14 +21,14 @@ Requirements for the sidebar navigation and organization milestone.
 - [x] **ORG-01**: Sidebar jobs are grouped under clear section headers by job source.
 - [x] **ORG-02**: Each source section header shows a human-readable source name and visible job count.
 - [x] **ORG-03**: Source groups with zero visible jobs are hidden.
-- [ ] **ORG-04**: Jobs keep their current display name, subtitle, health dot, and selection styling inside grouped sections.
+- [x] **ORG-04**: Jobs keep their current display name, subtitle, health dot, and selection styling inside grouped sections.
 - [x] **ORG-05**: Grouping preserves a stable order for sections and jobs so refreshes do not visually shuffle unrelated rows.
 
 ### Search And Filtering
 
 - [x] **SRCH-01**: Sidebar search results remain grouped by source after filtering.
 - [x] **SRCH-02**: Up and Down arrow navigation traverses only jobs visible under the current search query.
-- [ ] **SRCH-03**: When a search query produces no visible jobs, the sidebar communicates the empty state without a selectable placeholder row.
+- [x] **SRCH-03**: When a search query produces no visible jobs, the sidebar communicates the empty state without a selectable placeholder row.
 - [x] **SRCH-04**: Clearing search restores grouped navigation over the full visible job list.
 
 ### Quality And Regression Safety
@@ -81,11 +81,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORG-01 | Phase 1 | Complete |
 | ORG-02 | Phase 1 | Complete |
 | ORG-03 | Phase 1 | Complete |
-| ORG-04 | Phase 3 | Pending |
+| ORG-04 | Phase 3 | Complete |
 | ORG-05 | Phase 1 | Complete |
 | SRCH-01 | Phase 1 | Complete |
 | SRCH-02 | Phase 2 | Complete |
-| SRCH-03 | Phase 3 | Pending |
+| SRCH-03 | Phase 3 | Complete |
 | SRCH-04 | Phase 2 | Complete |
 | QUAL-01 | Phase 2 | Complete |
 | QUAL-02 | Phase 2 | Complete |
