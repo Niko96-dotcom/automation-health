@@ -10,7 +10,7 @@ This milestone improves the existing Automation Health sidebar without changing 
 - Integer phases (1, 2, 3): Planned milestone work.
 - Decimal phases (2.1, 2.2): Urgent insertions if needed.
 
-- [ ] **Phase 1: Sidebar Grouping Foundation** - Represent and render source-grouped visible jobs in the sidebar.
+- [x] **Phase 1: Sidebar Grouping Foundation** - Represent and render source-grouped visible jobs in the sidebar.
 - [ ] **Phase 2: Keyboard Navigation** - Add Up/Down selection movement across visible jobs and keep scrolling/detail state synchronized.
 - [ ] **Phase 3: Sidebar Polish And Verification** - Refine the grouped UI, empty state, and regression checks.
 
@@ -89,6 +89,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Sidebar Grouping Foundation | 0/3 | Not started | - |
+| 1. Sidebar Grouping Foundation | 3/3 | Complete | 2026-05-08 |
 | 2. Keyboard Navigation | 0/3 | Not started | - |
 | 3. Sidebar Polish And Verification | 0/2 | Not started | - |
