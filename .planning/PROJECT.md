@@ -16,7 +16,7 @@ Users can quickly understand and navigate the health of their local scheduled au
 
 **Target features:**
 - Public GitHub readiness: license, security/support/community files, README/docs/workflows, and privacy scrub so personal local details are not leaked.
-- Image-generated visual identity: use `imagegen` for app/public assets, with at least a polished app icon and a deterministic packaging path.
+- Image-generated visual identity: Codex should produce copy-paste-ready ChatGPT image prompts for app/public assets, with at least a polished app icon and a deterministic packaging path from chosen source art.
 - Broad automation inventory: add deterministic scanner coverage, confidence-labeled candidate discoveries, and manual app-only records for automations the scanner cannot prove.
 - Sidebar organization polish: app-matched focus styling, collapsible categories, and grouping/sorting options that separate source from ownership, health, trigger type, and confidence.
 

@@ -35,7 +35,7 @@ Keep the shipped SwiftPM/macOS stack intact. v1.1 should use the existing native
 
 ### Visual Assets
 
-- Use the `imagegen` skill to create source art for the app icon and any public-facing screenshots/graphics. Live generation requires `OPENAI_API_KEY`; it is currently missing in this session.
+- Use Codex to create copy-paste-ready prompts for ChatGPT app image generation for the app icon and any public-facing screenshots/graphics. The local Image API CLI requires `OPENAI_API_KEY` and should be treated as an optional paid reproducibility path, not the default workflow.
 - For macOS packaging, plan for a real icon pipeline that generates `AppIcon`/`.icns` outputs from one high-resolution source image.
 - Apple guidance frames app icons as distinct, recognizable identity assets; Xcode/asset catalogs expect multiple app icon sizes for macOS.
 

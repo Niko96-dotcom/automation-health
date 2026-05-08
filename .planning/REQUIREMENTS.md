@@ -25,7 +25,7 @@ Requirements for making Automation Health publishable as an open-source project 
 
 ### Visual Identity
 
-- [ ] **VIS-01**: Maintainer can generate at least one polished app icon source image through the `imagegen` workflow when `OPENAI_API_KEY` is available.
+- [ ] **VIS-01**: Maintainer can use a Codex-authored, copy-paste-ready ChatGPT image prompt to generate at least one polished app icon source image; API/CLI generation remains optional for paid reproducible runs.
 - [ ] **VIS-02**: User sees the generated icon integrated into the local macOS app bundle instead of the default/blank app identity.
 - [ ] **VIS-03**: Maintainer can regenerate app icon assets deterministically from committed source art using a documented local script or build step.
 - [ ] **VIS-04**: Public README/docs visuals use sanitized, aesthetically consistent screenshots or assets that do not expose personal local automations.

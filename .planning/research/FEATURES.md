@@ -54,13 +54,13 @@
 
 **Table stakes**
 
-- Generate at least one polished app icon concept through `imagegen`.
+- Generate at least one polished app icon concept from a Codex-authored prompt pasted into the ChatGPT app.
 - Convert final source art into app-ready icon assets and use it in the local app bundle.
 - Refresh README and docs visuals after privacy scrub.
 
 **Differentiators**
 
-- Small visual identity kit for open-source publication: icon, README hero/screenshot treatment, and consistent accent color usage.
+- Small visual identity kit for open-source publication: icon, README hero/screenshot treatment, consistent accent color usage, and reusable ChatGPT prompts.
 
 ## Anti-Features
 

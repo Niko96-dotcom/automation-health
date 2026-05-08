@@ -16,7 +16,7 @@ Milestone v1.1 makes Automation Health ready to publish as a clean open-source G
 - Decimal phases (6.1, 6.2): Urgent insertions if needed.
 
 - [ ] **Phase 4: Open Source Foundation And Privacy Scrub** - Prepare public repository materials, GitHub workflow hygiene, and privacy guardrails.
-- [ ] **Phase 5: Visual Identity And Icon Pipeline** - Generate and package a polished app icon and deterministic visual asset workflow.
+- [ ] **Phase 5: Visual Identity And Icon Pipeline** - Prompt, generate, and package a polished app icon and deterministic visual asset workflow.
 - [ ] **Phase 6: Inventory Model And Deterministic Sources** - Add confidence/origin modeling and deterministic scanner expansion for scheduler-backed or registered automations.
 - [ ] **Phase 7: Candidate Discovery And Manual Records** - Add bounded script-candidate discovery plus app-only manual records for uncovered automations.
 - [ ] **Phase 8: Sidebar Grouping, Collapse, And Focus Polish** - Add collapsible sections, better grouping modes, and screenshot-driven focus treatment.
@@ -53,7 +53,7 @@ Plans:
 **Requirements**: [VIS-01, VIS-02, VIS-03]
 **UI hint**: yes
 **Success Criteria** (what must be TRUE):
-  1. `imagegen` produces at least one app icon source concept when `OPENAI_API_KEY` is available.
+  1. Codex produces a copy-paste-ready ChatGPT image prompt for the app icon, with API/CLI generation documented only as an optional paid/reproducible path.
   2. Final source art is committed in a stable project asset location.
   3. A deterministic script or build step generates app-ready icon assets from source art.
   4. The generated icon appears in the local `.app` bundle created by existing packaging scripts.
@@ -62,7 +62,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 05-01: Generate/select the app icon source image and document the prompt/assets.
+- [ ] 05-01: Write the ChatGPT app icon prompt, generate/select the source image, and document the prompt/assets.
 
 **Wave 2 *(blocked on Wave 1 completion)***
 - [ ] 05-02: Add icon asset generation and integrate the icon into the app bundle.

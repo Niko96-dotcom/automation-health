@@ -6,7 +6,7 @@
 
 - No third-party Swift dependencies are needed.
 - Add repository health files, richer GitHub Actions/docs checks, and a deterministic icon asset pipeline.
-- Use `imagegen` for source visual assets when `OPENAI_API_KEY` is available; this session cannot run live generation because the key is missing.
+- Use Codex-authored, copy-paste-ready prompts in the ChatGPT app for source visual assets. API/CLI generation can be documented as an optional paid reproducibility path, not the default.
 
 ## Feature Table Stakes
 
