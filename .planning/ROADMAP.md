@@ -12,7 +12,7 @@ This milestone improves the existing Automation Health sidebar without changing 
 
 - [x] **Phase 1: Sidebar Grouping Foundation** - Represent and render source-grouped visible jobs in the sidebar.
 - [x] **Phase 2: Keyboard Navigation** - Add Up/Down selection movement across visible jobs and keep scrolling/detail state synchronized.
-- [ ] **Phase 3: Sidebar Polish And Verification** - Refine the grouped UI, empty state, and regression checks.
+- [x] **Phase 3: Sidebar Polish And Verification** - Refine the grouped UI, empty state, and regression checks.
 
 ## Phase Details
 
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 -> 2 -> 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Sidebar Grouping Foundation | 3/3 | Complete | 2026-05-08 |
-| 2. Keyboard Navigation | 0/3 | Not started | - |
-| 3. Sidebar Polish And Verification | 0/2 | Not started | - |
+| 2. Keyboard Navigation | 3/3 | Complete | 2026-05-08 |
+| 3. Sidebar Polish And Verification | 2/2 | Complete | 2026-05-08 |
