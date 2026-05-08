@@ -161,8 +161,8 @@ public struct LaunchAgentScanner: JobScanning, @unchecked Sendable {
 
         let searchable = "\(label) \(command ?? "")".lowercased()
         let interestingTerms = [
-            "hermes", "codex", "niko", "knowledge", "clipper", ".py", ".sh", ".zsh",
-            "python", "node", "script", "download", "cubase"
+            "hermes", "codex", "knowledge", "clipper", ".py", ".sh", ".zsh",
+            "python", "node", "script", "download"
         ]
         return interestingTerms.contains { searchable.contains($0) }
     }

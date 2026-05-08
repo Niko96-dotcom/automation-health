@@ -18,9 +18,9 @@ func testParsesEnabledHermesCronJobsWithLatestOutput() throws {
         {
           "jobs": [
             {
-              "id": "aa8acee71842",
-              "name": "daily-ft-bookmarks-to-eigenwiki",
-              "prompt": "Run the daily Field Theory bookmark pipeline.",
+              "id": "example-daily-report",
+              "name": "daily-example-report",
+              "prompt": "Run the daily example report.",
               "schedule": { "kind": "cron", "expr": "0 9 * * *", "display": "0 9 * * *" },
               "enabled": true,
               "state": "scheduled",
@@ -41,22 +41,22 @@ func testParsesEnabledHermesCronJobsWithLatestOutput() throws {
         """
     )
     try root.write(
-        relativePath: ".hermes/cron/output/aa8acee71842/2026-05-06_09-10-37.md",
+        relativePath: ".hermes/cron/output/example-daily-report/2026-05-06_09-10-37.md",
         contents: "old output"
     )
     try root.write(
-        relativePath: ".hermes/cron/output/aa8acee71842/2026-05-07_09-19-34.md",
+        relativePath: ".hermes/cron/output/example-daily-report/2026-05-07_09-19-34.md",
         contents: "latest run report"
     )
 
     let jobs = try HermesCronScanner(homeDirectory: root.url).scan()
 
-    expect(jobs.map(\.name) == ["daily-ft-bookmarks-to-eigenwiki"], "Hermes enabled job names")
+    expect(jobs.map(\.name) == ["daily-example-report"], "Hermes enabled job names")
     expect(jobs.first?.schedule == "0 9 * * *", "Hermes schedule")
     expectDatesEqual(jobs.first?.lastRun, isoDate("2026-05-07T09:19:34.169510+02:00"), "Hermes last run")
     expectDatesEqual(jobs.first?.nextRun, isoDate("2026-05-08T09:00:00+02:00"), "Hermes next run")
     expect(jobs.first?.lastStatus == "ok", "Hermes status")
-    expect(jobs.first?.definition == "Run the daily Field Theory bookmark pipeline.", "Hermes prompt definition")
+    expect(jobs.first?.definition == "Run the daily example report.", "Hermes prompt definition")
     expect(jobs.first?.lastRunDetails == "latest run report", "Hermes latest output")
     expect(jobs.first?.source == .hermesCron, "Hermes source")
 }
@@ -74,7 +74,7 @@ func testParsesLaunchAgentCalendarSchedulesAndLogTail() throws {
           <key>ProgramArguments</key>
           <array>
             <string>/usr/bin/python3</string>
-            <string>/Users/niko/Scripts/downloads-cleanup.py</string>
+            <string>/Users/example/Scripts/downloads-cleanup.py</string>
           </array>
           <key>StartCalendarInterval</key>
           <array>
@@ -98,7 +98,7 @@ func testParsesLaunchAgentCalendarSchedulesAndLogTail() throws {
 
     expect(jobs.count == 1, "LaunchAgent count")
     expect(jobs[0].name == "com.user.downloads-cleanup", "LaunchAgent name")
-    expect(jobs[0].command == "/usr/bin/python3 /Users/niko/Scripts/downloads-cleanup.py", "LaunchAgent command")
+    expect(jobs[0].command == "/usr/bin/python3 /Users/example/Scripts/downloads-cleanup.py", "LaunchAgent command")
     expect(jobs[0].schedule == "01:00, 04:00", "LaunchAgent schedule")
     expect(jobs[0].definition.hasSuffix("/Library/LaunchAgents/com.user.downloads-cleanup.plist"), "LaunchAgent definition path")
     expect(jobs[0].lastRunDetails == "first line\nsecond line\nthird line", "LaunchAgent log")
