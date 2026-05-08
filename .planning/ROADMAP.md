@@ -66,7 +66,7 @@ Plans:
 - [x] 02-01: Define visible-job navigation behavior for previous, next, and boundary cases.
 
 **Wave 2 *(blocked on Wave 1 completion)***
-- [ ] 02-02: Wire sidebar focus and keyboard handling into the existing selection binding.
+- [x] 02-02: Wire sidebar focus and keyboard handling into the existing selection binding.
 
 **Wave 3 *(blocked on Wave 2 completion)***
 - [ ] 02-03: Add scroll-to-selection behavior and verify search/refresh interactions.
