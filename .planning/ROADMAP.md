@@ -62,9 +62,26 @@ Cross-cutting constraints:
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
 - [ ] 02-01: Define visible-job navigation behavior for previous, next, and boundary cases.
+
+**Wave 2 *(blocked on Wave 1 completion)***
 - [ ] 02-02: Wire sidebar focus and keyboard handling into the existing selection binding.
+
+**Wave 3 *(blocked on Wave 2 completion)***
 - [ ] 02-03: Add scroll-to-selection behavior and verify search/refresh interactions.
+
+Cross-cutting constraints:
+- D-01: When no visible row is selected, Down enters at the first visible job and Up enters at the last visible job.
+- D-02: Boundary presses clamp on the current first or last visible job; navigation must not wrap, clear selection, or move focus away.
+- D-03: A selected job hidden by search is treated like no visible selection for keyboard navigation.
+- D-04: Up/Down handling belongs to the focused sidebar row/list area.
+- D-05: The sidebar search field keeps native text-editing arrow behavior.
+- D-08: Search changes preserve the existing selection and detail pane until explicit Up/Down navigation or row choice.
+- D-09: If the selected job remains visible after search, it remains the navigation anchor.
+- D-10: Refresh preservation remains owned by `JobStore.refresh()`.
+- D-11: Refresh removal fallback remains the existing `JobStore.refresh()` first-job behavior.
+- D-14: Scroll-to-selection behavior applies only to keyboard-originated navigation, not mouse clicks, search changes, or refresh preservation.
 
 ### Phase 3: Sidebar Polish And Verification
 **Goal**: The grouped sidebar looks clean, handles empty filtered results, and passes the local build/test gate.
