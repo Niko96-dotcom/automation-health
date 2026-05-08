@@ -22,8 +22,8 @@ key-decisions:
   - "CI failure is isolated to the pre-existing ActiveJobsCoreSelfTest tomorrow next run assertion, not the Phase 3 sidebar changes."
 patterns-established:
   - "Record manual sidebar verification in the phase summary instead of creating separate checklist artifacts."
-requirements-completed: [ORG-04, SRCH-03]
-duration: pending
+requirements-completed: [ORG-04, SRCH-03, QUAL-04]
+duration: 8 min
 completed: 2026-05-08
 ---
 
@@ -33,9 +33,9 @@ completed: 2026-05-08
 
 ## Performance
 
-- **Duration:** pending
+- **Duration:** 8 min
 - **Started:** 2026-05-08T11:17:36Z
-- **Completed:** pending
+- **Completed:** 2026-05-08T11:25:54Z
 - **Tasks:** 3
 - **Files modified:** 1
 
@@ -51,7 +51,7 @@ Each task is committed atomically:
 
 1. **Task 1: Run the local CI gate** - `74a743c` (test)
 2. **Task 2: Verify source-level sidebar contracts** - `5d0b86a` (test)
-3. **Task 3: Perform and document the manual sidebar behavior check** - pending
+3. **Task 3: Perform and document the manual sidebar behavior check** - `279598f` (test)
 
 ## Files Created/Modified
 
@@ -110,11 +110,13 @@ None - no external service configuration required.
 - clearing search restores grouped rows: the sidebar returned to `14 automations`, `launchd`, `Hermes cron`, and visible job rows.
 - Up/Down navigation over restored grouped rows works and skips headers and footer: pressing Down from `Hermes Dashboard` selected `Hermes Gateway`; pressing Up returned selection to `Hermes Dashboard`.
 
-## Self-Check: PENDING
+## Self-Check: PASSED
 
 - CI evidence recorded.
 - Source-level sidebar contract checks passed.
 - Manual sidebar behavior check passed.
+- Task commits are present in git history.
+- The known non-zero CI result is documented as an unrelated blocker.
 
 ## Next Phase Readiness
 
@@ -122,4 +124,4 @@ Phase 3 source and manual verification evidence is recorded. The remaining block
 
 ---
 *Phase: 03-sidebar-polish-and-verification*
-*Completed: pending*
+*Completed: 2026-05-08*

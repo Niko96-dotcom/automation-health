@@ -36,7 +36,7 @@ Requirements for the sidebar navigation and organization milestone.
 - [x] **QUAL-01**: The change preserves existing scan refresh behavior, including retaining the selected job after refresh when it still exists.
 - [x] **QUAL-02**: The change preserves the read-only product boundary; sidebar interactions do not mutate scheduled jobs.
 - [x] **QUAL-03**: Focused coverage or equivalent compile-time validation protects any extracted grouping or navigation helpers.
-- [ ] **QUAL-04**: The local CI gate builds successfully after the sidebar changes.
+- [x] **QUAL-04**: The local CI gate builds successfully after the sidebar changes.
 
 ## v2 Requirements
 
@@ -90,7 +90,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-01 | Phase 2 | Complete |
 | QUAL-02 | Phase 2 | Complete |
 | QUAL-03 | Phase 1 | Complete |
-| QUAL-04 | Phase 3 | Pending |
+| QUAL-04 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 19 total

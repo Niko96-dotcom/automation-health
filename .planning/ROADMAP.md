@@ -100,7 +100,7 @@ Plans:
 - [x] 03-01: Polish section header, row, and empty-state presentation.
 
 **Wave 2 *(blocked on Wave 1 completion)***
-- [ ] 03-02: Run the local CI gate and perform a manual sidebar behavior check.
+- [x] 03-02: Run the local CI gate and perform a manual sidebar behavior check.
 
 Cross-cutting constraints:
 - D-03: Job rows keep display name, subtitle, health dot, and selected-row behavior after polish.
