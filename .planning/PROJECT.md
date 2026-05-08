@@ -21,13 +21,13 @@ Users can quickly understand and navigate the health of their local scheduled au
 - [x] Local build and self-test workflows exist through SwiftPM scripts and Makefile shortcuts - existing.
 - [x] The sidebar groups visible jobs by source with clear section headers and counts - validated in Phase 1.
 - [x] Search filtering preserves the same grouping model - validated in Phase 1.
+- [x] The sidebar supports Up and Down arrow navigation across visible jobs - validated in Phase 2.
+- [x] Keyboard navigation skips non-job UI such as headers and footer controls - validated in Phase 2.
+- [x] Keyboard navigation keeps the selected row, detail view, and scroll position synchronized - validated in Phase 2.
+- [x] Search filtering only navigates through visible filtered jobs - validated in Phase 2.
 
 ### Active
 
-- [ ] The sidebar supports Up and Down arrow navigation across visible jobs.
-- [ ] Keyboard navigation skips non-job UI such as headers and footer controls.
-- [ ] Keyboard navigation keeps the selected row, detail view, and scroll position synchronized.
-- [ ] Search filtering only navigates through visible filtered jobs.
 - [ ] The visual sidebar treatment remains compact, native-feeling, and consistent with the existing macOS SwiftUI app.
 
 ### Out of Scope
@@ -63,8 +63,8 @@ The user specifically asked to improve the left sidebar by supporting Up/Down ar
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Group sidebar jobs by source for v1 | Source is already available on every job, maps cleanly to current scanners, and keeps categories stable under search. | Validated in Phase 1 |
-| Make Up/Down move selection through visible jobs | This matches common macOS sidebar/list behavior and keeps the detail pane aligned with keyboard navigation. | - Pending |
-| Keep section headers non-selectable | Headers should organize the list but not enter the job selection model. | - Pending |
+| Make Up/Down move selection through visible jobs | This matches common macOS sidebar/list behavior and keeps the detail pane aligned with keyboard navigation. | Validated in Phase 2 |
+| Keep section headers non-selectable | Headers should organize the list but not enter the job selection model. | Validated in Phase 2 |
 | Keep the app read-only | The product value is safe inspection of local automations, not administration. | - Pending |
 
 ## Evolution
@@ -85,4 +85,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-08 after Phase 1 completion*
+*Last updated: 2026-05-08 after Phase 2 completion*
