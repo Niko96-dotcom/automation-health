@@ -67,6 +67,11 @@ Plans:
 **Wave 2 *(blocked on Wave 1 completion)***
 - [ ] 05-02: Add icon asset generation and integrate the icon into the app bundle.
 
+Cross-cutting constraints:
+- Selected source art remains the stable input at `Assets/AppIcon/automation-health-icon-source.png`.
+- Manual ChatGPT source-art generation is the expected path; paid API/CLI generation, secrets, and network automation are not required.
+- Selection notes and generated assets must remain free of text, private data, screenshots, local paths, terminal output, and real scheduler details.
+
 ### Phase 6: Inventory Model And Deterministic Sources
 **Goal**: Broader inventory has source-independent confidence and ownership modeling, plus additional deterministic or registered scanner sources.
 **Depends on**: Phase 4
