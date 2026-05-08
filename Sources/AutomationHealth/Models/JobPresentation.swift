@@ -49,6 +49,37 @@ struct SidebarJobSummary: Identifiable, Hashable, Sendable {
     }
 }
 
+enum SidebarNavigationDirection: Sendable {
+    case previous
+    case next
+}
+
+enum SidebarNavigation {
+    static func targetJobID(in visibleJobs: [SidebarJobSummary], selectedJobID: String?, direction: SidebarNavigationDirection) -> String? {
+        guard !visibleJobs.isEmpty else {
+            return nil
+        }
+
+        let visibleIDs = visibleJobs.map(\.id)
+
+        if let selectedJobID, let currentIndex = visibleIDs.firstIndex(of: selectedJobID) {
+            switch direction {
+            case .previous:
+                return visibleIDs[max(currentIndex - 1, visibleIDs.startIndex)]
+            case .next:
+                return visibleIDs[min(currentIndex + 1, visibleIDs.index(before: visibleIDs.endIndex))]
+            }
+        }
+
+        switch direction {
+        case .previous:
+            return visibleIDs.last
+        case .next:
+            return visibleIDs.first
+        }
+    }
+}
+
 struct SidebarJobSection: Identifiable, Hashable, Sendable {
     let id: JobSource
     let source: JobSource
