@@ -6,9 +6,9 @@ status: planning
 last_updated: "2026-05-08T12:32:05.072Z"
 last_activity: 2026-05-08
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 16
   completed_plans: 0
   percent: 0
 ---
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-08)
 
 **Core value:** Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
-**Current focus:** Planning next milestone
+**Current focus:** Phase 4 - Open Source Foundation And Privacy Scrub
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-08 — Milestone v1.1 started
+Phase: 04 - Open Source Foundation And Privacy Scrub
+Plan: Not started
+Status: Roadmap created; ready to discuss or plan Phase 4
+Last activity: 2026-05-08 — Milestone v1.1 roadmap created
 
 ## Performance Metrics
 
@@ -70,7 +70,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-Run `$gsd-new-milestone` to define fresh requirements and create the next roadmap.
+Start Phase 4 with `$gsd-discuss-phase 4` or `$gsd-plan-phase 4`.
 
 ### Blockers/Concerns
 
@@ -85,6 +85,8 @@ Items acknowledged and carried forward from previous milestone close:
 | Alternate grouping | Health-based, schedule-based, and persisted custom grouping modes | Deferred | Initialization |
 | Navigation | Additional shortcuts beyond Up/Down | Deferred | Initialization |
 | Sidebar sections | Collapsible groups | Deferred | Initialization |
+| Distribution | Signed/notarized release artifact | Deferred | v1.1 scoping |
+| Preferences | Persisted grouping and candidate-scan preferences | Deferred | v1.1 scoping |
 
 ## Session Continuity
 

@@ -100,48 +100,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OSS-01 | — | Pending |
-| OSS-02 | — | Pending |
-| OSS-03 | — | Pending |
-| OSS-04 | — | Pending |
-| OSS-05 | — | Pending |
-| OSS-06 | — | Pending |
-| PRIV-01 | — | Pending |
-| PRIV-02 | — | Pending |
-| PRIV-03 | — | Pending |
-| VIS-01 | — | Pending |
-| VIS-02 | — | Pending |
-| VIS-03 | — | Pending |
-| VIS-04 | — | Pending |
-| DISC-01 | — | Pending |
-| DISC-02 | — | Pending |
-| DISC-03 | — | Pending |
-| DISC-04 | — | Pending |
-| DISC-05 | — | Pending |
-| DISC-06 | — | Pending |
-| DISC-07 | — | Pending |
-| DISC-08 | — | Pending |
-| MAN-01 | — | Pending |
-| MAN-02 | — | Pending |
-| MAN-03 | — | Pending |
-| SIDE-01 | — | Pending |
-| SIDE-02 | — | Pending |
-| SIDE-03 | — | Pending |
-| SIDE-04 | — | Pending |
-| SIDE-05 | — | Pending |
-| SIDE-06 | — | Pending |
-| SIDE-07 | — | Pending |
-| QUAL-01 | — | Pending |
-| QUAL-02 | — | Pending |
-| QUAL-03 | — | Pending |
-| QUAL-04 | — | Pending |
-| QUAL-05 | — | Pending |
+| OSS-01 | Phase 4 | Pending |
+| OSS-02 | Phase 4 | Pending |
+| OSS-03 | Phase 4 | Pending |
+| OSS-04 | Phase 4 | Pending |
+| OSS-05 | Phase 4 | Pending |
+| OSS-06 | Phase 4 | Pending |
+| PRIV-01 | Phase 4 | Pending |
+| PRIV-02 | Phase 4 | Pending |
+| PRIV-03 | Phase 4 | Pending |
+| VIS-01 | Phase 5 | Pending |
+| VIS-02 | Phase 5 | Pending |
+| VIS-03 | Phase 5 | Pending |
+| VIS-04 | Phase 9 | Pending |
+| DISC-01 | Phase 6 | Pending |
+| DISC-02 | Phase 6 | Pending |
+| DISC-03 | Phase 6 | Pending |
+| DISC-04 | Phase 6 | Pending |
+| DISC-05 | Phase 6 | Pending |
+| DISC-06 | Phase 7 | Pending |
+| DISC-07 | Phase 6 | Pending |
+| DISC-08 | Phase 7 | Pending |
+| MAN-01 | Phase 7 | Pending |
+| MAN-02 | Phase 7 | Pending |
+| MAN-03 | Phase 7 | Pending |
+| SIDE-01 | Phase 8 | Pending |
+| SIDE-02 | Phase 8 | Pending |
+| SIDE-03 | Phase 8 | Pending |
+| SIDE-04 | Phase 8 | Pending |
+| SIDE-05 | Phase 8 | Pending |
+| SIDE-06 | Phase 8 | Pending |
+| SIDE-07 | Phase 8 | Pending |
+| QUAL-01 | Phase 6 | Pending |
+| QUAL-02 | Phase 6 | Pending |
+| QUAL-03 | Phase 7 | Pending |
+| QUAL-04 | Phase 9 | Pending |
+| QUAL-05 | Phase 4 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 36 total
-- Mapped to phases: 0
-- Unmapped: 36
+- Mapped to phases: 36
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after initial definition*
+*Last updated: 2026-05-08 after roadmap creation*
