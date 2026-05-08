@@ -10,6 +10,7 @@ struct SidebarView: View {
     @Binding var selectedJobID: String?
     let lastScannedDescription: String
     let isScanning: Bool
+    @State private var keyboardNavigationTargetID: String?
     @FocusState private var focusedTarget: SidebarFocusTarget?
 
     private var visibleJobs: [SidebarJobSummary] {
@@ -30,39 +31,50 @@ struct SidebarView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 2) {
-                    SidebarHeader(
-                        jobCount: visibleJobs.count,
-                        statusSummary: statusSummary
-                    )
-                    .padding(.horizontal, 8)
-                    .padding(.bottom, 4)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 2) {
+                        SidebarHeader(
+                            jobCount: visibleJobs.count,
+                            statusSummary: statusSummary
+                        )
+                        .padding(.horizontal, 8)
+                        .padding(.bottom, 4)
 
-                    ForEach(sections) { section in
-                        SourceSectionHeader(section: section)
+                        ForEach(sections) { section in
+                            SourceSectionHeader(section: section)
 
-                        ForEach(section.jobs) { job in
-                            SidebarJobRow(
-                                job: job,
-                                isSelected: selectedJobID == job.id
-                            ) {
-                                select(job)
-                            }
+                            ForEach(section.jobs) { job in
+                                SidebarJobRow(
+                                    job: job,
+                                    isSelected: selectedJobID == job.id
+                                ) {
+                                    select(job)
+                                }
                                 .equatable()
+                                .id(job.id)
+                            }
                         }
                     }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 10)
                 }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 10)
+                .scrollContentBackground(.hidden)
+                .background(.regularMaterial)
+                .accessibilityLabel("Automation list")
+                .focusable()
+                .focused($focusedTarget, equals: .jobList)
+                .onKeyPress(.downArrow) { navigate(.next) }
+                .onKeyPress(.upArrow) { navigate(.previous) }
+                .onChange(of: keyboardNavigationTargetID) { _, targetID in
+                    guard let targetID else {
+                        return
+                    }
+
+                    proxy.scrollTo(targetID, anchor: nil)
+                    keyboardNavigationTargetID = nil
+                }
             }
-            .scrollContentBackground(.hidden)
-            .background(.regularMaterial)
-            .accessibilityLabel("Automation list")
-            .focusable()
-            .focused($focusedTarget, equals: .jobList)
-            .onKeyPress(.downArrow) { navigate(.next) }
-            .onKeyPress(.upArrow) { navigate(.previous) }
 
             Divider()
 
@@ -100,6 +112,8 @@ struct SidebarView: View {
         guard let targetID = SidebarNavigation.targetJobID(in: visibleJobs, selectedJobID: selectedJobID, direction: direction) else {
             return .ignored
         }
+
+        keyboardNavigationTargetID = targetID
 
         if targetID == selectedJobID {
             return .handled
