@@ -43,14 +43,14 @@ completed: 2026-05-08
 
 - Ran the repository CI gate.
 - Verified source-level sidebar contracts for row content, empty-state copy, search ownership, navigation source, and read-only boundaries.
-- Manual sidebar behavior check pending.
+- Performed and documented the manual sidebar behavior check through the launched macOS app.
 
 ## Task Commits
 
 Each task is committed atomically:
 
 1. **Task 1: Run the local CI gate** - `74a743c` (test)
-2. **Task 2: Verify source-level sidebar contracts** - pending
+2. **Task 2: Verify source-level sidebar contracts** - `5d0b86a` (test)
 3. **Task 3: Perform and document the manual sidebar behavior check** - pending
 
 ## Files Created/Modified
@@ -103,17 +103,22 @@ None - no external service configuration required.
 
 ## Manual sidebar behavior check
 
-Pending.
+- `./script/build_and_run.sh --verify` exited 0, confirming the SwiftPM app bundle launched and the `AutomationHealth` process was present.
+- With search cleared, the sidebar showed grouped rows with section headers `launchd` and `Hermes cron`, visible counts `12` and `2`, row display name, subtitle, health dot, and soft selected-row styling. Screenshot inspection showed `Hermes Dashboard` selected with its subtitle `Starts at login and stays running`, a green health dot, and the soft accent selected-row fill.
+- Typing `zzzz-no-match-automation-health` into the search field produced `0 automations`, `No matching automations`, and `Try a different search.` inside the sidebar list area.
+- With no visible jobs, pressing Up/Down left the detail selection on `Hermes Dashboard`; the empty state was not selectable and no placeholder row was selected.
+- clearing search restores grouped rows: the sidebar returned to `14 automations`, `launchd`, `Hermes cron`, and visible job rows.
+- Up/Down navigation over restored grouped rows works and skips headers and footer: pressing Down from `Hermes Dashboard` selected `Hermes Gateway`; pressing Up returned selection to `Hermes Dashboard`.
 
 ## Self-Check: PENDING
 
 - CI evidence recorded.
 - Source-level sidebar contract checks passed.
-- Manual behavior evidence pending.
+- Manual sidebar behavior check passed.
 
 ## Next Phase Readiness
 
-Pending source-level and manual verification evidence.
+Phase 3 source and manual verification evidence is recorded. The remaining blocker for a completely clean gate is the unrelated `ActiveJobsCoreSelfTest` assertion documented above.
 
 ---
 *Phase: 03-sidebar-polish-and-verification*
