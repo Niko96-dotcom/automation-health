@@ -14,10 +14,14 @@ struct ContentView: View {
         return store.jobs.filter { $0.searchText.contains(query) }
     }
 
+    private var sidebarSections: [SidebarJobSection] {
+        SidebarJobSection.sections(for: filteredJobs)
+    }
+
     var body: some View {
         NavigationSplitView {
             SidebarView(
-                jobs: filteredJobs,
+                sections: sidebarSections,
                 selectedJobID: $store.selectedJobID,
                 lastScannedDescription: store.lastScannedDescription,
                 isScanning: store.isScanning
