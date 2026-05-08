@@ -91,21 +91,23 @@ public enum JobHumanizer {
         let calendar = Calendar.current
         let time = timeString(from: date)
 
-        if calendar.isDateInToday(date) {
+        let startOfNow = calendar.startOfDay(for: now)
+        let startOfDate = calendar.startOfDay(for: date)
+        let dayOffset = calendar.dateComponents([.day], from: startOfNow, to: startOfDate).day
+
+        if dayOffset == 0 {
             return "Today at \(time)"
         }
 
-        if calendar.isDateInTomorrow(date) {
+        if dayOffset == 1 {
             return "Tomorrow at \(time)"
         }
 
-        if calendar.isDateInYesterday(date) {
+        if dayOffset == -1 {
             return "Yesterday at \(time)"
         }
 
-        let startOfNow = calendar.startOfDay(for: now)
-        let startOfDate = calendar.startOfDay(for: date)
-        if let days = calendar.dateComponents([.day], from: startOfNow, to: startOfDate).day {
+        if let days = dayOffset {
             if days > 1, days < 7 {
                 return "\(weekdayString(from: date)) at \(time)"
             }
