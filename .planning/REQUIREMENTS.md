@@ -49,13 +49,13 @@ Requirements for making Automation Health publishable as an open-source project 
 
 ### Sidebar Organization And Focus
 
-- [ ] **SIDE-01**: User can collapse and expand sidebar sections without losing the selected job detail.
-- [ ] **SIDE-02**: Keyboard navigation skips collapsed or hidden rows and remains predictable under search filtering.
-- [ ] **SIDE-03**: User can group sidebar records by source, origin/ownership, health, trigger type, and confidence.
-- [ ] **SIDE-04**: User can sort or browse grouped records in a stable order that avoids visually shuffling unrelated rows after refresh.
-- [ ] **SIDE-05**: User can understand why closed-source app jobs and user-authored jobs are separated even when both come from launchd.
-- [ ] **SIDE-06**: Sidebar focus styling matches the existing dark navigation surface and search focus treatment instead of showing an oversized default blue rectangle.
-- [ ] **SIDE-07**: Focus styling still gives keyboard users a visible, accessible focus cue.
+- [x] **SIDE-01**: User can collapse and expand sidebar sections without losing the selected job detail.
+- [x] **SIDE-02**: Keyboard navigation skips collapsed or hidden rows and remains predictable under search filtering.
+- [x] **SIDE-03**: User can group sidebar records by source, origin/ownership, health, trigger type, and confidence.
+- [x] **SIDE-04**: User can sort or browse grouped records in a stable order that avoids visually shuffling unrelated rows after refresh.
+- [x] **SIDE-05**: User can understand why closed-source app jobs and user-authored jobs are separated even when both come from launchd.
+- [x] **SIDE-06**: Sidebar focus styling matches the existing dark navigation surface and search focus treatment instead of showing an oversized default blue rectangle.
+- [x] **SIDE-07**: Focus styling still gives keyboard users a visible, accessible focus cue.
 
 ### Quality And Regression Safety
 
@@ -124,13 +124,13 @@ Which phases cover which requirements. Updated during roadmap creation and v1.1 
 | MAN-01 | Phase 7 | Complete |
 | MAN-02 | Phase 7 | Complete |
 | MAN-03 | Phase 7 | Complete |
-| SIDE-01 | Phase 8 | Pending |
-| SIDE-02 | Phase 8 | Pending |
-| SIDE-03 | Phase 8 | Pending |
-| SIDE-04 | Phase 8 | Pending |
-| SIDE-05 | Phase 8 | Pending |
-| SIDE-06 | Phase 8 | Pending |
-| SIDE-07 | Phase 8 | Pending |
+| SIDE-01 | Phase 8 | Complete |
+| SIDE-02 | Phase 8 | Complete |
+| SIDE-03 | Phase 8 | Complete |
+| SIDE-04 | Phase 8 | Complete |
+| SIDE-05 | Phase 8 | Complete |
+| SIDE-06 | Phase 8 | Complete |
+| SIDE-07 | Phase 8 | Complete |
 | QUAL-01 | Phase 6 | Complete |
 | QUAL-02 | Phase 6 | Complete |
 | QUAL-03 | Phase 7 | Complete |

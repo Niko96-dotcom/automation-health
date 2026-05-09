@@ -147,13 +147,13 @@ Cross-cutting constraints:
 
 Plans:
 **Wave 1**
-- [ ] 08-01: Build reusable grouping/collapse state and navigation behavior over visible inventory rows.
+- [x] 08-01: Build reusable grouping/collapse state and navigation behavior over visible inventory rows.
 
 **Wave 2 *(blocked on Wave 1 completion)***
-- [ ] 08-02: Add grouping controls, collapsible section rendering, and stable ordering.
+- [x] 08-02: Add grouping controls, collapsible section rendering, and stable ordering.
 
 **Wave 3 *(blocked on Wave 2 completion)***
-- [ ] 08-03: Replace the sidebar focus treatment and verify keyboard accessibility against the screenshots.
+- [x] 08-03: Replace the sidebar focus treatment and verify keyboard accessibility against the screenshots.
 
 Cross-cutting constraints:
 - SwiftUI views must consume `JobStore`, `JobPresentation`, and sidebar presentation helpers; scanner IO and source inference stay below the view layer.
@@ -194,7 +194,7 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 5. Visual Identity And Icon Pipeline | 2/2 | Complete | 2026-05-08 |
 | 6. Inventory Model And Deterministic Sources | 3/3 | Complete | 2026-05-08 |
 | 7. Candidate Discovery And Manual Records | 3/3 | Complete | 2026-05-08 |
-| 8. Sidebar Grouping, Collapse, And Focus Polish | 0/3 | Pending | — |
+| 8. Sidebar Grouping, Collapse, And Focus Polish | 3/3 | Complete | 2026-05-09 |
 | 9. Publication Verification And Docs Polish | 0/2 | Pending | — |
 
 ## Coverage
@@ -225,13 +225,13 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | MAN-01 | Phase 7 | Complete |
 | MAN-02 | Phase 7 | Complete |
 | MAN-03 | Phase 7 | Complete |
-| SIDE-01 | Phase 8 | Pending |
-| SIDE-02 | Phase 8 | Pending |
-| SIDE-03 | Phase 8 | Pending |
-| SIDE-04 | Phase 8 | Pending |
-| SIDE-05 | Phase 8 | Pending |
-| SIDE-06 | Phase 8 | Pending |
-| SIDE-07 | Phase 8 | Pending |
+| SIDE-01 | Phase 8 | Complete |
+| SIDE-02 | Phase 8 | Complete |
+| SIDE-03 | Phase 8 | Complete |
+| SIDE-04 | Phase 8 | Complete |
+| SIDE-05 | Phase 8 | Complete |
+| SIDE-06 | Phase 8 | Complete |
+| SIDE-07 | Phase 8 | Complete |
 | QUAL-01 | Phase 6 | Complete |
 | QUAL-02 | Phase 6 | Complete |
 | QUAL-03 | Phase 7 | Complete |
