@@ -1,7 +1,17 @@
 import Foundation
 
+public struct JobScanResult: Hashable, Sendable {
+    public let jobs: [ScheduledJob]
+    public let notes: [ScanNote]
+
+    public init(jobs: [ScheduledJob] = [], notes: [ScanNote] = []) {
+        self.jobs = jobs
+        self.notes = notes
+    }
+}
+
 public protocol JobScanning: Sendable {
-    func scan() throws -> [ScheduledJob]
+    func scan() throws -> JobScanResult
 }
 
 public struct JobInventory: Sendable {
@@ -11,25 +21,36 @@ public struct JobInventory: Sendable {
         self.scanners = scanners
     }
 
-    public static func live(homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser) -> JobInventory {
-        JobInventory(
+    public static func live(
+        homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser,
+        manualRecordStore: ManualRecordStore? = nil
+    ) -> JobInventory {
+        let manualRecordStore = manualRecordStore ?? ManualRecordStore.live(homeDirectory: homeDirectory)
+
+        return JobInventory(
             scanners: [
                 LaunchAgentScanner(homeDirectory: homeDirectory),
-                HermesCronScanner(homeDirectory: homeDirectory)
+                HermesCronScanner(homeDirectory: homeDirectory),
+                CronScanner(),
+                ShortcutsScanner(),
+                AutomatorScanner(homeDirectory: homeDirectory),
+                CandidateScriptScanner(homeDirectory: homeDirectory),
+                ManualRecordScanner(store: manualRecordStore)
             ],
             homeDirectory: homeDirectory
         )
     }
 
-    public func refresh() throws -> [ScheduledJob] {
-        let jobs = try scanners.flatMap { try $0.scan() }
+    public func refresh() throws -> JobScanResult {
+        let results = try scanners.map { try $0.scan() }
+        let jobs = results.flatMap(\.jobs)
         var seen = Set<String>()
         let uniqueJobs = jobs.filter { job in
             let inserted = seen.insert("\(job.source.rawValue):\(job.id)").inserted
             return inserted
         }
 
-        return uniqueJobs.sorted { lhs, rhs in
+        let uniqueSortedJobs = uniqueJobs.sorted { lhs, rhs in
             switch (lhs.nextRun, rhs.nextRun) {
             case let (left?, right?) where left != right:
                 return left < right
@@ -41,5 +62,7 @@ public struct JobInventory: Sendable {
                 return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
             }
         }
+
+        return JobScanResult(jobs: uniqueSortedJobs, notes: results.flatMap(\.notes))
     }
 }

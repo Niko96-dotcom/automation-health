@@ -19,8 +19,8 @@ public struct LaunchAgentScanner: JobScanning, @unchecked Sendable {
         self.fileManager = fileManager
     }
 
-    public func scan() throws -> [ScheduledJob] {
-        try launchAgentDirectories.flatMap(scanDirectory)
+    public func scan() throws -> JobScanResult {
+        JobScanResult(jobs: try launchAgentDirectories.flatMap(scanDirectory), notes: [])
     }
 
     private func scanDirectory(_ directory: URL) throws -> [ScheduledJob] {
@@ -66,6 +66,8 @@ public struct LaunchAgentScanner: JobScanning, @unchecked Sendable {
             id: label,
             name: label,
             source: .launchd,
+            confidence: .scheduled,
+            origin: launchdOrigin(label: label, command: command, plistURL: url),
             schedule: schedule ?? loginScheduleDescription(from: plist),
             command: command,
             state: launchState.state ?? "loaded",
@@ -180,6 +182,47 @@ public struct LaunchAgentScanner: JobScanning, @unchecked Sendable {
 
     private func modifiedDate(for url: URL) -> Date? {
         (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+    }
+
+    private func launchdOrigin(label: String, command: String?, plistURL: URL) -> JobOrigin {
+        let systemCommandPrefixes = [
+            "/System/",
+            "/usr/libexec/",
+            "/bin/",
+            "/sbin/",
+            "/usr/bin/",
+            "/usr/sbin/"
+        ]
+
+        if label.hasPrefix("com.apple.")
+            || systemCommandPrefixes.contains(where: { command?.hasPrefix($0) == true }) {
+            return .system
+        }
+
+        let plistPaths = [
+            plistURL.path,
+            plistURL.standardizedFileURL.path,
+            plistURL.resolvingSymlinksInPath().path
+        ]
+        let homePaths = [
+            homeDirectory.path,
+            homeDirectory.standardizedFileURL.path,
+            homeDirectory.resolvingSymlinksInPath().path
+        ]
+
+        if plistPaths.contains(where: { plistPath in
+            homePaths.contains(where: { plistPath.hasPrefix($0) })
+        }) {
+            return .userAuthored
+        }
+
+        if command?.contains(".app/Contents/MacOS/") == true
+            || command?.hasPrefix("/Applications/") == true
+            || command?.hasPrefix("/Library/Application Support/") == true {
+            return .thirdPartyApp
+        }
+
+        return .unknown
     }
 }
 

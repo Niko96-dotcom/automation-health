@@ -1,5 +1,6 @@
 import SwiftUI
 import ActiveJobsCore
+import AutomationHealthCore
 
 private enum SidebarFocusTarget: Hashable {
     case jobList
@@ -8,8 +9,12 @@ private enum SidebarFocusTarget: Hashable {
 struct SidebarView: View {
     let sections: [SidebarJobSection]
     let showsFilteredEmptyState: Bool
+    @Binding var groupingMode: SidebarGroupingMode
+    @Binding var collapseState: SidebarCollapseState
+    let hasSearchQuery: Bool
     @Binding var selectedJobID: String?
     let lastScannedDescription: String
+    let scanNotes: [ScanNote]
     let isScanning: Bool
     @State private var keyboardNavigationTargetID: String?
     @FocusState private var focusedTarget: SidebarFocusTarget?
@@ -18,8 +23,12 @@ struct SidebarView: View {
         sections.flatMap(\.jobs)
     }
 
+    private var allFilteredJobs: [SidebarJobSummary] {
+        sections.flatMap(\.allJobs)
+    }
+
     private var statusSummary: String {
-        let healths = visibleJobs.map(\.healthKind)
+        let healths = allFilteredJobs.map(\.healthKind)
         let healthy = healths.filter { $0 == .alive }.count
         let attention = healths.filter { $0 == .failed || $0 == .stale }.count
 
@@ -30,14 +39,28 @@ struct SidebarView: View {
         return "\(healthy) healthy"
     }
 
+    private var footerDescription: String {
+        guard !scanNotes.isEmpty else {
+            return lastScannedDescription
+        }
+
+        let noun = scanNotes.count == 1 ? "scan note" : "scan notes"
+        return "\(lastScannedDescription) • \(scanNotes.count) \(noun)"
+    }
+
+    private var scanNotesHelp: String {
+        scanNotes.map(\.message).joined(separator: "\n")
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 2) {
                         SidebarHeader(
-                            jobCount: visibleJobs.count,
-                            statusSummary: statusSummary
+                            jobCount: allFilteredJobs.count,
+                            statusSummary: statusSummary,
+                            groupingMode: $groupingMode
                         )
                         .padding(.horizontal, 8)
                         .padding(.bottom, 4)
@@ -47,7 +70,12 @@ struct SidebarView: View {
                         }
 
                         ForEach(sections) { section in
-                            SourceSectionHeader(section: section)
+                            SidebarSectionHeader(
+                                section: section,
+                                hasSearchQuery: hasSearchQuery
+                            ) {
+                                collapseState.toggle(section.id)
+                            }
 
                             ForEach(section.jobs) { job in
                                 SidebarJobRow(
@@ -66,8 +94,16 @@ struct SidebarView: View {
                 }
                 .scrollContentBackground(.hidden)
                 .background(.regularMaterial)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color.accentColor.opacity(focusedTarget == .jobList ? 0.9 : 0), lineWidth: 2)
+                        .padding(2)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
                 .accessibilityLabel("Automation list")
                 .focusable()
+                .focusEffectDisabled()
                 .focused($focusedTarget, equals: .jobList)
                 .onKeyPress(.downArrow) { navigate(.next) }
                 .onKeyPress(.upArrow) { navigate(.previous) }
@@ -92,13 +128,14 @@ struct SidebarView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                Text(lastScannedDescription)
+                Text(footerDescription)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
 
                 Spacer()
             }
+            .help(scanNotesHelp)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
         }
@@ -114,7 +151,7 @@ struct SidebarView: View {
             return .ignored
         }
 
-        guard let targetID = SidebarNavigation.targetJobID(in: visibleJobs, selectedJobID: selectedJobID, direction: direction) else {
+        guard let targetID = SidebarNavigation.targetJobID(in: sections, selectedJobID: selectedJobID, direction: direction) else {
             return .ignored
         }
 
@@ -132,11 +169,11 @@ struct SidebarView: View {
 private struct FilteredSidebarEmptyState: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("No matching automations")
+            Text("No matching automation records")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.primary)
 
-            Text("Try a different search.")
+            Text("Search by name, source, confidence, origin, command, notes, or path.")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
         }
@@ -149,27 +186,60 @@ private struct FilteredSidebarEmptyState: View {
 private struct SidebarHeader: View {
     let jobCount: Int
     let statusSummary: String
+    @Binding var groupingMode: SidebarGroupingMode
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text("\(jobCount) automations")
-                .font(.caption)
-                .fontWeight(.medium)
-                .foregroundStyle(.secondary)
-            Text(statusSummary)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+        HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(jobCount) automation records")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
+                Text(statusSummary)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 8)
+
+            Menu {
+                ForEach(SidebarGroupingMode.allCases) { mode in
+                    Button {
+                        groupingMode = mode
+                    } label: {
+                        if groupingMode == mode {
+                            Label(mode.label, systemImage: "checkmark")
+                        } else {
+                            Text(mode.label)
+                        }
+                    }
+                    .help(mode == .origin ? "Origin groups ownership or authorship. Source is the scheduler or inventory adapter." : mode.label)
+                }
+            } label: {
+                Label("Group Sidebar By", systemImage: "line.3.horizontal.decrease.circle")
+                Text(groupingMode.label)
+            }
+            .menuStyle(.button)
+            .controlSize(.small)
+            .help("Origin groups ownership or authorship. Source is the scheduler or inventory adapter.")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-private struct SourceSectionHeader: View {
+private struct SidebarSectionHeader: View {
     let section: SidebarJobSection
+    let hasSearchQuery: Bool
+    let toggle: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        Button(action: toggle) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Image(systemName: section.isPersistentlyCollapsed ? "chevron.right" : "chevron.down")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 12)
+
                 Text(section.title)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(.secondary)
@@ -183,13 +253,29 @@ private struct SourceSectionHeader: View {
                     .lineLimit(1)
                     .monospacedDigit()
             }
-
-            Divider()
-                .opacity(0.35)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .help(helpText)
+        .accessibilityLabel(accessibilityLabel)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
+    }
+
+    private var actionName: String {
+        section.isPersistentlyCollapsed ? "Expand" : "Collapse"
+    }
+
+    private var helpText: String {
+        if hasSearchQuery && section.isPersistentlyCollapsed {
+            return "Search is temporarily revealing this collapsed section."
+        }
+        return "\(actionName) \(section.title)"
+    }
+
+    private var accessibilityLabel: String {
+        "\(actionName) \(section.id.groupingMode.label) section \(section.title), \(section.visibleCount) records"
     }
 }
 

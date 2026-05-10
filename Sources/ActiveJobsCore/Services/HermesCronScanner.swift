@@ -12,16 +12,16 @@ public struct HermesCronScanner: JobScanning, @unchecked Sendable {
         self.fileManager = fileManager
     }
 
-    public func scan() throws -> [ScheduledJob] {
+    public func scan() throws -> JobScanResult {
         let jobsURL = homeDirectory.appending(path: ".hermes/cron/jobs.json")
         guard fileManager.fileExists(atPath: jobsURL.path) else {
-            return []
+            return JobScanResult()
         }
 
         let data = try Data(contentsOf: jobsURL)
         let decoded = try JSONDecoder().decode(HermesJobsFile.self, from: data)
 
-        return decoded.jobs.compactMap { job in
+        let jobs: [ScheduledJob] = decoded.jobs.compactMap { job in
             guard job.enabled == true, job.state != "paused" else {
                 return nil
             }
@@ -33,6 +33,8 @@ public struct HermesCronScanner: JobScanning, @unchecked Sendable {
                 id: job.id,
                 name: job.name,
                 source: .hermesCron,
+                confidence: .scheduled,
+                origin: .userAuthored,
                 schedule: job.scheduleDisplay ?? job.schedule?.display ?? job.schedule?.expr ?? "Unknown",
                 command: command,
                 state: job.state ?? "scheduled",
@@ -44,6 +46,8 @@ public struct HermesCronScanner: JobScanning, @unchecked Sendable {
                 detailPath: latestOutput.path
             )
         }
+
+        return JobScanResult(jobs: jobs, notes: [])
     }
 
     private func latestOutput(for id: String) -> (contents: String?, path: String?) {

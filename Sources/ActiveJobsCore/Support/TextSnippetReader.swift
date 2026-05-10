@@ -1,7 +1,7 @@
 import Foundation
 
 enum TextSnippetReader {
-    private static let maximumBytes = 120_000
+    private static let maximumBytes = 24_000
 
     static func read(url: URL) -> String? {
         guard FileManager.default.fileExists(atPath: url.path) else {
