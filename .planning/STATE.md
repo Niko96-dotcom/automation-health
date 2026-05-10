@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Preferences, Polish, and Shippable Distribution
 status: Defining requirements
-stopped_at: Phase 10 context gathered
-last_updated: "2026-05-10T21:23:09.966Z"
+stopped_at: Phase 10 UI-SPEC approved
+last_updated: "2026-05-10T21:38:55.862Z"
 last_activity: 2026-05-10 — Milestone v1.2 started
 progress:
   total_phases: 1
@@ -109,9 +109,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-10T21:23:09.961Z
-Stopped at: Phase 10 context gathered
-Resume file: .planning/phases/10-preferences-persistence/10-CONTEXT.md
+Last session: 2026-05-10T21:38:55.857Z
+Stopped at: Phase 10 UI-SPEC approved
+Resume file: .planning/phases/10-preferences-persistence/10-UI-SPEC.md
 
 ## Operator Next Steps
 
