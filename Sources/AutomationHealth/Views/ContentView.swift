@@ -4,9 +4,8 @@ import AutomationHealthCore
 
 struct ContentView: View {
     @ObservedObject var store: JobStore
+    @ObservedObject var preferences: PreferencesStore
     @State private var searchText = ""
-    @State private var sidebarGroupingMode: SidebarGroupingMode = .defaultMode
-    @State private var sidebarCollapseState = SidebarCollapseState()
     @State private var manualRecordSheet: ManualRecordSheetState?
 
     private var filteredJobs: [JobPresentation] {
@@ -29,8 +28,8 @@ struct ContentView: View {
     private var sidebarSections: [SidebarJobSection] {
         SidebarJobSection.sections(
             for: filteredJobs,
-            groupingMode: sidebarGroupingMode,
-            collapseState: sidebarCollapseState,
+            groupingMode: preferences.groupingMode,
+            collapseState: preferences.collapseState,
             hasSearchQuery: hasSearchQuery
         )
     }
@@ -40,8 +39,8 @@ struct ContentView: View {
             SidebarView(
                 sections: sidebarSections,
                 showsFilteredEmptyState: showsFilteredEmptyState,
-                groupingMode: $sidebarGroupingMode,
-                collapseState: $sidebarCollapseState,
+                groupingMode: $preferences.groupingMode,
+                collapseState: $preferences.collapseState,
                 hasSearchQuery: hasSearchQuery,
                 selectedJobID: $store.selectedJobID,
                 lastScannedDescription: store.lastScannedDescription,
