@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: Preferences, Polish, and Shippable Distribution
 status: executing
 stopped_at: Phase 10 UI-SPEC approved
-last_updated: "2026-05-10T22:52:40.808Z"
+last_updated: "2026-05-10T22:55:25.045Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-10)
 ## Current Position
 
 Phase: 10 (preferences-persistence) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-05-10
 
@@ -66,6 +66,7 @@ Last activity: 2026-05-10
 | Phase 05 P01 | 8 min | 3 tasks | 2 files |
 | Phase 05 P02 | 4 min | 4 tasks | 15 files |
 | Phase 10-preferences-persistence P03 | 4 min | 2 tasks | 2 files |
+| Phase 10-preferences-persistence P02 | 3 | 3 tasks | 3 files |
 
 ## Quick Tasks Completed
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - Initialization: Group sidebar jobs by source for v1.
 - Initialization: Up/Down arrow keys should move selection through visible jobs and skip headers.
 - Initialization: Keep Automation Health read-only; do not add job mutation controls.
+- [Phase ?]: Explicit init() in AutomationHealthApp creates PreferencesStore once, passes same reference to both @StateObject wrappers and JobStore
+- [Phase ?]: SettingsView uses Int-to-Double Binding wrappers to avoid Pitfall 3 compile error
+- [Phase ?]: Settings scene is a sibling to WindowGroup — SwiftUI auto-registers Cmd+,
 
 ### Pending Todos
 
@@ -111,7 +115,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-10T22:52:02.018Z
+Last session: 2026-05-10T22:54:30.525Z
 Stopped at: Phase 10 UI-SPEC approved
 Resume file: None
 

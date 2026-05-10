@@ -13,7 +13,7 @@ Requirements for v1.2 Preferences, Polish, and Shippable Distribution. Each maps
 - [ ] **PREFS-02**: Sidebar collapse state persists per group key via UserDefaults
 - [ ] **PREFS-03**: Candidate scan configuration (roots, depth, file count cap, result cap, file size cap) persists via UserDefaults
 - [ ] **PREFS-04**: Default values are used when no preferences exist (no migration required)
-- [ ] **PREFS-05**: Settings scene (Cmd+,) exposes persistent scan configuration preferences
+- [x] **PREFS-05**: Settings scene (Cmd+,) exposes persistent scan configuration preferences
 
 ### Grouping
 
@@ -77,7 +77,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREFS-02 | Phase 10 | Pending |
 | PREFS-03 | Phase 10 | Pending |
 | PREFS-04 | Phase 10 | Pending |
-| PREFS-05 | Phase 10 | Pending |
+| PREFS-05 | Phase 10 | Complete |
 | DIST-01 | Phase 10 | Complete |
 | NAV-01 | Phase 11 | Pending |
 | NAV-02 | Phase 11 | Pending |

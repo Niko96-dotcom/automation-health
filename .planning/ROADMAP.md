@@ -37,7 +37,7 @@
   - Requirements: PREFS-01, PREFS-02, PREFS-03, PREFS-04, PREFS-05, DIST-01
   - Plans:
     - [x] 10-01-PLAN.md — Preferences store foundation: Codable types, PreferencesStore, scan config wiring
-    - [ ] 10-02-PLAN.md — Settings scene and app integration: SettingsView, AutomationHealthApp, ContentView migration
+    - [x] 10-02-PLAN.md — Settings scene and app integration: SettingsView, AutomationHealthApp, ContentView migration
     - [x] 10-03-PLAN.md — LICENSE copyright and self-test verification
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/ARCHITECTURE.md`
 
