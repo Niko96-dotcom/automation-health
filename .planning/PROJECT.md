@@ -4,7 +4,7 @@
 
 Automation Health is a local macOS SwiftUI app for inspecting scheduled jobs on this Mac. It scans supported scheduler sources, presents a searchable sidebar of automations, and shows detail needed to understand job health, timing, configuration, and recent output.
 
-The shipped v1.0 sidebar now behaves like a more polished navigation surface: visible jobs are grouped by source, grouped search results stay stable, Up and Down move through visible jobs, and filtered no-result states avoid selectable placeholder rows.
+The v1.1 app is ready for source publication review: it keeps the v1.0 sidebar navigation foundation, adds broad inventory records, supports app-owned manual records, polishes sidebar grouping/focus behavior, and records final privacy/visual/CI verification.
 
 ## Core Value
 
@@ -14,6 +14,8 @@ Users can quickly understand and navigate the health of their local scheduled au
 
 **Goal:** Make Automation Health ready to publish as a clean open-source GitHub project while expanding discovery beyond the current machine-specific scheduler slice and polishing the sidebar experience.
 
+**Status:** Complete as of Phase 09 on 2026-05-10.
+
 **Target features:**
 - Public GitHub readiness: license, security/support/community files, README/docs/workflows, and privacy scrub so personal local details are not leaked.
 - Image-generated visual identity: Codex should produce copy-paste-ready ChatGPT image prompts for app/public assets, with at least a polished app icon and a deterministic packaging path from chosen source art.
@@ -22,11 +24,11 @@ Users can quickly understand and navigate the health of their local scheduled au
 
 ## Current State
 
-**Shipped version:** v1.0 Sidebar Navigation on 2026-05-08
+**Shipped version:** v1.1 Open Source Readiness and Broad Inventory on 2026-05-10
 
 v1.0 completed 3 phases, 8 plans, and 19/19 scoped requirements. The milestone archive lives in `.planning/milestones/`, and the living roadmap is collapsed to the shipped milestone summary.
 
-The repository CI gate passes after Phase 7's candidate discovery and manual record work. Phase 4 added public repository health files, privacy-safe templates, public scanner docs, a rerunnable privacy scrub checklist, a neutral bundle identifier, and synthetic scanner fixtures. Phase 5 added the Pulse Calendar icon source art, deterministic local icon generation, and local `.app` bundle icon integration. Phase 6 added confidence/origin modeling, scan notes, cron coverage, and registered Shortcuts/Automator inventory. Phase 7 added bounded Candidate script discovery, app-owned Manual records, and shared inventory presentation for confidence/origin/search/detail.
+v1.1 completed 6 phases and 16 plans. Phase 4 added public repository health files, privacy-safe templates, public scanner docs, a rerunnable privacy scrub checklist, a neutral bundle identifier, and synthetic scanner fixtures. Phase 5 added the Pulse Grid icon source art, deterministic local icon generation, and local `.app` bundle icon integration. Phase 6 added confidence/origin modeling, scan notes, cron coverage, and registered Shortcuts/Automator inventory. Phase 7 added bounded Candidate script discovery, app-owned Manual records, and shared inventory presentation for confidence/origin/search/detail. Phase 8 added grouping modes, collapsible sidebar sections, hidden-row keyboard navigation, and custom focus treatment. Phase 9 passed the final publication privacy scrub, visual safety check, local CI, app bundle verification, smoke evidence, and traceability closure.
 
 ## Requirements
 
@@ -53,11 +55,13 @@ The repository CI gate passes after Phase 7's candidate discovery and manual rec
 - [x] Scanner additions remain read-only and report source limitations without view-layer IO - shipped in Phase 6.
 - [x] Candidate script discovery and app-only manual records are available through bounded, read-only flows - shipped in Phase 7.
 - [x] Candidate and Manual records participate in shared inventory, search, sidebar, selection, and detail presentation - shipped in Phase 7.
+- [x] Sidebar sections are collapsible and can be grouped/sorted by source, origin, health, trigger, and confidence - shipped in Phase 8.
+- [x] The sidebar focus treatment matches the app's dark navigation surface while preserving keyboard accessibility - shipped in Phase 8.
+- [x] Publication privacy scrub, sanitized visual guidance, local CI, app bundle verification, smoke evidence, and traceability are complete - shipped in Phase 9.
 
 ### Active
 
-- [ ] Sidebar sections are collapsible and can be grouped/sorted by more useful categories than raw scheduler source.
-- [ ] The sidebar focus treatment matches the app's dark navigation surface while preserving keyboard accessibility.
+None for v1.1. Future work is tracked below.
 
 ### Out of Scope
 
@@ -109,6 +113,8 @@ The relevant current ownership boundaries are:
 | Treat Shortcuts and Automator as registered inventory | Listing registered automations is not schedule evidence, so these sources use Registered confidence and no next-run claims. | Shipped in Phase 6 |
 | Treat script discoveries as Candidate records | File presence is possible automation evidence, not schedule evidence, so Candidate scripts use Candidate confidence and no run/next-run claims. | Shipped in Phase 7 |
 | Keep Manual records app-owned | Users can track automations the scanner cannot prove, but only through Automation Health's own Application Support JSON. | Shipped in Phase 7 |
+| Use abstract or synthetic public visuals only | Public docs and release materials must not expose real local automations, paths, hostnames, scheduler output, private commands, tokens, or secrets. | Shipped in Phase 9 |
+| Treat publication evidence as command names plus outcomes | Final summaries and verification records should avoid raw terminal logs while preserving rerunnable command evidence. | Shipped in Phase 9 |
 
 ## Evolution
 
@@ -128,4 +134,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-08 after Phase 7 completion*
+*Last updated: 2026-05-10 after Phase 9 completion*

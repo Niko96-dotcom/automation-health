@@ -20,7 +20,7 @@ Milestone v1.1 makes Automation Health ready to publish as a clean open-source G
 - [x] **Phase 6: Inventory Model And Deterministic Sources** - Add confidence/origin modeling and deterministic scanner expansion for scheduler-backed or registered automations.
 - [x] **Phase 7: Candidate Discovery And Manual Records** - Add bounded script-candidate discovery plus app-only manual records for uncovered automations.
 - [ ] **Phase 8: Sidebar Grouping, Collapse, And Focus Polish** - Add collapsible sections, better grouping modes, and screenshot-driven focus treatment.
-- [ ] **Phase 9: Publication Verification And Docs Polish** - Verify CI, documentation, screenshots/assets, and public-ready release posture.
+- [x] **Phase 9: Publication Verification And Docs Polish** - Verify CI, documentation, screenshots/assets, and public-ready release posture.
 
 ## Phase Details
 
@@ -178,10 +178,10 @@ Cross-cutting constraints:
 
 Plans:
 **Wave 1**
-- [ ] 09-01: Refresh sanitized public docs/screenshots/assets and run the privacy scrub.
+- [x] 09-01: Refresh sanitized public docs/screenshots/assets and run the privacy scrub.
 
 **Wave 2 *(blocked on Wave 1 completion)***
-- [ ] 09-02: Run CI/manual verification and prepare publication notes.
+- [x] 09-02: Run CI/manual verification and prepare publication notes.
 
 ## Progress
 
@@ -195,7 +195,7 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 6. Inventory Model And Deterministic Sources | 3/3 | Complete | 2026-05-08 |
 | 7. Candidate Discovery And Manual Records | 3/3 | Complete | 2026-05-08 |
 | 8. Sidebar Grouping, Collapse, And Focus Polish | 3/3 | Complete | 2026-05-09 |
-| 9. Publication Verification And Docs Polish | 0/2 | Pending | — |
+| 9. Publication Verification And Docs Polish | 2/2 | Complete | 2026-05-10 |
 
 ## Coverage
 
@@ -207,13 +207,13 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | OSS-04 | Phase 4 | Complete |
 | OSS-05 | Phase 4 | Complete |
 | OSS-06 | Phase 4 | Complete |
-| PRIV-01 | Phase 9 | Pending |
+| PRIV-01 | Phase 9 | Complete |
 | PRIV-02 | Phase 4 | Complete |
 | PRIV-03 | Phase 4 | Complete |
 | VIS-01 | Phase 5 | Complete |
 | VIS-02 | Phase 5 | Complete |
 | VIS-03 | Phase 5 | Complete |
-| VIS-04 | Phase 9 | Pending |
+| VIS-04 | Phase 9 | Complete |
 | DISC-01 | Phase 6 | Complete |
 | DISC-02 | Phase 6 | Complete |
 | DISC-03 | Phase 6 | Complete |
@@ -235,7 +235,7 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | QUAL-01 | Phase 6 | Complete |
 | QUAL-02 | Phase 6 | Complete |
 | QUAL-03 | Phase 7 | Complete |
-| QUAL-04 | Phase 9 | Pending |
+| QUAL-04 | Phase 9 | Complete |
 | QUAL-05 | Phase 4 | Complete |
 
 **Coverage:**

@@ -19,7 +19,7 @@ Requirements for making Automation Health publishable as an open-source project 
 
 ### Privacy And Publication Safety
 
-- [ ] **PRIV-01**: Maintainer can run or follow a publication privacy scrub that checks docs, fixtures, screenshots, sample output, bundle identifiers, usernames, hostnames, and paths for personal data.
+- [x] **PRIV-01**: Maintainer can run or follow a publication privacy scrub that checks docs, fixtures, screenshots, sample output, bundle identifiers, usernames, hostnames, and paths for personal data.
 - [x] **PRIV-02**: Public examples and tests use synthetic automation names, paths, and output instead of real local job details.
 - [x] **PRIV-03**: User can see clear documentation of what each scanner reads, whether it shells out, and what data remains local.
 
@@ -28,7 +28,7 @@ Requirements for making Automation Health publishable as an open-source project 
 - [x] **VIS-01**: Maintainer can use a Codex-authored, copy-paste-ready ChatGPT image prompt to generate at least one polished app icon source image; API/CLI generation remains optional for paid reproducible runs.
 - [x] **VIS-02**: User sees the generated icon integrated into the local macOS app bundle instead of the default/blank app identity.
 - [x] **VIS-03**: Maintainer can regenerate app icon assets deterministically from committed source art using a documented local script or build step.
-- [ ] **VIS-04**: Public README/docs visuals use sanitized, aesthetically consistent screenshots or assets that do not expose personal local automations.
+- [x] **VIS-04**: Public README/docs visuals use sanitized, aesthetically consistent screenshots or assets that do not expose personal local automations.
 
 ### Broad Automation Inventory
 
@@ -62,7 +62,7 @@ Requirements for making Automation Health publishable as an open-source project 
 - [x] **QUAL-01**: The app remains read-only with respect to real scheduled jobs, scheduler files, scripts, and third-party automation systems.
 - [x] **QUAL-02**: Scanner additions are covered by focused self-tests with injected paths or command runners rather than live machine state.
 - [x] **QUAL-03**: Broad candidate discovery has documented performance bounds, ignore rules, and failure behavior.
-- [ ] **QUAL-04**: Existing launchd, Hermes cron, search, selection, and refresh behavior continue to pass the local CI gate.
+- [x] **QUAL-04**: Existing launchd, Hermes cron, search, selection, and refresh behavior continue to pass the local CI gate.
 - [x] **QUAL-05**: Public documentation explains that Automation Health provides broad best-effort inventory, not a guarantee that every automation on every Mac has been found.
 
 ## Future Requirements
@@ -106,13 +106,13 @@ Which phases cover which requirements. Updated during roadmap creation and v1.1 
 | OSS-04 | Phase 4 | Complete |
 | OSS-05 | Phase 4 | Complete |
 | OSS-06 | Phase 4 | Complete |
-| PRIV-01 | Phase 9 | Pending |
+| PRIV-01 | Phase 9 | Complete |
 | PRIV-02 | Phase 4 | Complete |
 | PRIV-03 | Phase 4 | Complete |
 | VIS-01 | Phase 5 | Complete |
 | VIS-02 | Phase 5 | Complete |
 | VIS-03 | Phase 5 | Complete |
-| VIS-04 | Phase 9 | Pending |
+| VIS-04 | Phase 9 | Complete |
 | DISC-01 | Phase 6 | Complete |
 | DISC-02 | Phase 6 | Complete |
 | DISC-03 | Phase 6 | Complete |
@@ -134,13 +134,13 @@ Which phases cover which requirements. Updated during roadmap creation and v1.1 
 | QUAL-01 | Phase 6 | Complete |
 | QUAL-02 | Phase 6 | Complete |
 | QUAL-03 | Phase 7 | Complete |
-| QUAL-04 | Phase 9 | Pending |
+| QUAL-04 | Phase 9 | Complete |
 | QUAL-05 | Phase 4 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 36 total
-- Satisfied: 20
-- Pending: 16
+- Satisfied: 23
+- Pending: 13
 - Mapped to phases: 36
 - Unmapped: 0
 
