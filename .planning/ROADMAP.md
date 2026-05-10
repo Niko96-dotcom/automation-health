@@ -33,7 +33,12 @@
 <summary>◆ v1.2 Preferences, Polish, and Shippable Distribution — in progress</summary>
 
 - [ ] **Phase 10: Preferences Persistence** (foundation) — PreferencesStore, @AppStorage/@UserDefaults for grouping mode, collapse state, and scan config. Native Settings scene. LICENSE file.
+  - **Plans:** 3 plans
   - Requirements: PREFS-01, PREFS-02, PREFS-03, PREFS-04, PREFS-05, DIST-01
+  - Plans:
+    - [ ] 10-01-PLAN.md — Preferences store foundation: Codable types, PreferencesStore, scan config wiring
+    - [ ] 10-02-PLAN.md — Settings scene and app integration: SettingsView, AutomationHealthApp, ContentView migration
+    - [ ] 10-03-PLAN.md — LICENSE copyright and self-test verification
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/ARCHITECTURE.md`
 
 - [ ] **Phase 11: Keyboard Navigation** (depends on Phase 10) — Focus search, expand/collapse all, switch grouping mode shortcuts, jump-to-letter navigation.
@@ -89,4 +94,4 @@
 | --------- | ------ | ----- | ----------- | ---------- |
 | v1.0      | 3      | 8/8   | Complete    | 2026-05-08 |
 | v1.1      | 6      | 16/16 | Complete    | 2026-05-10 |
-| v1.2      | 4      | 0/0   | In progress | —          |
+| v1.2      | 4      | 0/3   | In progress | —          |
