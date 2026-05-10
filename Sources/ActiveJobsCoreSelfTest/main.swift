@@ -32,6 +32,9 @@ try testJobPresentationManualRecordIDUsesRawJobID()
 try testAggregatesAndSortsJobsByNextRunThenName()
 try testHumanizesSchedulesAndRunTimes()
 try testHealthSummaries()
+try testCollapseStateCodableRoundTrip()
+try testGroupingModeCodableRoundTrip()
+try testScanConfigDefaults()
 
 print("ActiveJobsCoreSelfTest passed")
 
@@ -837,6 +840,107 @@ func testHealthSummaries() throws {
     expect(pending.health(relativeTo: now).label == "Waiting", "pending label")
     expect(failed.health(relativeTo: now).label == "Needs attention", "failed label")
     expect(stale.health(relativeTo: now).label == "Stale", "stale label")
+}
+
+func testCollapseStateCodableRoundTrip() throws {
+    let sectionA = SidebarSectionID(groupingMode: .source, groupKey: "launchd")
+    let sectionB = SidebarSectionID(groupingMode: .origin, groupKey: "userAuthored")
+    var original = SidebarCollapseState()
+    original.toggle(sectionA)
+    original.toggle(sectionB)
+
+    let encoder = JSONEncoder()
+    guard let data = try? encoder.encode(original) else {
+        fatalError("Expected SidebarCollapseState to encode to JSON Data")
+    }
+
+    let decoder = JSONDecoder()
+    guard let decoded = try? decoder.decode(SidebarCollapseState.self, from: data) else {
+        fatalError("Expected SidebarCollapseState to decode from JSON Data")
+    }
+
+    expect(decoded.collapsedSectionIDs == original.collapsedSectionIDs,
+           "Decoded collapse state matches original")
+    expect(decoded.isCollapsed(sectionA),
+           "Decoded state preserves collapsed section A")
+    expect(decoded.isCollapsed(sectionB),
+           "Decoded state preserves collapsed section B")
+    expect(!decoded.isCollapsed(SidebarSectionID(groupingMode: .confidence, groupKey: "scheduled")),
+           "Decoded state preserves non-collapsed sections")
+
+    // Round-trip empty state
+    let empty = SidebarCollapseState()
+    guard let emptyData = try? encoder.encode(empty) else {
+        fatalError("Expected empty SidebarCollapseState to encode")
+    }
+    guard let decodedEmpty = try? decoder.decode(SidebarCollapseState.self, from: emptyData) else {
+        fatalError("Expected empty SidebarCollapseState to decode")
+    }
+    expect(decodedEmpty.collapsedSectionIDs.isEmpty,
+           "Empty collapse state round-trips correctly")
+}
+
+func testGroupingModeCodableRoundTrip() throws {
+    let encoder = JSONEncoder()
+    let decoder = JSONDecoder()
+
+    for mode in SidebarGroupingMode.allCases {
+        guard let data = try? encoder.encode(mode) else {
+            fatalError("Expected SidebarGroupingMode.\(mode.rawValue) to encode")
+        }
+        guard let decoded = try? decoder.decode(SidebarGroupingMode.self, from: data) else {
+            fatalError("Expected SidebarGroupingMode.\(mode.rawValue) to decode")
+        }
+        expect(decoded == mode,
+               "SidebarGroupingMode \(mode.rawValue) round-trips correctly")
+    }
+
+    // Verify fallback: invalid raw value decodes to nil, which caller handles
+    let invalidJSON = "\"nonexistent_mode\"".data(using: .utf8)!
+    let invalidDecode = try? decoder.decode(SidebarGroupingMode.self, from: invalidJSON)
+    expect(invalidDecode == nil,
+           "Invalid SidebarGroupingMode raw value returns nil")
+}
+
+func testScanConfigDefaults() throws {
+    let config = CandidateScriptScanner.Configuration.default
+
+    expect(config.maxDepth == 2,
+           "Default maxDepth is 2")
+    expect(config.maxVisitedFiles == 2_000,
+           "Default maxVisitedFiles is 2,000")
+    expect(config.maxResults == 200,
+           "Default maxResults is 200")
+    expect(config.maximumCandidateBytes == 1_000_000,
+           "Default maximumCandidateBytes is 1,000,000")
+
+    expect(config.scriptExtensions.contains("sh"),
+           "Default scriptExtensions includes sh")
+    expect(config.scriptExtensions.contains("py"),
+           "Default scriptExtensions includes py")
+    expect(config.scriptExtensions.contains("swift"),
+           "Default scriptExtensions includes swift")
+
+    expect(config.ignoredDirectoryNames.contains(".git"),
+           "Default ignoredDirectoryNames includes .git")
+    expect(config.ignoredDirectoryNames.contains("node_modules"),
+           "Default ignoredDirectoryNames includes node_modules")
+    expect(config.ignoredDirectoryNames.contains(".swiftpm"),
+           "Default ignoredDirectoryNames includes .swiftpm")
+
+    // Verify custom Configuration constructor
+    let custom = CandidateScriptScanner.Configuration(
+        maxDepth: 5,
+        maxVisitedFiles: 500,
+        maxResults: 50,
+        maximumCandidateBytes: 500_000,
+        scriptExtensions: ["sh"],
+        ignoredDirectoryNames: [".git"]
+    )
+    expect(custom.maxDepth == 5, "Custom Configuration respects maxDepth")
+    expect(custom.maxResults == 50, "Custom Configuration respects maxResults")
+    expect(custom.maxVisitedFiles == 500, "Custom Configuration respects maxVisitedFiles")
+    expect(custom.scriptExtensions == ["sh"], "Custom Configuration respects scriptExtensions")
 }
 
 func expect(_ condition: @autoclosure () -> Bool, _ message: String) {
