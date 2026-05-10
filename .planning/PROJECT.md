@@ -4,17 +4,26 @@
 
 Automation Health is a local macOS SwiftUI app for inspecting scheduled jobs on this Mac. It scans supported scheduler sources, presents a searchable sidebar of automations, and shows detail needed to understand job health, timing, configuration, and recent output.
 
-The v1.1 app is ready for source publication review: it keeps the v1.0 sidebar navigation foundation, adds broad inventory records, supports app-owned manual records, polishes sidebar grouping/focus behavior, and records final privacy/visual/CI verification.
+v1.1 shipped broad inventory, sidebar grouping, and privacy/CI verification. v1.2 adds persisted user preferences (grouping mode, collapse state, scan config), additional grouping/navigation affordances (health-based, schedule-based, custom ordering, keyboard shortcuts), and a signed/notarized shippable release artifact.
 
 ## Core Value
 
 Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
 
-## Most Recent Milestone: v1.1 Open Source Readiness and Broad Inventory
+## Current Milestone: v1.2 Preferences, Polish, and Shippable Distribution
 
-**Status:** ✅ Shipped 2026-05-10 — 6 phases, 16 plans, 63 tasks, 36/36 requirements complete.
+**Goal:** Take Automation Health from "buildable locally" to "downloadable and personalized" — persist user preferences, add deferred grouping/navigation affordances, and ship a signed/notarized release artifact.
 
-See `.planning/milestones/v1.1-ROADMAP.md` for the archived scope and `.planning/MILESTONES.md` for the full accomplishments list.
+**Status:** ◆ Planning — requirements being defined
+
+**Target features:**
+- Persisted preferences (grouping mode, collapse state, candidate scan configuration)
+- Additional grouping modes (health-based, schedule-based, custom ordering)
+- Keyboard shortcuts beyond Up/Down (find, jump-to-letter, expand/collapse all, switch grouping, focus search)
+- Shippable distribution (LICENSE, code signing, notarization, GitHub Release)
+- Preserve Phase 8 evidence boundaries (registered/candidate/manual never claim schedule they don't have)
+
+See `.planning/milestones/v1.1-ROADMAP.md` for the archived v1.1 scope and `.planning/MILESTONES.md` for the full accomplishments list.
 
 ## Current State
 
@@ -55,24 +64,27 @@ v1.1 completed 6 phases and 16 plans. Phase 4 added public repository health fil
 
 ### Active
 
-None for v1.1. Future work is tracked below.
+- [ ] User preferences (grouping mode, collapse state, scan config) persist via UserDefaults/@AppStorage.
+- [ ] Health-based, schedule-based, and custom grouping modes are available alongside existing five modes.
+- [ ] Keyboard shortcuts support find/jump-to-letter, expand/collapse all, switch grouping mode, and focus search.
+- [ ] LICENSE file is committed to the repository root.
+- [ ] The `.app` bundle is codesigned with a Developer ID from the build pipeline.
+- [ ] A notarization recipe (notarytool + stapler) is documented and reproducible.
+- [ ] A GitHub Release for v1.2 delivers a downloadable `.app.zip` or `.dmg`.
+- [ ] Release process documentation covers signing and notarization with placeholder identifiers.
+- [ ] Evidence boundaries are preserved: registered/candidate/manual records never claim schedule they don't have.
 
 ### Out of Scope
 
 - Editing, enabling, disabling, deleting, or creating scheduled jobs - the app remains read-only.
-- Claiming perfect discovery of every possible automation on every Mac - v1.1 should label confidence and limitations honestly.
+- Claiming perfect discovery of every possible automation on every Mac - the app labels confidence and limitations honestly.
 - Broad unbounded filesystem indexing - candidate discovery must be bounded, transparent, and performance-conscious.
 - Uploading or sharing local scan data - publishing work must avoid leaking personal paths, hostnames, outputs, or job details.
-- A full design-system rewrite - v1.1 should polish the existing native SwiftUI app rather than replace the app shell.
-
-## Next Milestone Goals
-
-To be defined via `/gsd-new-milestone`. Candidate themes carried forward as Deferred Items:
-
-- Persisted grouping and candidate-scan preferences (UserDefaults/AppStorage).
-- Signed and notarized release artifact for distribution outside source-only publication.
-- Additional grouping modes (health-based, schedule-based, persisted custom) beyond the five shipped in v1.1.
-- Keyboard navigation beyond Up/Down (find, jump-to-letter, etc.).
+- A full design-system rewrite - v1.2 should polish the existing native SwiftUI app rather than replace the app shell.
+- Cloud sync, accounts, telemetry, or analytics — all preferences persist locally only.
+- iOS port or Mac Catalyst — macOS native only.
+- In-app auto-update — rely on the GitHub Releases page.
+- A separate preferences app or Settings scene redesign — use the native macOS Settings scene.
 
 ## Context
 
@@ -133,4 +145,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-10 after Phase 9 completion*
+*Last updated: 2026-05-10 after v1.2 milestone start*

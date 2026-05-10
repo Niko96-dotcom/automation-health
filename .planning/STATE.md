@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Open Source Readiness and Broad Inventory
-status: Awaiting next milestone
-stopped_at: Milestone v1.1 complete after Phase 09 verification
-last_updated: "2026-05-10T20:04:16.649Z"
-last_activity: 2026-05-10 — Milestone v1.1 completed and archived
+milestone: v1.2
+milestone_name: Preferences, Polish, and Shippable Distribution
+status: planning
+last_updated: "2026-05-10T20:38:21.841Z"
+last_activity: 2026-05-10
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 16
-  completed_plans: 16
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-10)
 
 ## Current Position
 
-Phase: Milestone v1.1 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-10 — Milestone v1.1 completed and archived
+Status: Defining requirements
+Last activity: 2026-05-10 — Milestone v1.2 started
 
 ## Performance Metrics
 
