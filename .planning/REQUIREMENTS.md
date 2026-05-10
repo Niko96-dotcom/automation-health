@@ -73,33 +73,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PREFS-01 | — | Pending |
-| PREFS-02 | — | Pending |
-| PREFS-03 | — | Pending |
-| PREFS-04 | — | Pending |
-| PREFS-05 | — | Pending |
-| GROUP-01 | — | Pending |
-| GROUP-02 | — | Pending |
-| GROUP-03 | — | Pending |
-| GROUP-04 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
-| NAV-04 | — | Pending |
-| NAV-05 | — | Pending |
-| DIST-01 | — | Pending |
-| DIST-02 | — | Pending |
-| DIST-03 | — | Pending |
-| DIST-04 | — | Pending |
-| DIST-05 | — | Pending |
-| DIST-06 | — | Pending |
-| DIST-07 | — | Pending |
+| PREFS-01 | Phase 10 | Pending |
+| PREFS-02 | Phase 10 | Pending |
+| PREFS-03 | Phase 10 | Pending |
+| PREFS-04 | Phase 10 | Pending |
+| PREFS-05 | Phase 10 | Pending |
+| DIST-01 | Phase 10 | Pending |
+| NAV-01 | Phase 11 | Pending |
+| NAV-02 | Phase 11 | Pending |
+| NAV-03 | Phase 11 | Pending |
+| NAV-04 | Phase 11 | Pending |
+| NAV-05 | Phase 11 | Pending |
+| GROUP-01 | Phase 12 | Pending |
+| GROUP-02 | Phase 12 | Pending |
+| GROUP-03 | Phase 12 | Pending |
+| GROUP-04 | Phase 12 | Pending |
+| DIST-02 | Phase 13 | Pending |
+| DIST-03 | Phase 13 | Pending |
+| DIST-04 | Phase 13 | Pending |
+| DIST-05 | Phase 13 | Pending |
+| DIST-06 | Phase 13 | Pending |
+| DIST-07 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 21 total
-- Mapped to phases: 0
-- Unmapped: 21
+- Mapped to phases: 21
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-10*
-*Last updated: 2026-05-10 after initial definition*
+*Last updated: 2026-05-10 after roadmap creation*

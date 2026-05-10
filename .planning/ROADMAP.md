@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 Sidebar Navigation** — Phases 1-3 shipped 2026-05-08; 8 plans, 23 tasks. Archives: [roadmap](milestones/v1.0-ROADMAP.md), [requirements](milestones/v1.0-REQUIREMENTS.md), [audit](milestones/v1.0-MILESTONE-AUDIT.md).
 - ✅ **v1.1 Open Source Readiness and Broad Inventory** — Phases 4-9 shipped 2026-05-10; 16 plans, 63 tasks. Archives: [roadmap](milestones/v1.1-ROADMAP.md), [requirements](milestones/v1.1-REQUIREMENTS.md), [audit](milestones/v1.1-MILESTONE-AUDIT.md).
-- 📋 **Next milestone** — TBD via `/gsd-new-milestone`. Deferred candidates: persisted grouping/candidate-scan preferences, signed/notarized release artifact, alternate grouping modes (health, schedule, custom).
+- ◆ **v1.2 Preferences, Polish, and Shippable Distribution** — Phases 10-13 in progress.
 
 ## Phases
 
@@ -29,10 +29,64 @@
 
 </details>
 
+<details open>
+<summary>◆ v1.2 Preferences, Polish, and Shippable Distribution — in progress</summary>
+
+- [ ] **Phase 10: Preferences Persistence** (foundation) — PreferencesStore, @AppStorage/@UserDefaults for grouping mode, collapse state, and scan config. Native Settings scene. LICENSE file.
+  - Requirements: PREFS-01, PREFS-02, PREFS-03, PREFS-04, PREFS-05, DIST-01
+  - Canonical refs: `.planning/research/STACK.md`, `.planning/research/ARCHITECTURE.md`
+
+- [ ] **Phase 11: Keyboard Navigation** (depends on Phase 10) — Focus search, expand/collapse all, switch grouping mode shortcuts, jump-to-letter navigation.
+  - Requirements: NAV-01, NAV-02, NAV-03, NAV-04, NAV-05
+  - Canonical refs: `.planning/research/STACK.md`, `.planning/research/FEATURES.md`
+
+- [ ] **Phase 12: Schedule-Based Grouping** (depends on Phase 10) — New schedule-based grouping mode with confidence-gated classifier. Evidence boundary preservation for Registered, Candidate, and Manual records.
+  - Requirements: GROUP-01, GROUP-02, GROUP-03, GROUP-04
+  - Canonical refs: `.planning/research/ARCHITECTURE.md`, `.planning/research/PITFALLS.md`
+
+- [ ] **Phase 13: Shippable Distribution** (independent of UI phases) — Codesigning, hardened runtime entitlements, notarization, DMG packaging, GitHub Release, release process documentation.
+  - Requirements: DIST-02, DIST-03, DIST-04, DIST-05, DIST-06, DIST-07
+  - Canonical refs: `.planning/research/STACK.md`, `.planning/research/PITFALLS.md`
+
+</details>
+
+## Success Criteria
+
+### Phase 10: Preferences Persistence
+1. Grouping mode selection survives app quit and relaunch
+2. Sidebar section collapse state is restored on relaunch per grouping mode and group key
+3. Candidate scan configuration (roots, depth, caps) persists across launches
+4. First launch with no preferences uses the documented v1.1 defaults
+5. Settings scene (Cmd+,) exposes scannable configuration fields with persistent values
+6. LICENSE file (MIT) is present in the repository root
+
+### Phase 11: Keyboard Navigation
+1. Cmd+Shift+F focuses the sidebar search field from anywhere in the app
+2. Single shortcut expands all sidebar sections; companion shortcut collapses all
+3. Cmd+1 through Cmd+N switch between available grouping modes
+4. Typing one or more letters in the sidebar selects the first matching job row
+5. All keyboard shortcuts coexist with existing Up/Down arrow navigation
+6. Shortcuts work regardless of current grouping mode or collapse state
+
+### Phase 12: Schedule-Based Grouping
+1. "Schedule" appears as a selectable grouping mode alongside existing five modes
+2. Jobs with schedule evidence are classified into time-of-day or frequency buckets
+3. Registered, Candidate, and Manual records appear in a "No schedule evidence" section
+4. Non-scheduled confidence records never display fabricated run times or next-run dates
+5. Existing grouping modes (Source, Origin, Health, Trigger, Confidence) are unaffected
+
+### Phase 13: Shippable Distribution
+1. A single script command produces a Developer ID-signed, hardened-runtime `.app` bundle
+2. Notarization succeeds via `notarytool --wait` and staple attaches the ticket
+3. Signed and notarized `.app.zip` or `.dmg` is ready for distribution
+4. GitHub Release page for v1.2 contains the downloadable artifact
+5. `docs/release-process.md` documents the full pipeline with placeholder identifiers
+6. No real Developer ID, team ID, or credentials appear in committed files
+
 ## Progress
 
 | Milestone | Phases | Plans | Status      | Shipped    |
 | --------- | ------ | ----- | ----------- | ---------- |
 | v1.0      | 3      | 8/8   | Complete    | 2026-05-08 |
 | v1.1      | 6      | 16/16 | Complete    | 2026-05-10 |
-| (next)    | -      | -     | Not started | -          |
+| v1.2      | 4      | 0/0   | In progress | —          |
