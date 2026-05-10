@@ -154,6 +154,8 @@ public struct ScheduledJob: Identifiable, Hashable, Sendable {
         "\(source.rawValue):\(id)"
     }
 
+    public static let manualDefaultScheduleDescription = "Manual record (no schedule evidence)"
+
     public init(
         id: String,
         name: String,

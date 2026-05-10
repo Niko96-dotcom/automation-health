@@ -5,33 +5,36 @@ import AutomationHealthCore
 
 @MainActor
 final class PreferencesStore: ObservableObject {
+    private let userDefaults: UserDefaults
+
     @Published var groupingMode: SidebarGroupingMode {
         didSet {
-            UserDefaults.standard.set(groupingMode.rawValue, forKey: "sidebarGroupingMode")
+            userDefaults.set(groupingMode.rawValue, forKey: "sidebarGroupingMode")
         }
     }
 
     @Published var collapseState: SidebarCollapseState {
         didSet {
             if let data = try? JSONEncoder().encode(collapseState) {
-                UserDefaults.standard.set(data, forKey: "sidebarCollapseState")
+                userDefaults.set(data, forKey: "sidebarCollapseState")
             }
         }
     }
 
     @Published var scanOnLaunch: Bool {
-        didSet { UserDefaults.standard.set(scanOnLaunch, forKey: "scanOnLaunch") }
+        didSet { userDefaults.set(scanOnLaunch, forKey: "scanOnLaunch") }
     }
 
     @Published var scanMaxDepth: Int {
-        didSet { UserDefaults.standard.set(scanMaxDepth, forKey: "scanMaxDepth") }
+        didSet { userDefaults.set(scanMaxDepth, forKey: "scanMaxDepth") }
     }
 
     @Published var scanMaxResults: Int {
-        didSet { UserDefaults.standard.set(scanMaxResults, forKey: "scanMaxResults") }
+        didSet { userDefaults.set(scanMaxResults, forKey: "scanMaxResults") }
     }
 
     init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
         userDefaults.register(defaults: [
             "sidebarGroupingMode": SidebarGroupingMode.defaultMode.rawValue,
             "scanOnLaunch": true,

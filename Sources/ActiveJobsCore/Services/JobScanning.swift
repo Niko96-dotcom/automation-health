@@ -17,7 +17,7 @@ public protocol JobScanning: Sendable {
 public struct JobInventory: Sendable {
     private let scanners: [JobScanning]
 
-    public init(scanners: [JobScanning], homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser) {
+    public init(scanners: [JobScanning]) {
         self.scanners = scanners
     }
 
@@ -37,8 +37,7 @@ public struct JobInventory: Sendable {
                 AutomatorScanner(homeDirectory: homeDirectory),
                 CandidateScriptScanner(homeDirectory: homeDirectory, configuration: candidateConfiguration ?? .default),
                 ManualRecordScanner(store: manualRecordStore)
-            ],
-            homeDirectory: homeDirectory
+            ]
         )
     }
 

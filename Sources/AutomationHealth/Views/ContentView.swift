@@ -145,7 +145,7 @@ private struct ManualRecordSheetState: Identifiable, Hashable {
 
     static func edit(id: UUID, job: JobPresentation) -> ManualRecordSheetState {
         let fallbackDefinition = "Manual app record: \(job.job.name)"
-        let scheduleDescription = job.job.schedule == "Manual record (no schedule evidence)" ? "" : job.job.schedule
+        let scheduleDescription = job.job.schedule == ScheduledJob.manualDefaultScheduleDescription ? "" : job.job.schedule
 
         return ManualRecordSheetState(
             mode: .edit(id),

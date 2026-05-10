@@ -37,7 +37,7 @@ public struct ManualAutomationRecord: Codable, Hashable, Identifiable, Sendable 
             source: .manualRecords,
             confidence: .manual,
             origin: origin,
-            schedule: scheduleDescription ?? "Manual record (no schedule evidence)",
+            schedule: scheduleDescription ?? ScheduledJob.manualDefaultScheduleDescription,
             command: command,
             state: "manual",
             lastStatus: nil,

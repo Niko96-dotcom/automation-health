@@ -205,7 +205,7 @@ func testInventoryAggregatesJobsAndScanNotes() throws {
         notes: [note]
     )
 
-    let result = try JobInventory(scanners: [scanner], homeDirectory: root.url).refresh()
+    let result = try JobInventory(scanners: [scanner]).refresh()
 
     expect(result.jobs.map(\.name) == ["Alpha", "Zulu"], "Inventory dedupes and sorts jobs")
     expect(result.notes == [note], "Inventory preserves scan notes")
@@ -455,7 +455,7 @@ func testInventoryIncludesCandidateAndManualRecordsWithoutBreakingExistingSource
         existingSources,
         CandidateScriptScanner(homeDirectory: root.url, candidateRootDirectories: [root.url.appending(path: "Scripts")]),
         ManualRecordScanner(store: manualStore)
-    ], homeDirectory: root.url).refresh()
+    ]).refresh()
 
     let sources = Set(result.jobs.map(\.source))
     expect(sources.isSuperset(of: [.launchd, .hermesCron, .cron, .shortcuts, .automator, .candidateScripts, .manualRecords]), "Inventory includes all sources")
@@ -501,7 +501,7 @@ func testSidebarGroupingModeLabelsAndOrders() throws {
         ScheduledJob.fixture(id: "queue", name: "queue", schedule: "queues: /tmp/example"),
         ScheduledJob.fixture(id: "registered", name: "registered", source: .shortcuts, confidence: .registered, schedule: "Registered shortcut (no schedule evidence)"),
         ScheduledJob.fixture(id: "candidate", name: "candidate", source: .candidateScripts, confidence: .candidate, schedule: "Script candidate (no schedule evidence)"),
-        ScheduledJob.fixture(id: "manual", name: "manual", source: .manualRecords, confidence: .manual, schedule: "Manual record (no schedule evidence)")
+        ScheduledJob.fixture(id: "manual", name: "manual", source: .manualRecords, confidence: .manual, schedule: ScheduledJob.manualDefaultScheduleDescription)
     ].map { JobPresentation(job: $0, now: now) }
     expect(SidebarJobSection.sections(for: triggerJobs, groupingMode: .trigger, collapseState: SidebarCollapseState(), hasSearchQuery: false).map(\.title) == ["Time-based", "Login / Keep Alive", "File / Queue Trigger", "Registered Only", "Candidate Scripts", "Manual / Unspecified"], "Trigger group order")
 
@@ -539,7 +539,7 @@ func testSidebarTriggerClassificationPreservesEvidenceBoundaries() throws {
         ScheduledJob.fixture(id: "shortcut", name: "Registered Shortcut", source: .shortcuts, confidence: .registered, schedule: "Registered shortcut (no schedule evidence)"),
         ScheduledJob.fixture(id: "automator", name: "Registered Automator", source: .automator, confidence: .registered, schedule: "Automator workflow (no schedule evidence)"),
         ScheduledJob.fixture(id: "candidate", name: "Candidate Script", source: .candidateScripts, confidence: .candidate, schedule: "Script candidate (no schedule evidence)"),
-        ScheduledJob.fixture(id: "manual", name: "Manual Record", source: .manualRecords, confidence: .manual, schedule: "Manual record (no schedule evidence)"),
+        ScheduledJob.fixture(id: "manual", name: "Manual Record", source: .manualRecords, confidence: .manual, schedule: ScheduledJob.manualDefaultScheduleDescription),
         ScheduledJob.fixture(id: "watched", name: "Watched Files", source: .launchd, schedule: "watches: /tmp/input"),
         ScheduledJob.fixture(id: "queued", name: "Queue Files", source: .launchd, schedule: "queues: /tmp/input"),
         ScheduledJob.fixture(id: "login", name: "Login Agent", source: .launchd, schedule: "at login, keep alive"),
@@ -647,7 +647,7 @@ func testAggregatesAndSortsJobsByNextRunThenName() throws {
         )
     ])
 
-    let jobs = try JobInventory(scanners: [scanner], homeDirectory: root.url).refresh().jobs
+    let jobs = try JobInventory(scanners: [scanner]).refresh().jobs
 
     expect(jobs.map(\.name) == ["Alpha", "Zulu"], "Job sort order")
 }

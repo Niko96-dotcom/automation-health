@@ -151,7 +151,9 @@ final class JobStore: ObservableObject {
             isScanning = false
 
             if let queuedRefresh {
-                refresh(preferredSelectionID: queuedRefresh.preferredSelectionID)
+                Task { @MainActor in
+                    refresh(preferredSelectionID: queuedRefresh.preferredSelectionID)
+                }
             }
         }
     }

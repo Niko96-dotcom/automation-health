@@ -26,7 +26,9 @@ struct AutomationHealthApp: App {
             ContentView(store: store, preferences: preferences)
                 .frame(minWidth: 980, minHeight: 620)
                 .task {
-                    store.refresh()
+                    if preferences.scanOnLaunch {
+                        store.refresh()
+                    }
                 }
         }
         .commands {
