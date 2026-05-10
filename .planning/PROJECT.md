@@ -10,17 +10,11 @@ The v1.1 app is ready for source publication review: it keeps the v1.0 sidebar n
 
 Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
 
-## Current Milestone: v1.1 Open Source Readiness and Broad Inventory
+## Most Recent Milestone: v1.1 Open Source Readiness and Broad Inventory
 
-**Goal:** Make Automation Health ready to publish as a clean open-source GitHub project while expanding discovery beyond the current machine-specific scheduler slice and polishing the sidebar experience.
+**Status:** ✅ Shipped 2026-05-10 — 6 phases, 16 plans, 63 tasks, 36/36 requirements complete.
 
-**Status:** Complete as of Phase 09 on 2026-05-10.
-
-**Target features:**
-- Public GitHub readiness: license, security/support/community files, README/docs/workflows, and privacy scrub so personal local details are not leaked.
-- Image-generated visual identity: Codex should produce copy-paste-ready ChatGPT image prompts for app/public assets, with at least a polished app icon and a deterministic packaging path from chosen source art.
-- Broad automation inventory: add deterministic scanner coverage, confidence-labeled candidate discoveries, and manual app-only records for automations the scanner cannot prove.
-- Sidebar organization polish: app-matched focus styling, collapsible categories, and grouping/sorting options that separate source from ownership, health, trigger type, and confidence.
+See `.planning/milestones/v1.1-ROADMAP.md` for the archived scope and `.planning/MILESTONES.md` for the full accomplishments list.
 
 ## Current State
 
@@ -73,7 +67,12 @@ None for v1.1. Future work is tracked below.
 
 ## Next Milestone Goals
 
-This section is superseded by the active v1.1 milestone above.
+To be defined via `/gsd-new-milestone`. Candidate themes carried forward as Deferred Items:
+
+- Persisted grouping and candidate-scan preferences (UserDefaults/AppStorage).
+- Signed and notarized release artifact for distribution outside source-only publication.
+- Additional grouping modes (health-based, schedule-based, persisted custom) beyond the five shipped in v1.1.
+- Keyboard navigation beyond Up/Down (find, jump-to-letter, etc.).
 
 ## Context
 
