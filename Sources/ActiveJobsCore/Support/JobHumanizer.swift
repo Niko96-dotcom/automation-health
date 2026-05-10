@@ -16,18 +16,9 @@ public struct JobHealth: Hashable, Sendable {
 
 public enum JobHumanizer {
     public static func displayName(_ rawName: String, source: JobSource) -> String {
-        let cleaned = rawName
-            .replacingOccurrences(of: "com.user.", with: "")
-            .replacingOccurrences(of: "com.niko.", with: "")
-            .replacingOccurrences(of: "com.", with: "")
-            .replacingOccurrences(of: "ai.", with: "")
-            .replacingOccurrences(of: ".wake", with: "")
-            .replacingOccurrences(of: ".", with: " ")
-            .replacingOccurrences(of: "-", with: " ")
-            .replacingOccurrences(of: "_", with: " ")
+        let words = displayNameWords(from: rawName)
 
-        return cleaned
-            .split(separator: " ")
+        return words
             .enumerated()
             .map { index, word in
                 let lowercased = word.lowercased()
@@ -40,6 +31,22 @@ public enum JobHumanizer {
                 return word.prefix(1).uppercased() + word.dropFirst().lowercased()
             }
             .joined(separator: " ")
+    }
+
+    private static func displayNameWords(from rawName: String) -> [Substring] {
+        var components = rawName
+            .replacingOccurrences(of: ".wake", with: "")
+            .split(separator: ".")
+
+        while let first = components.first?.lowercased(), droppedBundlePrefixComponents.contains(first) {
+            components.removeFirst()
+        }
+
+        return components
+            .joined(separator: " ")
+            .replacingOccurrences(of: "-", with: " ")
+            .replacingOccurrences(of: "_", with: " ")
+            .split(separator: " ")
     }
 
     public static func scheduleDescription(_ rawSchedule: String) -> String {
@@ -213,6 +220,8 @@ public enum JobHumanizer {
     ]
 
     private static let smallWords: Set<String> = ["and", "for", "of", "or", "the", "to"]
+
+    private static let droppedBundlePrefixComponents: Set<String> = ["com", "org", "net", "io", "ai", "user"]
 
     private static func timeString(from date: Date) -> String {
         let formatter = DateFormatter()
