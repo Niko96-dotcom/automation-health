@@ -9,18 +9,23 @@ let package = Package(
     ],
     products: [
         .library(name: "ActiveJobsCore", targets: ["ActiveJobsCore"]),
+        .library(name: "AutomationHealthCore", targets: ["AutomationHealthCore"]),
         .executable(name: "AutomationHealth", targets: ["AutomationHealth"]),
         .executable(name: "ActiveJobsCoreSelfTest", targets: ["ActiveJobsCoreSelfTest"])
     ],
     targets: [
         .target(name: "ActiveJobsCore"),
-        .executableTarget(
-            name: "AutomationHealth",
+        .target(
+            name: "AutomationHealthCore",
             dependencies: ["ActiveJobsCore"]
         ),
         .executableTarget(
+            name: "AutomationHealth",
+            dependencies: ["ActiveJobsCore", "AutomationHealthCore"]
+        ),
+        .executableTarget(
             name: "ActiveJobsCoreSelfTest",
-            dependencies: ["ActiveJobsCore"]
+            dependencies: ["ActiveJobsCore", "AutomationHealthCore"]
         )
     ]
 )
