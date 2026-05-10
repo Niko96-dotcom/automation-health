@@ -23,7 +23,7 @@ jobs:
       TZ: Europe/Berlin
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Show toolchain
         run: swift --version
