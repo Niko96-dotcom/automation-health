@@ -12,11 +12,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct AutomationHealthApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var store = JobStore()
+    @StateObject private var preferences: PreferencesStore
+    @StateObject private var store: JobStore
+
+    init() {
+        let prefs = PreferencesStore()
+        _preferences = StateObject(wrappedValue: prefs)
+        _store = StateObject(wrappedValue: JobStore(preferences: prefs))
+    }
 
     var body: some Scene {
         WindowGroup("Automation Health", id: "main") {
-            ContentView(store: store)
+            ContentView(store: store, preferences: preferences)
                 .frame(minWidth: 980, minHeight: 620)
                 .task {
                     store.refresh()
@@ -29,6 +36,10 @@ struct AutomationHealthApp: App {
                 }
                 .keyboardShortcut("r", modifiers: [.command])
             }
+        }
+
+        Settings {
+            SettingsView(preferences: preferences)
         }
     }
 }
