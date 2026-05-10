@@ -38,7 +38,7 @@
   - Plans:
     - [x] 10-01-PLAN.md — Preferences store foundation: Codable types, PreferencesStore, scan config wiring
     - [ ] 10-02-PLAN.md — Settings scene and app integration: SettingsView, AutomationHealthApp, ContentView migration
-    - [ ] 10-03-PLAN.md — LICENSE copyright and self-test verification
+    - [x] 10-03-PLAN.md — LICENSE copyright and self-test verification
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/ARCHITECTURE.md`
 
 - [ ] **Phase 11: Keyboard Navigation** (depends on Phase 10) — Focus search, expand/collapse all, switch grouping mode shortcuts, jump-to-letter navigation.

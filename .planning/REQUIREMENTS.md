@@ -32,7 +32,7 @@ Requirements for v1.2 Preferences, Polish, and Shippable Distribution. Each maps
 
 ### Distribution
 
-- [ ] **DIST-01**: Permissive LICENSE file (MIT) is committed to the repository root
+- [x] **DIST-01**: Permissive LICENSE file (MIT) is committed to the repository root
 - [ ] **DIST-02**: The `.app` bundle is codesigned with a Developer ID Application certificate via the build pipeline
 - [ ] **DIST-03**: Hardened runtime entitlements are configured for the signed app
 - [ ] **DIST-04**: Notarization recipe (notarytool + stapler) is documented and reproducible with placeholder identifiers
@@ -78,7 +78,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREFS-03 | Phase 10 | Pending |
 | PREFS-04 | Phase 10 | Pending |
 | PREFS-05 | Phase 10 | Pending |
-| DIST-01 | Phase 10 | Pending |
+| DIST-01 | Phase 10 | Complete |
 | NAV-01 | Phase 11 | Pending |
 | NAV-02 | Phase 11 | Pending |
 | NAV-03 | Phase 11 | Pending |
