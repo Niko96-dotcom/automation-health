@@ -16,16 +16,19 @@ final class JobStore: ObservableObject {
     @Published private(set) var isScanning = false
     @Published private(set) var lastScannedAt: Date?
 
-    private let inventory: JobInventory
+    private let injectedInventory: JobInventory?
+    private let preferences: PreferencesStore?
     private let manualRecordStore: ManualRecordStore
     private var pendingRefresh: PendingRefresh?
 
-    init(inventory: JobInventory? = nil, manualRecordStore: ManualRecordStore = .live()) {
+    init(
+        inventory: JobInventory? = nil,
+        manualRecordStore: ManualRecordStore = .live(),
+        preferences: PreferencesStore? = nil
+    ) {
         self.manualRecordStore = manualRecordStore
-        self.inventory = inventory ?? JobInventory.live(
-            homeDirectory: FileManager.default.homeDirectoryForCurrentUser,
-            manualRecordStore: manualRecordStore
-        )
+        self.preferences = preferences
+        self.injectedInventory = inventory
     }
 
     var selectedJob: JobPresentation? {
@@ -40,6 +43,17 @@ final class JobStore: ObservableObject {
             return "Not scanned yet"
         }
         return AppDateFormatters.shortTime.string(from: lastScannedAt)
+    }
+
+    private func currentInventory() -> JobInventory {
+        if let injectedInventory {
+            return injectedInventory
+        }
+        return JobInventory.live(
+            homeDirectory: FileManager.default.homeDirectoryForCurrentUser,
+            manualRecordStore: manualRecordStore,
+            candidateConfiguration: preferences?.candidateScannerConfiguration
+        )
     }
 
     func refresh() {
@@ -89,7 +103,7 @@ final class JobStore: ObservableObject {
         }
 
         isScanning = true
-        let inventory = inventory
+        let inventory = currentInventory()
 
         Task {
             let result = await Task.detached(priority: .userInitiated) {

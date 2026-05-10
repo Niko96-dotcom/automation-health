@@ -23,7 +23,8 @@ public struct JobInventory: Sendable {
 
     public static func live(
         homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser,
-        manualRecordStore: ManualRecordStore? = nil
+        manualRecordStore: ManualRecordStore? = nil,
+        candidateConfiguration: CandidateScriptScanner.Configuration? = nil
     ) -> JobInventory {
         let manualRecordStore = manualRecordStore ?? ManualRecordStore.live(homeDirectory: homeDirectory)
 
@@ -34,7 +35,7 @@ public struct JobInventory: Sendable {
                 CronScanner(),
                 ShortcutsScanner(),
                 AutomatorScanner(homeDirectory: homeDirectory),
-                CandidateScriptScanner(homeDirectory: homeDirectory),
+                CandidateScriptScanner(homeDirectory: homeDirectory, configuration: candidateConfiguration ?? .default),
                 ManualRecordScanner(store: manualRecordStore)
             ],
             homeDirectory: homeDirectory
