@@ -1,15 +1,22 @@
 import AppKit
 import SwiftUI
 import ActiveJobsCore
+import AutomationHealthCore
 
 struct DetailView: View {
     let job: JobPresentation?
     let errorMessage: String?
+    let onEditManualRecord: (JobPresentation) -> Void
+    let onRemoveManualRecord: (JobPresentation) -> Void
 
     var body: some View {
         Group {
             if let job {
-                JobDetailContent(job: job)
+                JobDetailContent(
+                    job: job,
+                    onEditManualRecord: onEditManualRecord,
+                    onRemoveManualRecord: onRemoveManualRecord
+                )
             } else {
                 EmptySelectionView(errorMessage: errorMessage)
             }
@@ -19,6 +26,9 @@ struct DetailView: View {
 
 private struct JobDetailContent: View {
     let job: JobPresentation
+    let onEditManualRecord: (JobPresentation) -> Void
+    let onRemoveManualRecord: (JobPresentation) -> Void
+    @State private var showsRemoveConfirmation = false
 
     var body: some View {
         ScrollView {
@@ -40,20 +50,33 @@ private struct JobDetailContent: View {
                 TextSection(
                     title: "Configured Task",
                     systemImage: "text.alignleft",
-                    text: job.job.definition.isEmpty ? "No definition text found." : job.job.definition,
+                    text: job.definitionText,
                     monospaced: false
                 )
 
                 TextSection(
                     title: "What Happened Last Time",
                     systemImage: "waveform.path.ecg",
-                    text: job.job.lastRunDetails ?? "No run output or log file found yet.",
+                    text: job.lastOutputText,
                     monospaced: true
                 )
             }
             .padding(.horizontal, 28)
             .padding(.vertical, 24)
             .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .confirmationDialog(
+            "Remove Manual Record?",
+            isPresented: $showsRemoveConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Remove Manual Record", role: .destructive) {
+                onRemoveManualRecord(job)
+            }
+
+            Button("Keep Manual Record", role: .cancel) {}
+        } message: {
+            Text("This removes the app-only record from Automation Health. Scheduler files, scripts, Shortcuts, Automator workflows, cron entries, launchd plists, and Hermes metadata are not changed.")
         }
     }
 
@@ -63,7 +86,7 @@ private struct JobDetailContent: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(.tint.opacity(0.12))
-                    Image(systemName: job.job.source == .hermesCron ? "calendar.badge.clock" : "gearshape.2")
+                    Image(systemName: job.sourceIconName)
                         .font(.title3)
                         .foregroundStyle(.tint)
                 }
@@ -83,7 +106,26 @@ private struct JobDetailContent: View {
 
                 Spacer(minLength: 16)
 
-                HealthPill(health: job.health)
+                VStack(alignment: .trailing, spacing: 8) {
+                    HealthPill(health: job.health)
+
+                    if job.job.source == .manualRecords {
+                        HStack(spacing: 8) {
+                            Button {
+                                onEditManualRecord(job)
+                            } label: {
+                                Label("Edit Manual Record", systemImage: "square.and.pencil")
+                            }
+
+                            Button(role: .destructive) {
+                                showsRemoveConfirmation = true
+                            } label: {
+                                Label("Remove Manual Record", systemImage: "trash")
+                            }
+                        }
+                        .controlSize(.small)
+                    }
+                }
             }
         }
     }
@@ -100,6 +142,22 @@ private struct StatusOverview: View {
                 detail: job.health.detail,
                 systemImage: "heart.text.square",
                 tint: color(for: job.health.kind)
+            )
+
+            StatusCard(
+                title: "Confidence",
+                value: job.confidenceName,
+                detail: job.job.confidence.description,
+                systemImage: "checkmark.seal",
+                tint: .green
+            )
+
+            StatusCard(
+                title: "Origin",
+                value: job.originName,
+                detail: "Source-independent ownership/origin",
+                systemImage: "person.crop.circle.badge.questionmark",
+                tint: .indigo
             )
 
             StatusCard(
@@ -182,20 +240,91 @@ private struct TextSection: View {
     let systemImage: String
     let text: String
     var monospaced = false
+    private let maximumAccessibilityCharacters = 800
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label(title, systemImage: systemImage)
                 .font(.headline)
 
-            Text(text)
-                .font(monospaced ? .system(.callout, design: .monospaced) : .callout)
-                .textSelection(.enabled)
-                .lineSpacing(monospaced ? 2 : 3)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+            if monospaced {
+                ReadOnlyLogTextView(text: text)
+                    .frame(maxWidth: .infinity, minHeight: 180, idealHeight: 260, maxHeight: 320)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .accessibilityLabel(accessibilityText)
+            } else {
+                Text(text)
+                    .font(.callout)
+                    .textSelection(.enabled)
+                    .lineSpacing(3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    .accessibilityLabel(accessibilityText)
+            }
         }
+    }
+
+    private var accessibilityText: String {
+        guard text.count > maximumAccessibilityCharacters else {
+            return text
+        }
+
+        let preview = String(text.prefix(maximumAccessibilityCharacters))
+        return "\(title): \(preview)..."
+    }
+}
+
+private struct ReadOnlyLogTextView: NSViewRepresentable {
+    let text: String
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeNSView(context: Context) -> NSScrollView {
+        let scrollView = NSScrollView()
+        scrollView.drawsBackground = false
+        scrollView.hasVerticalScroller = true
+        scrollView.borderType = .noBorder
+
+        let textView = NSTextView()
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.drawsBackground = false
+        textView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        textView.textColor = .labelColor
+        textView.textContainerInset = NSSize(width: 12, height: 10)
+        textView.isHorizontallyResizable = false
+        textView.isVerticallyResizable = true
+        textView.textContainer?.widthTracksTextView = true
+        textView.textContainer?.containerSize = NSSize(
+            width: scrollView.contentSize.width,
+            height: .greatestFiniteMagnitude
+        )
+
+        scrollView.documentView = textView
+        context.coordinator.textView = textView
+        return scrollView
+    }
+
+    func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        guard let textView = context.coordinator.textView ?? scrollView.documentView as? NSTextView else {
+            return
+        }
+
+        if textView.string != text {
+            textView.string = text
+            textView.scrollToBeginningOfDocument(nil)
+        }
+
+        textView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        textView.textColor = .labelColor
+    }
+
+    final class Coordinator {
+        weak var textView: NSTextView?
     }
 }
 
@@ -231,7 +360,7 @@ private struct TechnicalDetails: View {
                     Button {
                         NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: detailPath)])
                     } label: {
-                        Label("Reveal", systemImage: "magnifyingglass")
+                        Label(job.revealActionLabel, systemImage: "magnifyingglass")
                     }
                     .controlSize(.small)
                 }
@@ -264,12 +393,12 @@ private struct EmptySelectionView: View {
 
     var body: some View {
         ContentUnavailableView {
-            Label("No Job Selected", systemImage: "calendar.badge.exclamationmark")
+            Label("No automation records yet", systemImage: "calendar.badge.exclamationmark")
         } description: {
             if let errorMessage {
-                Text(errorMessage)
+                Text("Inventory scan failed. Review scan notes, confirm local permissions, then rescan. \(errorMessage)")
             } else {
-                Text("Refresh to scan launchd and Hermes cron jobs.")
+                Text("Rescan supported inventory or add a manual record for an automation the scanner cannot prove.")
             }
         }
     }
