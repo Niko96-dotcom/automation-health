@@ -111,7 +111,7 @@ public struct JobPresentation: Identifiable, Sendable {
     }
 }
 
-public enum SidebarGroupingMode: String, CaseIterable, Identifiable, Sendable {
+public enum SidebarGroupingMode: String, CaseIterable, Identifiable, Sendable, Codable {
     case source
     case origin
     case health
@@ -166,7 +166,7 @@ public enum SidebarTriggerKind: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
-public struct SidebarSectionID: Hashable, Sendable {
+public struct SidebarSectionID: Hashable, Sendable, Codable {
     public let groupingMode: SidebarGroupingMode
     public let groupKey: String
 
@@ -176,7 +176,7 @@ public struct SidebarSectionID: Hashable, Sendable {
     }
 }
 
-public struct SidebarCollapseState: Hashable, Sendable {
+public struct SidebarCollapseState: Hashable, Sendable, Codable {
     public private(set) var collapsedSectionIDs: Set<SidebarSectionID>
 
     public init(collapsedSectionIDs: Set<SidebarSectionID> = []) {
