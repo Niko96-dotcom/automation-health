@@ -33,6 +33,11 @@ final class PreferencesStore: ObservableObject {
         didSet { userDefaults.set(scanMaxResults, forKey: "scanMaxResults") }
     }
 
+    // Transient UI state — not persisted to UserDefaults.
+    @Published var sidebarExpandAllOverride: Bool? = nil
+    @Published var requestSearchFieldFocus = false
+    @Published var requestJobListFocus = false
+
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
         userDefaults.register(defaults: [
