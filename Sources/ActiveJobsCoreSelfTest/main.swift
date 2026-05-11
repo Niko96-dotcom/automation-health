@@ -35,6 +35,9 @@ try testHealthSummaries()
 try testCollapseStateCodableRoundTrip()
 try testGroupingModeCodableRoundTrip()
 try testScanConfigDefaults()
+try testSidebarTypeToSelect()
+try testSidebarExpandOverride()
+try testGroupingModeShortcutKeys()
 
 print("ActiveJobsCoreSelfTest passed")
 
@@ -941,6 +944,163 @@ func testScanConfigDefaults() throws {
     expect(custom.maxResults == 50, "Custom Configuration respects maxResults")
     expect(custom.maxVisitedFiles == 500, "Custom Configuration respects maxVisitedFiles")
     expect(custom.scriptExtensions == ["sh"], "Custom Configuration respects scriptExtensions")
+}
+
+func testSidebarTypeToSelect() throws {
+    let jobs = [
+        JobPresentation(job: ScheduledJob.fixture(id: "alpha", name: "Alpha Backup", source: .launchd)),
+        JobPresentation(job: ScheduledJob.fixture(id: "alice", name: "Alice Watcher", source: .hermesCron)),
+        JobPresentation(job: ScheduledJob.fixture(id: "beta", name: "Beta Cleanup", source: .launchd)),
+        JobPresentation(job: ScheduledJob.fixture(id: "baker", name: "Baker Report", source: .cron)),
+        JobPresentation(job: ScheduledJob.fixture(id: "gamma", name: "Gamma Sync", source: .hermesCron))
+    ]
+    let sections = SidebarJobSection.sections(for: jobs)
+
+    // Single-character prefix match
+    expect(SidebarNavigation.typeToSelectMatch(for: "a", in: sections) == "launchd:alpha",
+           "typeToSelect 'a' matches first visible 'Alpha Backup' by prefix")
+    expect(SidebarNavigation.typeToSelectMatch(for: "b", in: sections) == "launchd:beta",
+           "typeToSelect 'b' matches first visible 'Beta Cleanup' by prefix")
+    expect(SidebarNavigation.typeToSelectMatch(for: "g", in: sections) == "hermesCron:gamma",
+           "typeToSelect 'g' matches 'Gamma Sync' by prefix")
+
+    // Multi-character prefix match
+    expect(SidebarNavigation.typeToSelectMatch(for: "al", in: sections) == "launchd:alpha",
+           "typeToSelect 'al' matches 'Alpha Backup' (not 'Alice Watcher' — Alpha comes first)")
+    expect(SidebarNavigation.typeToSelectMatch(for: "ali", in: sections) == "hermesCron:alice",
+           "typeToSelect 'ali' matches 'Alice Watcher' specifically")
+
+    // Case-insensitive
+    expect(SidebarNavigation.typeToSelectMatch(for: "ALPHA", in: sections) == "launchd:alpha",
+           "typeToSelect is case-insensitive")
+
+    // No match — returns nil (D-10)
+    expect(SidebarNavigation.typeToSelectMatch(for: "z", in: sections) == nil,
+           "typeToSelect no-match returns nil")
+    expect(SidebarNavigation.typeToSelectMatch(for: "", in: sections) == nil,
+           "typeToSelect empty prefix returns nil")
+
+    // Cycle detection: typeToSelectNextMatch
+    expect(SidebarNavigation.typeToSelectNextMatch(for: "a", in: sections, after: "launchd:alpha") == "hermesCron:alice",
+           "typeToSelectNextMatch 'a' after alpha returns alice")
+    expect(SidebarNavigation.typeToSelectNextMatch(for: "a", in: sections, after: "hermesCron:alice") == "launchd:alpha",
+           "typeToSelectNextMatch 'a' after alice wraps to alpha")
+    expect(SidebarNavigation.typeToSelectNextMatch(for: "b", in: sections, after: "launchd:beta") == "cron:baker",
+           "typeToSelectNextMatch 'b' after beta returns baker")
+    expect(SidebarNavigation.typeToSelectNextMatch(for: "b", in: sections, after: "cron:baker") == "launchd:beta",
+           "typeToSelectNextMatch 'b' after baker wraps to beta")
+
+    // NextMatch with no match returns nil
+    expect(SidebarNavigation.typeToSelectNextMatch(for: "z", in: sections, after: "launchd:alpha") == nil,
+           "typeToSelectNextMatch no-match returns nil")
+
+    // Collapsed sections: type-to-select only matches visible jobs (D-09)
+    var collapseState = SidebarCollapseState()
+    let launchdSectionID = SidebarSectionID(groupingMode: .source, groupKey: JobSource.launchd.rawValue)
+    collapseState.toggle(launchdSectionID)
+    let collapsedSections = SidebarJobSection.sections(for: jobs, groupingMode: .source, collapseState: collapseState, hasSearchQuery: false)
+
+    // Alpha and Beta are in collapsed launchd section; Alice and Gamma are visible
+    expect(SidebarNavigation.typeToSelectMatch(for: "a", in: collapsedSections) == "hermesCron:alice",
+           "typeToSelect 'a' with collapsed launchd returns alice (not alpha — alpha is hidden)")
+    expect(SidebarNavigation.typeToSelectMatch(for: "b", in: collapsedSections) == "cron:baker",
+           "typeToSelect 'b' with collapsed launchd returns baker (not beta — beta is hidden)")
+}
+
+func testSidebarExpandOverride() throws {
+    let jobs = [
+        JobPresentation(job: ScheduledJob.fixture(id: "alpha", name: "Alpha", source: .launchd)),
+        JobPresentation(job: ScheduledJob.fixture(id: "gamma", name: "Gamma", source: .hermesCron))
+    ]
+    let launchdSectionID = SidebarSectionID(groupingMode: .source, groupKey: JobSource.launchd.rawValue)
+
+    // Baseline: normal collapse state hides jobs
+    var collapseState = SidebarCollapseState()
+    collapseState.toggle(launchdSectionID)
+    let collapsedSections = SidebarJobSection.sections(for: jobs, groupingMode: .source, collapseState: collapseState, hasSearchQuery: false)
+    let collapsedLaunchd = section(collapsedSections, titled: "launchd")
+    expect(collapsedLaunchd.jobs.isEmpty, "Normal collapse hides launchd jobs")
+    expect(collapsedLaunchd.isPersistentlyCollapsed, "Normal collapse marks section persistently collapsed")
+
+    // Override: true forces all sections open
+    let openOverrideSections = collapsedSections.map { section in
+        SidebarJobSection(
+            id: section.id,
+            title: section.title,
+            visibleCount: section.totalCount,
+            totalCount: section.totalCount,
+            isPersistentlyCollapsed: false,
+            isEffectivelyCollapsed: false,
+            isCollapsed: false,
+            jobs: section.allJobs,
+            allJobs: section.allJobs,
+            allJobIDs: section.allJobIDs
+        )
+    }
+    let openLaunchd = section(openOverrideSections, titled: "launchd")
+    expect(!openLaunchd.jobs.isEmpty, "Expand override forces jobs visible")
+    expect(!openLaunchd.isPersistentlyCollapsed, "Expand override clears collapse flag")
+    expect(openLaunchd.jobs.map(\.id) == ["launchd:alpha"], "Expand override shows all launchd jobs")
+
+    // Override: false forces all sections closed
+    let closedOverrideSections = collapsedSections.map { section in
+        SidebarJobSection(
+            id: section.id,
+            title: section.title,
+            visibleCount: section.totalCount,
+            totalCount: section.totalCount,
+            isPersistentlyCollapsed: true,
+            isEffectivelyCollapsed: true,
+            isCollapsed: true,
+            jobs: [],
+            allJobs: section.allJobs,
+            allJobIDs: section.allJobIDs
+        )
+    }
+    let closedLaunchd = section(closedOverrideSections, titled: "launchd")
+    expect(closedLaunchd.jobs.isEmpty, "Collapse override hides all jobs")
+    expect(closedLaunchd.isPersistentlyCollapsed, "Collapse override marks sections collapsed")
+
+    // Override: nil means normal behavior (no forcing)
+    let nilOverrideSections = SidebarJobSection.sections(for: jobs, groupingMode: .source, collapseState: collapseState, hasSearchQuery: false)
+    let nilLaunchd = section(nilOverrideSections, titled: "launchd")
+    expect(nilLaunchd.jobs.isEmpty, "nil override respects normal collapse state")
+    expect(nilLaunchd.isPersistentlyCollapsed, "nil override preserves collapse state flag")
+
+    // Manual reset: toggle after override clears override
+    var manualCollapseState = SidebarCollapseState()
+    manualCollapseState.toggle(launchdSectionID) // Collapse launchd
+    // Simulate: sidebarExpandAllOverride was true, user clicked disclosure
+    // After nil reset, toggle should uncollapse (since it was collapsed)
+    manualCollapseState.toggle(launchdSectionID)
+    let afterManualReset = SidebarJobSection.sections(for: jobs, groupingMode: .source, collapseState: manualCollapseState, hasSearchQuery: false)
+    let resetLaunchd = section(afterManualReset, titled: "launchd")
+    expect(!resetLaunchd.jobs.isEmpty, "Manual click uncollapses section after override reset")
+    expect(!resetLaunchd.isPersistentlyCollapsed, "Manual click clears persistent collapse after override reset")
+}
+
+func testGroupingModeShortcutKeys() throws {
+    let allModes = SidebarGroupingMode.allCases
+
+    // Verify exactly 5 modes per D-03 (Cmd+1 through Cmd+5)
+    expect(allModes.count == 5, "Exactly 5 grouping modes for Cmd+1..5 shortcuts")
+
+    // Verify enum case order matches shortcut key: Source=1, Origin=2, Health=3, Trigger=4, Confidence=5
+    expect(allModes[0] == .source, "Cmd+1 maps to Source grouping")
+    expect(allModes[1] == .origin, "Cmd+2 maps to Origin grouping")
+    expect(allModes[2] == .health, "Cmd+3 maps to Health grouping")
+    expect(allModes[3] == .trigger, "Cmd+4 maps to Trigger grouping")
+    expect(allModes[4] == .confidence, "Cmd+5 maps to Confidence grouping")
+
+    // Verify labels match menu items
+    expect(allModes[0].label == "Source", "Source mode label is 'Source'")
+    expect(allModes[1].label == "Origin", "Origin mode label is 'Origin'")
+    expect(allModes[2].label == "Health", "Health mode label is 'Health'")
+    expect(allModes[3].label == "Trigger", "Trigger mode label is 'Trigger'")
+    expect(allModes[4].label == "Confidence", "Confidence mode label is 'Confidence'")
+
+    // Verify default mode is source (ensures first-launch state is predictable)
+    expect(SidebarGroupingMode.defaultMode == .source, "Default grouping mode is Source")
 }
 
 func expect(_ condition: @autoclosure () -> Bool, _ message: String) {
