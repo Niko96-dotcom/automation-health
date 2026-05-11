@@ -111,14 +111,23 @@ struct ContentView: View {
     }
 
     private func focusSearchField() {
-        guard let window = NSApp.keyWindow,
-              let toolbar = window.toolbar else { return }
-        for item in toolbar.visibleItems ?? [] {
-            if let searchField = item.view as? NSSearchField {
-                window.makeFirstResponder(searchField)
-                return
+        guard let window = NSApp.keyWindow else { return }
+        if let searchField = findSearchField(in: window.contentView) {
+            window.makeFirstResponder(searchField)
+        }
+    }
+
+    private func findSearchField(in view: NSView?) -> NSSearchField? {
+        guard let view else { return nil }
+        if let searchField = view as? NSSearchField {
+            return searchField
+        }
+        for subview in view.subviews {
+            if let found = findSearchField(in: subview) {
+                return found
             }
         }
+        return nil
     }
 
     private func openManualRecordEditor(_ job: JobPresentation) {
