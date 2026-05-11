@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Preferences, Polish, and Shippable Distribution
-status: Awaiting next milestone
-stopped_at: Phase 12 Plan 02 complete
-last_updated: "2026-05-11T23:33:08.134Z"
-last_activity: 2026-05-11 — Milestone v1.2 completed and archived
+milestone: v1.3
+milestone_name: Shippable Distribution
+status: planning
+last_updated: "2026-05-11T23:45:38.794Z"
+last_activity: 2026-05-11
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-10)
 
 ## Current Position
 
-Phase: Milestone v1.2 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-11 — Milestone v1.2 completed and archived
+Status: Defining requirements
+Last activity: 2026-05-11 — Milestone v1.3 started
 
 ## Performance Metrics
 
@@ -133,6 +132,7 @@ Items acknowledged and deferred at milestone close on 2026-05-11:
 | Distribution | Signed/notarized release artifact | Deferred | v1.1 scoping |
 
 Previously deferred items now resolved in v1.2:
+
 - Alternate grouping (schedule-based, health-based) → shipped Phase 12
 - Navigation (keyboard shortcuts, type-to-select) → shipped Phase 11
 - Sidebar sections (collapsible groups) → shipped Phase 8

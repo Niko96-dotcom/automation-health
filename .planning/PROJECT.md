@@ -4,11 +4,23 @@
 
 Automation Health is a local macOS SwiftUI app for inspecting scheduled jobs on this Mac. It scans supported scheduler sources, presents a searchable sidebar of automations grouped by source, origin, health, trigger, confidence, or schedule, and shows detail needed to understand job health, timing, configuration, and recent output.
 
-v1.2 shipped persisted user preferences (grouping mode, collapse state, scan config), keyboard navigation (8 shortcuts + type-to-select), and schedule-based grouping. Distribution (codesigning, notarization, DMG, GitHub Release) remains for the next milestone.
+v1.2 shipped persisted user preferences (grouping mode, collapse state, scan config), keyboard navigation (8 shortcuts + type-to-select), and schedule-based grouping. v1.3 targets the remaining distribution work: codesigning, notarization, DMG, GitHub Release, and Sparkle auto-update.
 
 ## Core Value
 
 Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
+
+## Current Milestone: v1.3 Shippable Distribution
+
+**Goal:** Ship a signed, notarized, auto-updating downloadable release of Automation Health.
+
+**Target features:**
+- Codesigning with Developer ID and hardened runtime entitlements
+- Notarization recipe (notarytool + stapler) with CI automation
+- Signed + notarized DMG produced by the release pipeline
+- GitHub Release with downloadable artifact
+- Release process documentation with placeholder identifiers
+- Sparkle auto-update integration against GitHub Releases
 
 ## Current State
 
@@ -69,12 +81,14 @@ v1.2 completed 3 phases and 8 plans:
 
 ### Active
 
-- [ ] The `.app` bundle is codesigned with a Developer ID from the build pipeline.
-- [ ] Hardened runtime entitlements are configured for the signed app.
-- [ ] A notarization recipe (notarytool + stapler) is documented and reproducible.
-- [ ] A signed and notarized `.app.zip` or `.dmg` is produced by the release pipeline.
-- [ ] A GitHub Release for v1.2 delivers a downloadable artifact.
-- [ ] Release process documentation covers signing and notarization with placeholder identifiers.
+- [ ] **DIST-01**: The `.app` bundle is codesigned with a Developer ID from the build pipeline.
+- [ ] **DIST-02**: Hardened runtime entitlements are configured for the signed app.
+- [ ] **DIST-03**: A notarization recipe (notarytool + stapler) is documented and reproducible.
+- [ ] **DIST-04**: A signed and notarized DMG is produced by the release pipeline.
+- [ ] **DIST-05**: A GitHub Release delivers a downloadable artifact.
+- [ ] **DIST-06**: Release process documentation covers signing and notarization with placeholder identifiers.
+- [ ] **DIST-07**: CI-based notarization runs in GitHub Actions as part of the release pipeline.
+- [ ] **DIST-08**: Sparkle auto-update checks GitHub Releases and presents update UI to the user.
 
 ### Out of Scope
 
@@ -82,13 +96,12 @@ v1.2 completed 3 phases and 8 plans:
 - Claiming perfect discovery of every possible automation on every Mac - the app labels confidence and limitations honestly.
 - Broad unbounded filesystem indexing - candidate discovery must be bounded, transparent, and performance-conscious.
 - Uploading or sharing local scan data - publishing work must avoid leaking personal paths, hostnames, outputs, or job details.
-- A full design-system rewrite - v1.2 should polish the existing native SwiftUI app rather than replace the app shell.
+- A full design-system rewrite - polish the existing native SwiftUI app rather than replace the app shell.
 - Cloud sync, accounts, telemetry, or analytics — all preferences persist locally only.
 - iOS port or Mac Catalyst — macOS native only.
-- In-app auto-update — rely on the GitHub Releases page.
 - A separate preferences app or Settings scene redesign — use the native macOS Settings scene.
 - Custom ordering grouping mode — deferred to future milestone, drag-to-reorder is non-trivial in current LazyVStack layout.
-- CI-based notarization (GitHub Actions) — stretch goal, local notarization recipe is the v1.2 requirement.
+- In-app auto-update beyond Sparkle's standard GitHub Releases integration (custom update channels, delta updates).
 
 ## Context
 
@@ -161,4 +174,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-11 after v1.2 milestone*
+*Last updated: 2026-05-12 — v1.3 milestone started*
