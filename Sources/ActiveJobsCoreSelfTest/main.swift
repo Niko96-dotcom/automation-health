@@ -38,6 +38,10 @@ try testScanConfigDefaults()
 try testSidebarTypeToSelect()
 try testSidebarExpandOverride()
 try testGroupingModeShortcutKeys()
+try testSidebarScheduleClassifierTimeOfDay()
+try testSidebarScheduleClassifierClockTimeFallback()
+try testSidebarScheduleClassifierFrequency()
+try testSidebarScheduleClassifierNoEvidence()
 
 print("ActiveJobsCoreSelfTest passed")
 
@@ -1101,6 +1105,59 @@ func testGroupingModeShortcutKeys() throws {
 
     // Verify default mode is source (ensures first-launch state is predictable)
     expect(SidebarGroupingMode.defaultMode == .source, "Default grouping mode is Source")
+}
+
+func testSidebarScheduleClassifierTimeOfDay() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let morning = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 8, minute: 0))!
+    let afternoon = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 14, minute: 0))!
+    let evening = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 20, minute: 0))!
+    let night = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 23, minute: 0))!
+    let nightEarly = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 2, minute: 0))!
+
+    let morningJob = JobPresentation(job: ScheduledJob.fixture(id: "morning", confidence: .scheduled, nextRun: morning))
+    let afternoonJob = JobPresentation(job: ScheduledJob.fixture(id: "afternoon", confidence: .scheduled, nextRun: afternoon))
+    let eveningJob = JobPresentation(job: ScheduledJob.fixture(id: "evening", confidence: .scheduled, nextRun: evening))
+    let nightJob = JobPresentation(job: ScheduledJob.fixture(id: "night", confidence: .scheduled, nextRun: night))
+    let nightEarlyJob = JobPresentation(job: ScheduledJob.fixture(id: "night-early", confidence: .scheduled, nextRun: nightEarly))
+
+    expect(SidebarScheduleClassifier.kind(for: morningJob) == .morning, "8 AM nextRun -> morning")
+    expect(SidebarScheduleClassifier.kind(for: afternoonJob) == .afternoon, "2 PM nextRun -> afternoon")
+    expect(SidebarScheduleClassifier.kind(for: eveningJob) == .evening, "8 PM nextRun -> evening")
+    expect(SidebarScheduleClassifier.kind(for: nightJob) == .night, "11 PM nextRun -> night")
+    expect(SidebarScheduleClassifier.kind(for: nightEarlyJob) == .night, "2 AM nextRun -> night")
+}
+
+func testSidebarScheduleClassifierClockTimeFallback() throws {
+    let afternoonClock = JobPresentation(job: ScheduledJob.fixture(id: "clock-aft", confidence: .scheduled, schedule: "14:00"))
+    let nightClock = JobPresentation(job: ScheduledJob.fixture(id: "clock-night", confidence: .scheduled, schedule: "01:00"))
+    let morningClock = JobPresentation(job: ScheduledJob.fixture(id: "clock-morn", confidence: .scheduled, schedule: "07:30, 19:45"))
+
+    expect(SidebarScheduleClassifier.kind(for: afternoonClock) == .afternoon, "clock time 14:00 -> afternoon")
+    expect(SidebarScheduleClassifier.kind(for: nightClock) == .night, "clock time 01:00 -> night")
+    expect(SidebarScheduleClassifier.kind(for: morningClock) == .morning, "first clock time 07:30 -> morning")
+}
+
+func testSidebarScheduleClassifierFrequency() throws {
+    let hourlyJob = JobPresentation(job: ScheduledJob.fixture(id: "hourly", confidence: .scheduled, schedule: "every hour"))
+    let dailyJob = JobPresentation(job: ScheduledJob.fixture(id: "daily", confidence: .scheduled, schedule: "0 10 * * *"))
+    let weeklyJob = JobPresentation(job: ScheduledJob.fixture(id: "weekly", confidence: .scheduled, schedule: "@weekly"))
+    let monthlyJob = JobPresentation(job: ScheduledJob.fixture(id: "monthly", confidence: .scheduled, schedule: "@monthly"))
+
+    expect(SidebarScheduleClassifier.kind(for: hourlyJob) == .hourly, "\"every hour\" -> hourly")
+    expect(SidebarScheduleClassifier.kind(for: dailyJob) == .daily, "\"0 10 * * *\" humanizes to \"Daily at 10:00\" -> daily")
+    expect(SidebarScheduleClassifier.kind(for: weeklyJob) == .weekly, "\"@weekly\" -> weekly")
+    expect(SidebarScheduleClassifier.kind(for: monthlyJob) == .monthly, "\"@monthly\" -> monthly")
+}
+
+func testSidebarScheduleClassifierNoEvidence() throws {
+    let registeredJob = JobPresentation(job: ScheduledJob.fixture(id: "reg", confidence: .registered, schedule: "every hour"))
+    let candidateJob = JobPresentation(job: ScheduledJob.fixture(id: "cand", confidence: .candidate, schedule: "0 9 * * *"))
+    let manualJob = JobPresentation(job: ScheduledJob.fixture(id: "man", confidence: .manual, schedule: "every day"))
+
+    expect(SidebarScheduleClassifier.kind(for: registeredJob) == .noScheduleEvidence, "registered -> noScheduleEvidence")
+    expect(SidebarScheduleClassifier.kind(for: candidateJob) == .noScheduleEvidence, "candidate -> noScheduleEvidence")
+    expect(SidebarScheduleClassifier.kind(for: manualJob) == .noScheduleEvidence, "manual -> noScheduleEvidence")
 }
 
 func expect(_ condition: @autoclosure () -> Bool, _ message: String) {
