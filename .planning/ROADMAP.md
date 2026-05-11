@@ -42,7 +42,12 @@
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/ARCHITECTURE.md`
 
 - [ ] **Phase 11: Keyboard Navigation** (depends on Phase 10) — Focus search, expand/collapse all, switch grouping mode shortcuts, jump-to-letter navigation.
+  - **Plans:** 3 plans
   - Requirements: NAV-01, NAV-02, NAV-03, NAV-04, NAV-05
+  - Plans:
+    - [ ] 11-01-PLAN.md — PreferencesStore expand override + global shortcuts (View CommandMenu, Cmd+Shift+F/E/W, Cmd+1..5) + ContentView search focus and Escape
+    - [ ] 11-02-PLAN.md — Type-to-select matching logic (SidebarNavigation) + sidebar buffer/cycling + expand override rendering and manual reset
+    - [ ] 11-03-PLAN.md — Self-test coverage for type-to-select, expand override lifecycle, and shortcut key mappings
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/FEATURES.md`
 
 - [ ] **Phase 12: Schedule-Based Grouping** (depends on Phase 10) — New schedule-based grouping mode with confidence-gated classifier. Evidence boundary preservation for Registered, Candidate, and Manual records.
