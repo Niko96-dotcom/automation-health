@@ -39,6 +39,10 @@ try testSidebarTypeToSelect()
 try testSidebarExpandOverride()
 try testGroupingModeShortcutKeys()
 try testSidebarScheduleGroupingModeAndSections()
+try testScheduleClassifierTimeOfDay()
+try testScheduleClassifierFrequency()
+try testScheduleClassifierEvidenceBoundaries()
+try testScheduleGroupingIntegration()
 
 print("ActiveJobsCoreSelfTest passed")
 
@@ -1147,6 +1151,123 @@ func testSidebarScheduleGroupingModeAndSections() throws {
 
     // Verify "No schedule evidence" is the last section
     expect(sections.last?.title == "No schedule evidence", "No schedule evidence section appears last")
+}
+
+func testScheduleClassifierTimeOfDay() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let now = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 12, minute: 0))!
+
+    // D-05: Primary path — nextRun hour classification
+    let morningDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 8, minute: 0))!
+    let afternoonDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 14, minute: 0))!
+    let eveningDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 20, minute: 0))!
+    let lateNightDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 22, minute: 0))!
+    let earlyNightDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 2, minute: 0))!
+
+    let jobs = [
+        JobPresentation(job: ScheduledJob.fixture(id: "morning-job", confidence: .scheduled, nextRun: morningDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "afternoon-job", confidence: .scheduled, nextRun: afternoonDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "evening-job", confidence: .scheduled, nextRun: eveningDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "late-night-job", confidence: .scheduled, nextRun: lateNightDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "early-night-job", confidence: .scheduled, nextRun: earlyNightDate), now: now),
+    ]
+    let sections = SidebarJobSection.sections(for: jobs, groupingMode: .schedule, collapseState: SidebarCollapseState(), hasSearchQuery: false)
+
+    expect(section(sections, titled: "Morning (4 AM – 12 PM)").allJobIDs == ["hermesCron:morning-job"], "hour 8 -> Morning")
+    expect(section(sections, titled: "Afternoon (12 PM – 6 PM)").allJobIDs == ["hermesCron:afternoon-job"], "hour 14 -> Afternoon")
+    expect(section(sections, titled: "Evening (6 PM – 10 PM)").allJobIDs == ["hermesCron:evening-job"], "hour 20 -> Evening")
+    expect(section(sections, titled: "Night (10 PM – 4 AM)").allJobIDs == ["hermesCron:late-night-job", "hermesCron:early-night-job"], "hours 22 and 2 -> Night")
+
+    // D-06: Fallback — clock-time parsing from schedule string when nextRun is nil
+    let fallbackJobs = [
+        JobPresentation(job: ScheduledJob.fixture(id: "clock-noon", confidence: .scheduled, schedule: "12:00"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "clock-multi", confidence: .scheduled, schedule: "01:00, 04:00"), now: now),
+    ]
+    let fallbackSections = SidebarJobSection.sections(for: fallbackJobs, groupingMode: .schedule, collapseState: SidebarCollapseState(), hasSearchQuery: false)
+
+    expect(section(fallbackSections, titled: "Afternoon (12 PM – 6 PM)").allJobIDs == ["hermesCron:clock-noon"], "clock-time '12:00' -> Afternoon")
+    expect(section(fallbackSections, titled: "Night (10 PM – 4 AM)").allJobIDs == ["hermesCron:clock-multi"], "clock-time '01:00, 04:00' earliest hour 1 -> Night")
+}
+
+func testScheduleClassifierFrequency() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let now = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 12, minute: 0))!
+
+    // D-07: Frequency keyword detection from scheduleDescription when no nextRun
+    let jobs = [
+        JobPresentation(job: ScheduledJob.fixture(id: "hourly-job", confidence: .scheduled, schedule: "Every hour"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "daily-job", confidence: .scheduled, schedule: "0 10 * * *"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "weekly-job", confidence: .scheduled, schedule: "Every week"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "monthly-job", confidence: .scheduled, schedule: "0 10 15 * *"), now: now),
+    ]
+    let sections = SidebarJobSection.sections(for: jobs, groupingMode: .schedule, collapseState: SidebarCollapseState(), hasSearchQuery: false)
+
+    expect(section(sections, titled: "Hourly").allJobIDs == ["hermesCron:hourly-job"], "'Every hour' contains 'every hour' -> Hourly")
+    expect(section(sections, titled: "Daily").allJobIDs == ["hermesCron:daily-job"], "cron '0 10 * * *' humanized 'Daily at 10:00' contains 'daily' -> Daily")
+    expect(section(sections, titled: "Weekly").allJobIDs == ["hermesCron:weekly-job"], "'Every week' contains 'every week' -> Weekly")
+    expect(section(sections, titled: "Monthly").allJobIDs == ["hermesCron:monthly-job"], "cron '0 10 15 * *' humanized 'Monthly on day 15 at 10:00' contains 'monthly' -> Monthly")
+}
+
+func testScheduleClassifierEvidenceBoundaries() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let now = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 12, minute: 0))!
+
+    // D-08 / Pitfall 3: Non-.scheduled jobs and empty-schedule .scheduled jobs
+    // must always land in "No schedule evidence" — never leak into time-of-day or frequency buckets
+    let jobs = [
+        JobPresentation(job: ScheduledJob.fixture(id: "registered-with-schedule", confidence: .registered, schedule: "Daily at noon"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "candidate-with-cron", confidence: .candidate, schedule: "0 10 * * *"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "manual-with-frequency", confidence: .manual, schedule: "Every Friday"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "scheduled-empty", confidence: .scheduled, schedule: ""), now: now),
+    ]
+    let sections = SidebarJobSection.sections(for: jobs, groupingMode: .schedule, collapseState: SidebarCollapseState(), hasSearchQuery: false)
+
+    // All four jobs must land in "No schedule evidence"
+    let noEvidenceIDs = Set(section(sections, titled: "No schedule evidence").allJobIDs)
+    let expectedIDs: Set<String> = ["hermesCron:registered-with-schedule", "hermesCron:candidate-with-cron", "hermesCron:manual-with-frequency", "hermesCron:scheduled-empty"]
+    expect(noEvidenceIDs == expectedIDs, "All non-scheduled or empty-schedule jobs land in No schedule evidence")
+
+    // Only one section exists
+    expect(sections.count == 1, "Only 'No schedule evidence' section exists for evidence boundary test")
+    expect(sections[0].title == "No schedule evidence", "Single section is 'No schedule evidence'")
+
+    // Pitfall 3 specifically: .candidate with "0 10 * * *" (humanizes to "Daily at 10:00") must NOT
+    // appear in a Daily section — confidence gate prevents it
+    let dailySection = sections.first(where: { $0.title == "Daily" })
+    expect(dailySection == nil, "No Daily section — candidate with cron schedule does not leak into Daily bucket (Pitfall 3)")
+}
+
+func testScheduleGroupingIntegration() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let now = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 12, minute: 0))!
+
+    let morningDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 8, minute: 0))!
+
+    // Mixed bag: scheduled with nextRun, scheduled with frequency schedule, registered, candidate
+    let jobs = [
+        JobPresentation(job: ScheduledJob.fixture(id: "morning-scheduled", confidence: .scheduled, nextRun: morningDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "daily-scheduled", confidence: .scheduled, schedule: "0 10 * * *"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "registered-no-evidence", confidence: .registered, schedule: "Registered entry"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "candidate-no-evidence", confidence: .candidate, schedule: "Candidate entry"), now: now),
+    ]
+    let sections = SidebarJobSection.sections(for: jobs, groupingMode: .schedule, collapseState: SidebarCollapseState(), hasSearchQuery: false)
+
+    // Section titles in order: time-of-day before frequency before no-evidence (D-04: no-evidence last)
+    expect(sections.map(\.title) == ["Morning (4 AM – 12 PM)", "Daily", "No schedule evidence"], "Section order: time-of-day -> frequency -> no-evidence")
+
+    // Each section contains the expected jobs
+    expect(section(sections, titled: "Morning (4 AM – 12 PM)").allJobIDs == ["hermesCron:morning-scheduled"], "Morning section has morning job")
+    expect(section(sections, titled: "Daily").allJobIDs == ["hermesCron:daily-scheduled"], "Daily section has daily scheduled job")
+
+    let noEvidenceIDs = section(sections, titled: "No schedule evidence").allJobIDs
+    let expectedNoEvidence: Set<String> = ["hermesCron:registered-no-evidence", "hermesCron:candidate-no-evidence"]
+    expect(Set(noEvidenceIDs) == expectedNoEvidence, "No schedule evidence contains registered and candidate jobs")
+
+    // Exactly 3 sections — empty sections (Afternoon, Evening, Night, Hourly, Weekly, Monthly) excluded
+    expect(sections.count == 3, "Exactly 3 sections — empty sections excluded")
+
+    // "No schedule evidence" is the last section
+    expect(sections.last?.title == "No schedule evidence", "No schedule evidence is the last section")
 }
 
 func expect(_ condition: @autoclosure () -> Bool, _ message: String) {
