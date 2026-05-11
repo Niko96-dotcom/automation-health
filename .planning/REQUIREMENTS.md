@@ -28,7 +28,7 @@ Requirements for v1.2 Preferences, Polish, and Shippable Distribution. Each maps
 - [x] **NAV-02**: Keyboard shortcut expands all sidebar groups at once
 - [x] **NAV-03**: Keyboard shortcut collapses all sidebar groups at once
 - [x] **NAV-04**: Keyboard shortcuts switch grouping mode (Cmd+1 through Cmd+N)
-- [ ] **NAV-05**: Jump-to-letter navigation in sidebar — typing first letters of a job name selects the matching row
+- [x] **NAV-05**: Jump-to-letter navigation in sidebar — typing first letters of a job name selects the matching row
 
 ### Distribution
 
@@ -80,10 +80,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREFS-05 | Phase 10 | Complete |
 | DIST-01 | Phase 10 | Complete |
 | NAV-01 | Phase 11 | Pending |
-| NAV-02 | Phase 11 | Pending |
-| NAV-03 | Phase 11 | Pending |
+| NAV-02 | Phase 11 | Complete |
+| NAV-03 | Phase 11 | Complete |
 | NAV-04 | Phase 11 | Pending |
-| NAV-05 | Phase 11 | Pending |
+| NAV-05 | Phase 11 | Complete |
 | GROUP-01 | Phase 12 | Pending |
 | GROUP-02 | Phase 12 | Pending |
 | GROUP-03 | Phase 12 | Pending |

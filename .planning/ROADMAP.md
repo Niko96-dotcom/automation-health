@@ -46,7 +46,7 @@
   - Requirements: NAV-01, NAV-02, NAV-03, NAV-04, NAV-05
   - Plans:
     - [x] 11-01-PLAN.md — PreferencesStore expand override + global shortcuts (View CommandMenu, Cmd+Shift+F/E/W, Cmd+1..5) + ContentView search focus and Escape
-    - [ ] 11-02-PLAN.md — Type-to-select matching logic (SidebarNavigation) + sidebar buffer/cycling + expand override rendering and manual reset
+    - [x] 11-02-PLAN.md — Type-to-select matching logic (SidebarNavigation) + sidebar buffer/cycling + expand override rendering and manual reset
     - [ ] 11-03-PLAN.md — Self-test coverage for type-to-select, expand override lifecycle, and shortcut key mappings
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/FEATURES.md`
 

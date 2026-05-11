@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Preferences, Polish, and Shippable Distribution
-status: completed
-stopped_at: Phase 11 Plan 01 complete
-last_updated: "2026-05-11T07:17:48.714Z"
+status: in-progress
+stopped_at: Phase 11 Plan 02 complete
+last_updated: "2026-05-11T07:27:15Z"
 last_activity: 2026-05-11
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
-  percent: 67
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-10)
 ## Current Position
 
 Phase: 11
-Plan: 01
-Status: Plan 01 complete, 02 next
+Plan: 02
+Status: Plan 02 complete, 03 next
 Last activity: 2026-05-11
 
 ## Performance Metrics
@@ -69,6 +69,7 @@ Last activity: 2026-05-11
 | Phase 10-preferences-persistence P03 | 4 min | 2 tasks | 2 files |
 | Phase 10-preferences-persistence P02 | 3 | 3 tasks | 3 files |
 | Phase 11 P01 | 1 min | 3 tasks | 3 files |
+| Phase 11-keyboard-navigation P02 | 5 min | 2 tasks | 3 files |
 
 ## Quick Tasks Completed
 
@@ -92,6 +93,10 @@ Recent decisions affecting current work:
 - [Phase ?]: Explicit init() in AutomationHealthApp creates PreferencesStore once, passes same reference to both @StateObject wrappers and JobStore
 - [Phase ?]: SettingsView uses Int-to-Double Binding wrappers to avoid Pitfall 3 compile error
 - [Phase ?]: Settings scene is a sibling to WindowGroup — SwiftUI auto-registers Cmd+,
+- [Phase ?]: Type-to-select uses .onKeyPress(characters: .alphanumerics) — arrow keys, Escape, and modifiers pass through unmodified
+- [Phase ?]: 300ms buffer timeout via Date comparison rather than Timer/DispatchQueue — simpler, no lifecycle management
+- [Phase ?]: effectiveSections computed property avoids mutating persistent collapseState — override is view-level transformation
+- [Phase ?]: ContentView updated with new bindings as Rule 3 auto-fix
 
 ### Pending Todos
 
@@ -120,9 +125,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-11T07:16:22.000Z
-Stopped at: Phase 11 Plan 01 complete
-Resume file: .planning/phases/11-keyboard-navigation/11-01-SUMMARY.md
+Last session: 2026-05-11T07:29:01.818Z
+Stopped at: Phase 11 Plan 02 complete
+Resume file: None
 
 ## Operator Next Steps
 
