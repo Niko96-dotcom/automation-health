@@ -166,6 +166,34 @@ public enum SidebarTriggerKind: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
+public enum SidebarScheduleKind: String, CaseIterable, Identifiable, Sendable {
+    case morning
+    case afternoon
+    case evening
+    case night
+    case hourly
+    case daily
+    case weekly
+    case monthly
+    case noScheduleEvidence
+
+    public var id: String { rawValue }
+
+    public var title: String {
+        switch self {
+        case .morning: "Morning (4 AM – 12 PM)"
+        case .afternoon: "Afternoon (12 PM – 6 PM)"
+        case .evening: "Evening (6 PM – 10 PM)"
+        case .night: "Night (10 PM – 4 AM)"
+        case .hourly: "Hourly"
+        case .daily: "Daily"
+        case .weekly: "Weekly"
+        case .monthly: "Monthly"
+        case .noScheduleEvidence: "No schedule evidence"
+        }
+    }
+}
+
 public struct SidebarSectionID: Hashable, Sendable, Codable {
     public let groupingMode: SidebarGroupingMode
     public let groupKey: String
@@ -609,5 +637,70 @@ private enum SidebarTriggerClassifier {
             || lowercased.hasPrefix("every")
             || lowercased.hasPrefix("monthly")
             || weekdayPrefixes.contains { lowercased.hasPrefix($0) }
+    }
+}
+
+private enum SidebarScheduleClassifier {
+    static func kind(for job: JobPresentation) -> SidebarScheduleKind {
+        guard job.job.confidence == .scheduled else {
+            return .noScheduleEvidence
+        }
+
+        if let nextRun = job.job.nextRun {
+            let hour = Calendar.current.component(.hour, from: nextRun)
+            if let kind = timeOfDayKind(forHour: hour) {
+                return kind
+            }
+        }
+
+        if let clockHour = firstClockHour(from: job.job.schedule) {
+            if let kind = timeOfDayKind(forHour: clockHour) {
+                return kind
+            }
+        }
+
+        let lowercased = job.scheduleText.lowercased()
+        if lowercased.contains("every hour") || lowercased.contains("hourly") {
+            return .hourly
+        }
+        if lowercased.contains("every day") || lowercased.contains("daily") {
+            return .daily
+        }
+        if lowercased.contains("every week") || lowercased.contains("weekly") {
+            return .weekly
+        }
+        if lowercased.contains("every month") || lowercased.contains("monthly") {
+            return .monthly
+        }
+
+        return .noScheduleEvidence
+    }
+
+    private static func timeOfDayKind(forHour hour: Int) -> SidebarScheduleKind? {
+        switch hour {
+        case 4..<12: return .morning
+        case 12..<18: return .afternoon
+        case 18..<22: return .evening
+        default: return .night
+        }
+    }
+
+    private static func firstClockHour(from schedule: String) -> Int? {
+        let pattern = "\\b(\\d{1,2}):(\\d{2})\\b"
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return nil
+        }
+        let range = NSRange(schedule.startIndex..<schedule.endIndex, in: schedule)
+        guard let match = regex.firstMatch(in: schedule, range: range),
+              match.numberOfRanges > 1,
+              let swiftRange = Range(match.range(at: 1), in: schedule)
+        else {
+            return nil
+        }
+        let hourString = String(schedule[swiftRange])
+        guard let hour = Int(hourString), (0..<24).contains(hour) else {
+            return nil
+        }
+        return hour
     }
 }
