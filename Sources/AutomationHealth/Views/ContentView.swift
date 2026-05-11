@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import ActiveJobsCore
 import AutomationHealthCore
@@ -49,6 +50,20 @@ struct ContentView: View {
             )
             .searchable(text: $searchText, placement: .sidebar)
             .navigationSplitViewColumnWidth(min: 280, ideal: 340)
+            .onChange(of: preferences.requestSearchFieldFocus) { _, shouldFocus in
+                if shouldFocus {
+                    focusSearchField()
+                    preferences.requestSearchFieldFocus = false
+                }
+            }
+            .onKeyPress(.escape) {
+                if !searchText.isEmpty || NSEvent.modifierFlags.isEmpty {
+                    searchText = ""
+                    preferences.requestJobListFocus = true
+                    return .handled
+                }
+                return .ignored
+            }
         } detail: {
             DetailView(
                 job: store.selectedJob,
@@ -90,6 +105,17 @@ struct ContentView: View {
                     manualRecordSheet = nil
                 }
             )
+        }
+    }
+
+    private func focusSearchField() {
+        guard let window = NSApp.keyWindow,
+              let toolbar = window.toolbar else { return }
+        for item in toolbar.visibleItems ?? [] {
+            if let searchField = item.view as? NSSearchField {
+                window.makeFirstResponder(searchField)
+                return
+            }
         }
     }
 
