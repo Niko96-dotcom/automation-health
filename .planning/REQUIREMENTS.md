@@ -17,10 +17,10 @@ Requirements for v1.2 Preferences, Polish, and Shippable Distribution. Each maps
 
 ### Grouping
 
-- [ ] **GROUP-01**: Schedule-based grouping mode is available in the grouping mode selector
-- [ ] **GROUP-02**: Schedule-based grouping classifies jobs into time-of-day or frequency buckets
-- [ ] **GROUP-03**: Non-scheduled records (Registered, Candidate, Manual) appear in a "No schedule evidence" bucket
-- [ ] **GROUP-04**: Evidence boundaries are preserved — non-scheduled records never claim schedule they don't have
+- [x] **GROUP-01**: Schedule-based grouping mode is available in the grouping mode selector
+- [x] **GROUP-02**: Schedule-based grouping classifies jobs into time-of-day or frequency buckets
+- [x] **GROUP-03**: Non-scheduled records (Registered, Candidate, Manual) appear in a "No schedule evidence" bucket
+- [x] **GROUP-04**: Evidence boundaries are preserved — non-scheduled records never claim schedule they don't have
 
 ### Keyboard Navigation
 
@@ -84,10 +84,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAV-03 | Phase 11 | Complete |
 | NAV-04 | Phase 11 | Pending |
 | NAV-05 | Phase 11 | Complete |
-| GROUP-01 | Phase 12 | Pending |
-| GROUP-02 | Phase 12 | Pending |
-| GROUP-03 | Phase 12 | Pending |
-| GROUP-04 | Phase 12 | Pending |
+| GROUP-01 | Phase 12 | Complete |
+| GROUP-02 | Phase 12 | Complete |
+| GROUP-03 | Phase 12 | Complete |
+| GROUP-04 | Phase 12 | Complete |
 | DIST-02 | Phase 13 | Pending |
 | DIST-03 | Phase 13 | Pending |
 | DIST-04 | Phase 13 | Pending |

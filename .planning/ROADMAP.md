@@ -54,7 +54,7 @@
   - **Plans:** 2 plans
   - Requirements: GROUP-01, GROUP-02, GROUP-03, GROUP-04
   - Plans:
-    - [ ] 12-01-PLAN.md — Schedule classifier core: SidebarScheduleKind enum, SidebarScheduleClassifier, .schedule grouping mode, groupDefinitions branch, Cmd+6 shortcut
+    - [x] 12-01-PLAN.md — Schedule classifier core: SidebarScheduleKind enum, SidebarScheduleClassifier, .schedule grouping mode, groupDefinitions branch, Cmd+6 shortcut
     - [ ] 12-02-PLAN.md — Self-test coverage: time-of-day, frequency, evidence boundary, grouping integration tests
   - Canonical refs: `.planning/research/ARCHITECTURE.md`, `.planning/research/PITFALLS.md`
 

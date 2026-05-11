@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Preferences, Polish, and Shippable Distribution
-status: milestone_complete
-stopped_at: Phase 11 Plan 02 complete
-last_updated: "2026-05-11T07:40:40.515Z"
+status: in_progress
+stopped_at: Phase 12 Plan 01 complete
+last_updated: "2026-05-11T09:09:30Z"
 last_activity: 2026-05-11
 progress:
-  total_phases: 2
+  total_phases: 4
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
-  percent: 150
+  total_plans: 2
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-05-10)
 
 ## Current Position
 
-Phase: 11
-Plan: Not started
-Status: Milestone complete
+Phase: 12
+Plan: 02 (next)
+Status: In progress
 Last activity: 2026-05-11
 
 ## Performance Metrics
@@ -53,6 +53,7 @@ Last activity: 2026-05-11
 | 09 | 2 | - | - |
 | 10 | 3 | - | - |
 | 11 | 3 | - | - |
+| 12 | 1 | - | - |
 
 **Recent Trend:**
 
@@ -72,6 +73,7 @@ Last activity: 2026-05-11
 | Phase 11 P01 | 1 min | 3 tasks | 3 files |
 | Phase 11-keyboard-navigation P02 | 5 min | 2 tasks | 3 files |
 | Phase 11-keyboard-navigation P03 | 5 min | 1 tasks | 1 files |
+| Phase 12-schedule-based-grouping P01 | 17 min | 3 tasks | 3 files |
 
 ## Quick Tasks Completed
 
@@ -100,6 +102,8 @@ Recent decisions affecting current work:
 - [Phase ?]: effectiveSections computed property avoids mutating persistent collapseState — override is view-level transformation
 - [Phase ?]: ContentView updated with new bindings as Rule 3 auto-fix
 - Phase 11 Plan 03: Expand override tests use manual SidebarJobSection construction to simulate override states — no PreferencesStore dependency needed for pure logic verification
+- Phase 12 Plan 01: Schedule classifier tested indirectly through SidebarJobSection.sections() API (following existing SidebarTriggerClassifier pattern) rather than direct classifier calls — SidebarScheduleClassifier is file-private and inaccessible from test module
+- Phase 12 Plan 01: Time-of-day classification ranges: Morning (4-11), Afternoon (12-17), Evening (18-21), Night (0-3, 22-23) — standard macOS day-part intervals
 
 ### Pending Todos
 
@@ -128,7 +132,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-11T07:40:40.510Z
+Last session: 2026-05-11T09:11:14.028Z
 Stopped at: Phase 11 Plan 02 complete
 Resume file: None
 
