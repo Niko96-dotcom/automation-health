@@ -117,6 +117,7 @@ public enum SidebarGroupingMode: String, CaseIterable, Identifiable, Sendable, C
     case health
     case trigger
     case confidence
+    case schedule
 
     public static let defaultMode: SidebarGroupingMode = .source
 
@@ -134,6 +135,8 @@ public enum SidebarGroupingMode: String, CaseIterable, Identifiable, Sendable, C
             "Trigger"
         case .confidence:
             "Confidence"
+        case .schedule:
+            "Schedule"
         }
     }
 }
@@ -245,7 +248,7 @@ public struct SidebarJobSummary: Identifiable, Hashable, Sendable {
         switch groupingMode {
         case .source:
             subtitle = "\(job.confidenceName) - \(detailText)"
-        case .origin, .health, .trigger:
+        case .origin, .health, .trigger, .schedule:
             subtitle = "\(job.sourceName) - \(job.confidenceName) - \(detailText)"
         case .confidence:
             subtitle = "\(job.sourceName) - \(detailText)"
@@ -522,6 +525,14 @@ public struct SidebarJobSection: Identifiable, Hashable, Sendable {
                     id: SidebarSectionID(groupingMode: groupingMode, groupKey: confidence.rawValue),
                     title: confidence.displayName,
                     matches: { $0.job.confidence == confidence }
+                )
+            }
+        case .schedule:
+            return SidebarScheduleKind.allCases.map { kind in
+                SidebarGroupDefinition(
+                    id: SidebarSectionID(groupingMode: groupingMode, groupKey: kind.rawValue),
+                    title: kind.title,
+                    matches: { SidebarScheduleClassifier.kind(for: $0) == kind }
                 )
             }
         }
