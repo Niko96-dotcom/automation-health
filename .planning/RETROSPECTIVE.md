@@ -97,6 +97,58 @@
 
 ---
 
+## Milestone: v1.2 — Preferences, Polish, and Shippable Distribution
+
+**Shipped:** 2026-05-11
+**Phases:** 3 | **Plans:** 8 | **Tasks:** 19
+
+### What Was Built
+
+- PreferencesStore with UserDefaults-backed persistence for grouping mode, collapse state, and scan configuration (Phase 10).
+- Native macOS Settings scene (Cmd+,) with grouping mode picker and scan config controls (Phase 10).
+- MIT LICENSE with correct copyright; 3 Codable round-trip and config-defaults self-tests (Phase 10).
+- 8 keyboard shortcuts: Cmd+Shift+F (focus search), Cmd+Shift+E/W (expand/collapse all), Cmd+1-5 (grouping modes) (Phase 11).
+- Finder-style type-to-select letter navigation with 300ms multi-char buffer and wrap-around cycling (Phase 11).
+- Expand/collapse override with manual disclosure-click reset and focus bridge wiring (Phase 11).
+- 3 self-tests for type-to-select, expand override lifecycle, and shortcut key mappings (Phase 11).
+- SidebarScheduleKind (9 cases) and SidebarScheduleClassifier with confidence-gated time-of-day and frequency detection (Phase 12).
+- .schedule as 6th grouping mode with Cmd+6 shortcut and evidence boundary preservation (Phase 12).
+- 4 self-tests for schedule classifier time-of-day, frequency, evidence boundaries, and integration (Phase 12).
+
+### What Worked
+
+- The TDD pattern (test/RED commit → feat/GREEN commit) from Plan 12-01 caught the classifier's file-private visibility issue immediately.
+- Transient @Published bridge flags for keyboard shortcuts kept UserDefaults clean — ephemeral UI signals don't need persistence.
+- Following existing patterns (SidebarTriggerClassifier for schedule classifier, SidebarJobSection.sections() for testing) made Phase 12 integration predictable.
+- Rule 1 auto-fixes (testSidebarGroupingModeLabelsAndOrders, testGroupingModeShortcutKeys) were caught and fixed inline during Phase 12 execution rather than deferred.
+- Per-plan self-tests grew from 33 → 41 with zero regressions — each phase added coverage for its own behavior.
+
+### What Was Inefficient
+
+- Phase 10 Plan 02 required task reordering (Task 3 before Task 2) due to a compile dependency that wasn't visible in the plan.
+- Plan 12-01 documented that two pre-existing tests would fail but left the fix for Plan 02 — this two-step breakage could have been a single plan.
+
+### Patterns Established
+
+- ObservableObject Store with @Published + didSet UserDefaults writes, registered defaults before reads.
+- Transient @Published bridge flags for CommandMenu→view communication (set, observe, act, reset).
+- Private enum classifier pattern: confidence gate → classification → tested indirectly through public sections() API.
+- Int-to-Double Binding wrappers for SwiftUI Slider controls (Pitfall 3 avoidance).
+
+### Key Lessons
+
+1. The `register(defaults:)` before `object(forKey:)` pattern is essential — without it, `bool(forKey:)` returns false for absent keys and corrupts the default-state assumption.
+2. When adding a new enum case that drives `allCases` iteration, audit every test that hardcodes case counts — they all break simultaneously.
+3. File-private classifiers are testable through their public API surface — don't make them public just for tests.
+
+### Cost Observations
+
+- Model mix: not tracked.
+- Sessions: not tracked.
+- Notable: All 8 plans executed in a single session with 19 atomic commits. 63 total commits in the milestone range including docs, tests, and fixes.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -105,6 +157,7 @@
 |-----------|----------|--------|------------|
 | v1.0 | not tracked | 3 | Established grouped-sidebar planning, phase verification, milestone audit, archive, and retrospective flow. |
 | v1.1 | not tracked | 6 | Added publication readiness (privacy scrub, public docs, icon pipeline), broad inventory (confidence/origin/scan-notes, cron/Shortcuts/Automator/candidate/manual sources), sidebar grouping polish, and module-split testable presentation. Exposed and worked around a GSD executor commit-deferral gap. |
+| v1.2 | not tracked | 3 | Added preferences persistence (PreferencesStore, Settings scene), keyboard navigation (8 shortcuts, type-to-select), and schedule-based grouping (classifier, 6th mode). All plans executed with proper atomic commits. No forensic recovery needed. |
 
 ### Cumulative Quality
 
@@ -112,6 +165,7 @@
 |-----------|-------|----------|-------------------|
 | v1.0 | ActiveJobsCoreSelfTest plus manual app verification | Focused scanner/presentation checks | 0 |
 | v1.1 | ActiveJobsCoreSelfTest expanded ~750 lines: model, aggregation, cron, Shortcuts, Automator, candidate, manual, presentation, and grouping coverage; plus app-icon validation and CI gate | Inventory contract + 5 new scanners + manual store + sidebar grouping/collapse/navigation helpers | 0 |
+| v1.2 | 41 self-tests (8 new): Codable round-trips, scan config defaults, type-to-select, expand override, shortcut keys, schedule time-of-day/frequency/evidence-boundaries/integration | Preferences persistence + keyboard nav + schedule classifier | 0 |
 
 ### Top Lessons
 
@@ -119,3 +173,5 @@
 2. Keep read-only scanner boundaries explicit when improving UI navigation.
 3. Verify atomic commit hygiene every phase: `git status --porcelain` should be clean when a plan is ticked complete. Silent commit-deferral compounds invisibly across phases.
 4. SUMMARY.md files are the recovery anchor — keep their `Files Created/Modified` sections explicit and accurate even when the executor would otherwise be skipping the git step.
+5. When adding to an enum that drives `allCases`, all tests hardcoding `.count` or case lists break — audit them in the same plan, not the next one.
+6. File-private types are testable through their public API surface — don't weaken access control for tests.

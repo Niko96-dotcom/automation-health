@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.2 Preferences, Polish, and Shippable Distribution (Shipped: 2026-05-11)
+
+**Phases completed:** 3 phases, 8 plans, 19 tasks
+
+**Key accomplishments:**
+
+- Codable sidebar types, PreferencesStore with UserDefaults-backed @Published properties, and scan configuration wired through JobInventory → CandidateScriptScanner
+- Native macOS Settings window wired to PreferencesStore, ContentView migrated to @ObservedObject
+- Updated MIT LICENSE copyright line per D-06, and added 3 self-test functions verifying Codable round-trips and scan configuration defaults created in Plan 01.
+- PreferencesStore transient bridge properties, View CommandMenu with 8 shortcuts, and AppKit search field focus wiring — the app-level infrastructure for keyboard navigation
+- Type-to-select letter navigation with Finder-style cycling, expand/collapse override rendering, and focus bridge wiring — the view-level keyboard interaction layer
+- Automated regression tests for type-to-select matching logic, expand/collapse override lifecycle, and grouping mode shortcut key mappings — 160 lines of pure logic verification added to ActiveJobsCoreSelfTest
+- Schedule grouping mode with time-of-day and frequency classification, gated on .scheduled confidence, accessible via Cmd+6
+- Four new self-test functions for schedule classification + updated grouping mode shortcut/label tests
+
+---
+
 ## v1.1 Open Source Readiness and Broad Inventory (Shipped: 2026-05-10)
 
 **Phases completed:** 6 phases, 16 plans, 63 tasks

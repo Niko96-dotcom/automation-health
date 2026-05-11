@@ -2,36 +2,26 @@
 
 ## What This Is
 
-Automation Health is a local macOS SwiftUI app for inspecting scheduled jobs on this Mac. It scans supported scheduler sources, presents a searchable sidebar of automations, and shows detail needed to understand job health, timing, configuration, and recent output.
+Automation Health is a local macOS SwiftUI app for inspecting scheduled jobs on this Mac. It scans supported scheduler sources, presents a searchable sidebar of automations grouped by source, origin, health, trigger, confidence, or schedule, and shows detail needed to understand job health, timing, configuration, and recent output.
 
-v1.1 shipped broad inventory, sidebar grouping, and privacy/CI verification. v1.2 adds persisted user preferences (grouping mode, collapse state, scan config), additional grouping/navigation affordances (health-based, schedule-based, custom ordering, keyboard shortcuts), and a signed/notarized shippable release artifact.
+v1.2 shipped persisted user preferences (grouping mode, collapse state, scan config), keyboard navigation (8 shortcuts + type-to-select), and schedule-based grouping. Distribution (codesigning, notarization, DMG, GitHub Release) remains for the next milestone.
 
 ## Core Value
 
 Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
 
-## Current Milestone: v1.2 Preferences, Polish, and Shippable Distribution
-
-**Goal:** Take Automation Health from "buildable locally" to "downloadable and personalized" — persist user preferences, add deferred grouping/navigation affordances, and ship a signed/notarized release artifact.
-
-**Status:** ◆ Planning — requirements being defined
-
-**Target features:**
-- Persisted preferences (grouping mode, collapse state, candidate scan configuration)
-- Additional grouping modes (health-based, schedule-based, custom ordering)
-- Keyboard shortcuts beyond Up/Down (find, jump-to-letter, expand/collapse all, switch grouping, focus search)
-- Shippable distribution (LICENSE, code signing, notarization, GitHub Release)
-- Preserve Phase 8 evidence boundaries (registered/candidate/manual never claim schedule they don't have)
-
-See `.planning/milestones/v1.1-ROADMAP.md` for the archived v1.1 scope and `.planning/MILESTONES.md` for the full accomplishments list.
-
 ## Current State
 
-**Shipped version:** v1.1 Open Source Readiness and Broad Inventory on 2026-05-10
+**Shipped version:** v1.2 Preferences, Polish, and Shippable Distribution on 2026-05-11
 
-v1.0 completed 3 phases, 8 plans, and 19/19 scoped requirements. The milestone archive lives in `.planning/milestones/`, and the living roadmap is collapsed to the shipped milestone summary.
+v1.0 (3 phases, 8 plans) shipped sidebar grouping foundation, keyboard navigation, and polish. v1.1 (6 phases, 16 plans) shipped open source readiness, visual identity, inventory model, candidate discovery, sidebar grouping/collapse, and publication verification.
 
-v1.1 completed 6 phases and 16 plans. Phase 4 added public repository health files, privacy-safe templates, public scanner docs, a rerunnable privacy scrub checklist, a neutral bundle identifier, and synthetic scanner fixtures. Phase 5 added the Pulse Grid icon source art, deterministic local icon generation, and local `.app` bundle icon integration. Phase 6 added confidence/origin modeling, scan notes, cron coverage, and registered Shortcuts/Automator inventory. Phase 7 added bounded Candidate script discovery, app-owned Manual records, and shared inventory presentation for confidence/origin/search/detail. Phase 8 added grouping modes, collapsible sidebar sections, hidden-row keyboard navigation, and custom focus treatment. Phase 9 passed the final publication privacy scrub, visual safety check, local CI, app bundle verification, smoke evidence, and traceability closure.
+v1.2 completed 3 phases and 8 plans:
+- **Phase 10:** PreferencesStore with UserDefaults-backed @Published properties (grouping mode, collapse state, scan config), native macOS Settings scene (Cmd+,), Codable sidebar types, LICENSE with correct copyright, 3 self-tests
+- **Phase 11:** 8 keyboard shortcuts (Cmd+Shift+F/E/W, Cmd+1-6), Finder-style type-to-select with 300ms buffer and wrap-around cycling, expand/collapse override with manual reset, AppKit search field focus, Escape handler, 3 self-tests
+- **Phase 12:** SidebarScheduleKind (9 cases), SidebarScheduleClassifier (confidence-gated, time-of-day + frequency detection), .schedule grouping mode, Cmd+6 shortcut, evidence boundary preservation, 5 self-tests
+
+41/41 self-tests passing. 5,795 lines of Swift.
 
 ## Requirements
 
@@ -61,18 +51,30 @@ v1.1 completed 6 phases and 16 plans. Phase 4 added public repository health fil
 - [x] Sidebar sections are collapsible and can be grouped/sorted by source, origin, health, trigger, and confidence - shipped in Phase 8.
 - [x] The sidebar focus treatment matches the app's dark navigation surface while preserving keyboard accessibility - shipped in Phase 8.
 - [x] Publication privacy scrub, sanitized visual guidance, local CI, app bundle verification, smoke evidence, and traceability are complete - shipped in Phase 9.
+- [x] Sidebar grouping mode persists across app launches via UserDefaults — shipped in Phase 10.
+- [x] Sidebar collapse state persists per group key via UserDefaults — shipped in Phase 10.
+- [x] Candidate scan configuration persists via UserDefaults — shipped in Phase 10.
+- [x] Default values used when no preferences exist — shipped in Phase 10.
+- [x] Settings scene (Cmd+,) exposes persistent scan configuration preferences — shipped in Phase 10.
+- [x] LICENSE file (MIT) committed to repository root — shipped in Phase 10.
+- [x] Keyboard shortcut focuses search field (Cmd+Shift+F) — shipped in Phase 11.
+- [x] Keyboard shortcut expands all sidebar groups (Cmd+Shift+E) — shipped in Phase 11.
+- [x] Keyboard shortcut collapses all sidebar groups (Cmd+Shift+W) — shipped in Phase 11.
+- [x] Keyboard shortcuts switch grouping mode (Cmd+1 through Cmd+6) — shipped in Phase 11/12.
+- [x] Type-to-select letter navigation in sidebar — shipped in Phase 11.
+- [x] Schedule-based grouping mode available in grouping mode selector — shipped in Phase 12.
+- [x] Schedule-based grouping classifies jobs into time-of-day or frequency buckets — shipped in Phase 12.
+- [x] Non-scheduled records appear in "No schedule evidence" bucket — shipped in Phase 12.
+- [x] Evidence boundaries preserved — non-scheduled records never claim schedule they don't have — shipped in Phase 12.
 
 ### Active
 
-- [ ] User preferences (grouping mode, collapse state, scan config) persist via UserDefaults/@AppStorage.
-- [ ] Health-based, schedule-based, and custom grouping modes are available alongside existing five modes.
-- [ ] Keyboard shortcuts support find/jump-to-letter, expand/collapse all, switch grouping mode, and focus search.
-- [ ] LICENSE file is committed to the repository root.
 - [ ] The `.app` bundle is codesigned with a Developer ID from the build pipeline.
+- [ ] Hardened runtime entitlements are configured for the signed app.
 - [ ] A notarization recipe (notarytool + stapler) is documented and reproducible.
-- [ ] A GitHub Release for v1.2 delivers a downloadable `.app.zip` or `.dmg`.
+- [ ] A signed and notarized `.app.zip` or `.dmg` is produced by the release pipeline.
+- [ ] A GitHub Release for v1.2 delivers a downloadable artifact.
 - [ ] Release process documentation covers signing and notarization with placeholder identifiers.
-- [ ] Evidence boundaries are preserved: registered/candidate/manual records never claim schedule they don't have.
 
 ### Out of Scope
 
@@ -85,6 +87,8 @@ v1.1 completed 6 phases and 16 plans. Phase 4 added public repository health fil
 - iOS port or Mac Catalyst — macOS native only.
 - In-app auto-update — rely on the GitHub Releases page.
 - A separate preferences app or Settings scene redesign — use the native macOS Settings scene.
+- Custom ordering grouping mode — deferred to future milestone, drag-to-reorder is non-trivial in current LazyVStack layout.
+- CI-based notarization (GitHub Actions) — stretch goal, local notarization recipe is the v1.2 requirement.
 
 ## Context
 
@@ -96,6 +100,7 @@ The relevant current ownership boundaries are:
 - `Sources/AutomationHealth/Views/SidebarView.swift` renders the sidebar header, grouped source sections, job rows, selection visuals, keyboard navigation, scroll view, filtered empty state, and scan footer.
 - `Sources/AutomationHealth/Models/JobPresentation.swift` adapts scanner models into display names, source names, health values, grouped sidebar sections, and navigation targets.
 - `Sources/AutomationHealth/Stores/JobStore.swift` owns the selected job id and selected job lookup used by the detail view.
+- `Sources/AutomationHealth/Stores/PreferencesStore.swift` owns persisted preferences (grouping mode, collapse state, scan config) and transient bridge flags for keyboard shortcuts.
 
 ## Constraints
 
@@ -113,19 +118,30 @@ The relevant current ownership boundaries are:
 | Make Up/Down move selection through visible jobs | This matches common macOS sidebar/list behavior and keeps the detail pane aligned with keyboard navigation. | Shipped in v1.0 |
 | Keep section headers non-selectable | Headers should organize the list but not enter the job selection model. | Shipped in v1.0 |
 | Use compact source headers with trailing counts | This keeps categories scannable without adding badges, collapse controls, or new grouping modes. | Shipped in v1.0 |
-| Keep the app read-only | The product value is safe inspection of local automations, not administration. | Preserved in v1.0 |
+| Keep the app read-only | The product value is safe inspection of local automations, not administration. | Preserved |
 | Compute relative run labels from the supplied reference date | Tests and UI adapters can pass deterministic dates, so humanized labels should not depend on the wall-clock day when `relativeTo` is provided. | Fixed during v1.0 audit |
-| Use confidence labels for broad discovery | A script or registered tool can be automation-like without being a proven scheduled job, so the UI should distinguish scheduled, registered, candidate, and manual records. | Planned for v1.1 |
-| Separate scheduler source from ownership/origin | launchd can contain Apple jobs, third-party app updaters, and user-authored scripts, so grouping by source alone is not enough for v1.1. | Planned for v1.1 |
+| Use confidence labels for broad discovery | A script or registered tool can be automation-like without being a proven scheduled job, so the UI should distinguish scheduled, registered, candidate, and manual records. | Shipped in v1.1 |
+| Separate scheduler source from ownership/origin | launchd can contain Apple jobs, third-party app updaters, and user-authored scripts. | Shipped in v1.1 |
 | Require a privacy scrub before GitHub publication | Public repo materials must not expose local usernames, hostnames, real job output, personal bundle identifiers, or private paths. | Shipped in Phase 4 |
 | Use Pulse Calendar for the app icon | A graphite calendar tile with one green pulse communicates scheduled automations and health without text, screenshots, or private scheduler detail. | Shipped in Phase 5 |
-| Generate icon assets locally from committed source art | Built-in macOS `sips` and `iconutil` keep the app icon pipeline deterministic without secrets, network access, signing, notarization, or new dependencies. | Shipped in Phase 5 |
+| Generate icon assets locally from committed source art | Built-in macOS `sips` and `iconutil` keep the app icon pipeline deterministic. | Shipped in Phase 5 |
 | Return scanner jobs with source notes | Missing tools, unreadable locations, and evidence limitations need to be visible even when a scanner returns no jobs. | Shipped in Phase 6 |
 | Treat Shortcuts and Automator as registered inventory | Listing registered automations is not schedule evidence, so these sources use Registered confidence and no next-run claims. | Shipped in Phase 6 |
 | Treat script discoveries as Candidate records | File presence is possible automation evidence, not schedule evidence, so Candidate scripts use Candidate confidence and no run/next-run claims. | Shipped in Phase 7 |
 | Keep Manual records app-owned | Users can track automations the scanner cannot prove, but only through Automation Health's own Application Support JSON. | Shipped in Phase 7 |
 | Use abstract or synthetic public visuals only | Public docs and release materials must not expose real local automations, paths, hostnames, scheduler output, private commands, tokens, or secrets. | Shipped in Phase 9 |
 | Treat publication evidence as command names plus outcomes | Final summaries and verification records should avoid raw terminal logs while preserving rerunnable command evidence. | Shipped in Phase 9 |
+| Two @StateObjects with explicit init() sharing one PreferencesStore | Single source of truth for preferences, both stores receive identical reference. | Shipped in Phase 10 |
+| Settings scene as sibling to WindowGroup | SwiftUI auto-registers Cmd+, without manual menu wiring. | Shipped in Phase 10 |
+| Int-to-Double Binding wrappers for Slider controls | Avoids SwiftUI compile error (Slider expects Binding<Double>, not Binding<Int>). | Shipped in Phase 10 |
+| Transient @Published bridge flags for keyboard shortcuts | Focus and expand/collapse requests use non-persisted flags, reset immediately after consumption. | Shipped in Phase 11 |
+| NSSearchField located via NSToolbar.visibleItems iteration | Standard AppKit approach for .searchable-placed fields, no environment injection needed. | Shipped in Phase 11 |
+| Type-to-select via .onKeyPress(characters: .alphanumerics) | Arrow keys, Escape, and modifiers pass through unmodified. | Shipped in Phase 11 |
+| 300ms buffer timeout via Date comparison | Simpler than Timer/DispatchQueue, no lifecycle management or retain cycle risk. | Shipped in Phase 11 |
+| effectiveSections computed property for expand override | Avoids mutating persistent collapseState — override is view-level transformation. | Shipped in Phase 11 |
+| Schedule classifier as file-private enum with static kind(for:) | Follows existing SidebarTriggerClassifier pattern, tested indirectly through sections() API. | Shipped in Phase 12 |
+| Time-of-day classification ranges: Morning (4-11), Afternoon (12-17), Evening (18-21), Night (0-3,22-23) | Standard macOS day-part intervals. | Shipped in Phase 12 |
+| Only .scheduled confidence jobs eligible for schedule classification | Evidence boundary: registered/candidate/manual always → No schedule evidence. | Shipped in Phase 12 |
 
 ## Evolution
 
@@ -145,4 +161,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-10 after v1.2 milestone start*
+*Last updated: 2026-05-11 after v1.2 milestone*

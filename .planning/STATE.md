@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Preferences, Polish, and Shippable Distribution
-status: executing
+status: Awaiting next milestone
 stopped_at: Phase 12 Plan 02 complete
-last_updated: "2026-05-11T09:23:00Z"
-last_activity: 2026-05-11
+last_updated: "2026-05-11T23:33:08.134Z"
+last_activity: 2026-05-11 — Milestone v1.2 completed and archived
 progress:
   total_phases: 3
   completed_phases: 3
   total_plans: 8
-  completed_plans: 10
+  completed_plans: 8
   percent: 100
 ---
 
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-10)
 
 ## Current Position
 
-Phase: 12
-Plan: 02 (complete)
-Status: Phase complete
-Last activity: 2026-05-11
+Phase: Milestone v1.2 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-11 — Milestone v1.2 completed and archived
 
 ## Performance Metrics
 
@@ -123,15 +123,20 @@ project.
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged and deferred at milestone close on 2026-05-11:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Alternate grouping | Health-based, schedule-based, and persisted custom grouping modes | Deferred | Initialization |
-| Navigation | Additional shortcuts beyond Up/Down | Deferred | Initialization |
-| Sidebar sections | Collapsible groups | Deferred | Initialization |
+| verification_gap | Phase 10: 10-VERIFICATION.md | human_needed | v1.2 close |
+| verification_gap | Phase 11: 11-VERIFICATION.md | human_needed | v1.2 close |
+| verification_gap | Phase 12: 12-VERIFICATION.md | human_needed | v1.2 close |
 | Distribution | Signed/notarized release artifact | Deferred | v1.1 scoping |
-| Preferences | Persisted grouping and candidate-scan preferences | Deferred | v1.1 scoping |
+
+Previously deferred items now resolved in v1.2:
+- Alternate grouping (schedule-based, health-based) → shipped Phase 12
+- Navigation (keyboard shortcuts, type-to-select) → shipped Phase 11
+- Sidebar sections (collapsible groups) → shipped Phase 8
+- Preferences (persisted grouping, scan config) → shipped Phase 10
 
 ## Session Continuity
 
