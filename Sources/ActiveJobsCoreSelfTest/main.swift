@@ -38,6 +38,7 @@ try testScanConfigDefaults()
 try testSidebarTypeToSelect()
 try testSidebarExpandOverride()
 try testGroupingModeShortcutKeys()
+try testSidebarScheduleGroupingModeAndSections()
 
 print("ActiveJobsCoreSelfTest passed")
 
@@ -1101,6 +1102,49 @@ func testGroupingModeShortcutKeys() throws {
 
     // Verify default mode is source (ensures first-launch state is predictable)
     expect(SidebarGroupingMode.defaultMode == .source, "Default grouping mode is Source")
+}
+
+func testSidebarScheduleGroupingModeAndSections() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let now = calendar.date(from: DateComponents(year: 2026, month: 5, day: 8, hour: 12, minute: 0))!
+
+    let morningDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 8, minute: 0))!
+    let afternoonDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 14, minute: 0))!
+    let eveningDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 20, minute: 0))!
+    let nightDate = calendar.date(from: DateComponents(year: 2026, month: 5, day: 9, hour: 2, minute: 0))!
+
+    // Verify .schedule case exists and is the 6th mode
+    let allModes = SidebarGroupingMode.allCases
+    expect(allModes.count == 6, "6 grouping modes after adding schedule")
+    expect(allModes[5] == .schedule, "schedule is 6th case (index 5) after confidence")
+    expect(allModes[5].label == "Schedule", "schedule mode label is 'Schedule'")
+
+    // Verify sections classify correctly via .schedule grouping
+    let jobs = [
+        JobPresentation(job: ScheduledJob.fixture(id: "morning", confidence: .scheduled, nextRun: morningDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "afternoon", confidence: .scheduled, nextRun: afternoonDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "evening", confidence: .scheduled, nextRun: eveningDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "night", confidence: .scheduled, nextRun: nightDate), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "hourly", confidence: .scheduled, schedule: "every hour"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "daily", confidence: .scheduled, schedule: "0 10 * * *"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "weekly", confidence: .scheduled, schedule: "@weekly"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "monthly", confidence: .scheduled, schedule: "@monthly"), now: now),
+        JobPresentation(job: ScheduledJob.fixture(id: "candidate", confidence: .candidate, schedule: "0 9 * * *"), now: now),
+    ]
+    let sections = SidebarJobSection.sections(for: jobs, groupingMode: .schedule, collapseState: SidebarCollapseState(), hasSearchQuery: false)
+
+    expect(section(sections, titled: "Morning (4 AM – 12 PM)").allJobIDs == ["hermesCron:morning"], "morning section contains morning job")
+    expect(section(sections, titled: "Afternoon (12 PM – 6 PM)").allJobIDs == ["hermesCron:afternoon"], "afternoon section contains afternoon job")
+    expect(section(sections, titled: "Evening (6 PM – 10 PM)").allJobIDs == ["hermesCron:evening"], "evening section contains evening job")
+    expect(section(sections, titled: "Night (10 PM – 4 AM)").allJobIDs == ["hermesCron:night"], "night section contains night job")
+    expect(section(sections, titled: "Hourly").allJobIDs == ["hermesCron:hourly"], "hourly section contains hourly job")
+    expect(section(sections, titled: "Daily").allJobIDs == ["hermesCron:daily"], "daily section contains daily job")
+    expect(section(sections, titled: "Weekly").allJobIDs == ["hermesCron:weekly"], "weekly section contains weekly job")
+    expect(section(sections, titled: "Monthly").allJobIDs == ["hermesCron:monthly"], "monthly section contains monthly job")
+    expect(section(sections, titled: "No schedule evidence").allJobIDs == ["hermesCron:candidate"], "noScheduleEvidence section contains candidate job")
+
+    // Verify "No schedule evidence" is the last section
+    expect(sections.last?.title == "No schedule evidence", "No schedule evidence section appears last")
 }
 
 func expect(_ condition: @autoclosure () -> Bool, _ message: String) {
