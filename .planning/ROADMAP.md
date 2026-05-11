@@ -47,7 +47,7 @@
   - Plans:
     - [x] 11-01-PLAN.md — PreferencesStore expand override + global shortcuts (View CommandMenu, Cmd+Shift+F/E/W, Cmd+1..5) + ContentView search focus and Escape
     - [x] 11-02-PLAN.md — Type-to-select matching logic (SidebarNavigation) + sidebar buffer/cycling + expand override rendering and manual reset
-    - [ ] 11-03-PLAN.md — Self-test coverage for type-to-select, expand override lifecycle, and shortcut key mappings
+    - [x] 11-03-PLAN.md — Self-test coverage for type-to-select, expand override lifecycle, and shortcut key mappings
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/FEATURES.md`
 
 - [ ] **Phase 12: Schedule-Based Grouping** (depends on Phase 10) — New schedule-based grouping mode with confidence-gated classifier. Evidence boundary preservation for Registered, Candidate, and Manual records.
