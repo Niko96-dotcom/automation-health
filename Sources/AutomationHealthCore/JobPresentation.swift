@@ -266,6 +266,43 @@ public enum SidebarNavigation {
         }
     }
 
+    public static func typeToSelectMatch(
+        for prefix: String,
+        in sections: [SidebarJobSection]
+    ) -> String? {
+        let lowercased = prefix.lowercased()
+        guard !lowercased.isEmpty else { return nil }
+
+        let allVisible = sections.flatMap(\.jobs)
+        return allVisible.first { $0.displayName.lowercased().hasPrefix(lowercased) }?.id
+    }
+
+    public static func typeToSelectNextMatch(
+        for prefix: String,
+        in sections: [SidebarJobSection],
+        after currentID: String
+    ) -> String? {
+        let lowercased = prefix.lowercased()
+        guard !lowercased.isEmpty else { return nil }
+
+        let allVisible = sections.flatMap(\.jobs)
+        let matchingIDs = allVisible
+            .filter { $0.displayName.lowercased().hasPrefix(lowercased) }
+            .map(\.id)
+
+        guard !matchingIDs.isEmpty else { return nil }
+
+        if let currentIndex = matchingIDs.firstIndex(of: currentID) {
+            let nextIndex = currentIndex + 1
+            if nextIndex < matchingIDs.endIndex {
+                return matchingIDs[nextIndex]
+            }
+            return matchingIDs.first
+        }
+
+        return matchingIDs.first
+    }
+
     public static func targetJobID(
         in visibleJobs: [SidebarJobSummary],
         selectedJobID: String?,
