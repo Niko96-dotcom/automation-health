@@ -24,10 +24,10 @@ Requirements for v1.2 Preferences, Polish, and Shippable Distribution. Each maps
 
 ### Keyboard Navigation
 
-- [ ] **NAV-01**: Keyboard shortcut focuses the search field (Cmd+Shift+F)
-- [ ] **NAV-02**: Keyboard shortcut expands all sidebar groups at once
-- [ ] **NAV-03**: Keyboard shortcut collapses all sidebar groups at once
-- [ ] **NAV-04**: Keyboard shortcuts switch grouping mode (Cmd+1 through Cmd+N)
+- [x] **NAV-01**: Keyboard shortcut focuses the search field (Cmd+Shift+F)
+- [x] **NAV-02**: Keyboard shortcut expands all sidebar groups at once
+- [x] **NAV-03**: Keyboard shortcut collapses all sidebar groups at once
+- [x] **NAV-04**: Keyboard shortcuts switch grouping mode (Cmd+1 through Cmd+N)
 - [ ] **NAV-05**: Jump-to-letter navigation in sidebar — typing first letters of a job name selects the matching row
 
 ### Distribution

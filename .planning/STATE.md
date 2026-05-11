@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Preferences, Polish, and Shippable Distribution
 status: completed
-stopped_at: Phase 11 UI-SPEC approved
-last_updated: "2026-05-11T06:49:12.516Z"
+stopped_at: Phase 11 Plan 01 complete
+last_updated: "2026-05-11T07:17:48.714Z"
 last_activity: 2026-05-11
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_plans: 6
+  completed_plans: 4
+  percent: 67
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-05-10)
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
-Status: Milestone complete
+Phase: 11
+Plan: 01
+Status: Plan 01 complete, 02 next
 Last activity: 2026-05-11
 
 ## Performance Metrics
@@ -68,6 +68,7 @@ Last activity: 2026-05-11
 | Phase 05 P02 | 4 min | 4 tasks | 15 files |
 | Phase 10-preferences-persistence P03 | 4 min | 2 tasks | 2 files |
 | Phase 10-preferences-persistence P02 | 3 | 3 tasks | 3 files |
+| Phase 11 P01 | 1 min | 3 tasks | 3 files |
 
 ## Quick Tasks Completed
 
@@ -85,6 +86,9 @@ Recent decisions affecting current work:
 - Initialization: Group sidebar jobs by source for v1.
 - Initialization: Up/Down arrow keys should move selection through visible jobs and skip headers.
 - Initialization: Keep Automation Health read-only; do not add job mutation controls.
+- Phase 11 Plan 01: Keyboard shortcut infrastructure uses transient @Published bridge flags rather than UserDefaults — focus and expand/collapse requests reset immediately after consumption
+- Phase 11 Plan 01: NSSearchField located via NSToolbar.visibleItems iteration rather than environment injection — standard AppKit approach for .searchable-placed fields
+- Phase 11 Plan 01: Escape handler guards against modifier keys so Option+Escape and system shortcuts pass through
 - [Phase ?]: Explicit init() in AutomationHealthApp creates PreferencesStore once, passes same reference to both @StateObject wrappers and JobStore
 - [Phase ?]: SettingsView uses Int-to-Double Binding wrappers to avoid Pitfall 3 compile error
 - [Phase ?]: Settings scene is a sibling to WindowGroup — SwiftUI auto-registers Cmd+,
@@ -116,9 +120,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-11T06:49:12.511Z
-Stopped at: Phase 11 UI-SPEC approved
-Resume file: .planning/phases/11-keyboard-navigation/11-UI-SPEC.md
+Last session: 2026-05-11T07:16:22.000Z
+Stopped at: Phase 11 Plan 01 complete
+Resume file: .planning/phases/11-keyboard-navigation/11-01-SUMMARY.md
 
 ## Operator Next Steps
 
