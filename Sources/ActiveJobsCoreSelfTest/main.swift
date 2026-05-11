@@ -477,7 +477,7 @@ func testSidebarGroupingModeLabelsAndOrders() throws {
     let old = isoDate("2026-05-01T10:00:00Z")
     let future = isoDate("2026-05-09T10:00:00Z")
 
-    expect(SidebarGroupingMode.allCases.map(\.label) == ["Source", "Origin", "Health", "Trigger", "Confidence"], "Sidebar grouping labels")
+    expect(SidebarGroupingMode.allCases.map(\.label) == ["Source", "Origin", "Health", "Trigger", "Confidence", "Schedule"], "Sidebar grouping labels")
     expect(SidebarGroupingMode.defaultMode == .source, "Sidebar grouping default")
 
     let sourceJobs = JobSource.allCases.map { source in
@@ -1083,15 +1083,16 @@ func testSidebarExpandOverride() throws {
 func testGroupingModeShortcutKeys() throws {
     let allModes = SidebarGroupingMode.allCases
 
-    // Verify exactly 5 modes per D-03 (Cmd+1 through Cmd+5)
-    expect(allModes.count == 5, "Exactly 5 grouping modes for Cmd+1..5 shortcuts")
+    // Verify exactly 6 modes per D-03 (Cmd+1 through Cmd+6)
+    expect(allModes.count == 6, "Exactly 6 grouping modes for Cmd+1..6 shortcuts")
 
-    // Verify enum case order matches shortcut key: Source=1, Origin=2, Health=3, Trigger=4, Confidence=5
+    // Verify enum case order matches shortcut key: Source=1, Origin=2, Health=3, Trigger=4, Confidence=5, Schedule=6
     expect(allModes[0] == .source, "Cmd+1 maps to Source grouping")
     expect(allModes[1] == .origin, "Cmd+2 maps to Origin grouping")
     expect(allModes[2] == .health, "Cmd+3 maps to Health grouping")
     expect(allModes[3] == .trigger, "Cmd+4 maps to Trigger grouping")
     expect(allModes[4] == .confidence, "Cmd+5 maps to Confidence grouping")
+    expect(allModes[5] == .schedule, "Cmd+6 maps to Schedule grouping")
 
     // Verify labels match menu items
     expect(allModes[0].label == "Source", "Source mode label is 'Source'")
@@ -1099,6 +1100,7 @@ func testGroupingModeShortcutKeys() throws {
     expect(allModes[2].label == "Health", "Health mode label is 'Health'")
     expect(allModes[3].label == "Trigger", "Trigger mode label is 'Trigger'")
     expect(allModes[4].label == "Confidence", "Confidence mode label is 'Confidence'")
+    expect(allModes[5].label == "Schedule", "Schedule mode label is 'Schedule'")
 
     // Verify default mode is source (ensures first-launch state is predictable)
     expect(SidebarGroupingMode.defaultMode == .source, "Default grouping mode is Source")
