@@ -50,12 +50,12 @@
     - [x] 11-03-PLAN.md — Self-test coverage for type-to-select, expand override lifecycle, and shortcut key mappings
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/FEATURES.md`
 
-- [ ] **Phase 12: Schedule-Based Grouping** (depends on Phase 10) — New schedule-based grouping mode with confidence-gated classifier. Evidence boundary preservation for Registered, Candidate, and Manual records.
+- [x] **Phase 12: Schedule-Based Grouping** (depends on Phase 10) — New schedule-based grouping mode with confidence-gated classifier. Evidence boundary preservation for Registered, Candidate, and Manual records.
   - **Plans:** 2 plans
   - Requirements: GROUP-01, GROUP-02, GROUP-03, GROUP-04
   - Plans:
     - [x] 12-01-PLAN.md — Schedule classifier core: SidebarScheduleKind enum, SidebarScheduleClassifier, .schedule grouping mode, groupDefinitions branch, Cmd+6 shortcut
-    - [ ] 12-02-PLAN.md — Self-test coverage: time-of-day, frequency, evidence boundary, grouping integration tests
+    - [x] 12-02-PLAN.md — Self-test coverage: time-of-day, frequency, evidence boundary, grouping integration tests
   - Canonical refs: `.planning/research/ARCHITECTURE.md`, `.planning/research/PITFALLS.md`
 
 - [ ] **Phase 13: Shippable Distribution** (independent of UI phases) — Codesigning, hardened runtime entitlements, notarization, DMG packaging, GitHub Release, release process documentation.
@@ -103,4 +103,4 @@
 | --------- | ------ | ----- | ----------- | ---------- |
 | v1.0      | 3      | 8/8   | Complete    | 2026-05-08 |
 | v1.1      | 6      | 16/16 | Complete    | 2026-05-10 |
-| v1.2      | 4      | 0/3   | In progress | —          |
+| v1.2      | 4      | 2/3   | In progress | —          |
