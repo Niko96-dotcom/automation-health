@@ -51,7 +51,11 @@
   - Canonical refs: `.planning/research/STACK.md`, `.planning/research/FEATURES.md`
 
 - [ ] **Phase 12: Schedule-Based Grouping** (depends on Phase 10) — New schedule-based grouping mode with confidence-gated classifier. Evidence boundary preservation for Registered, Candidate, and Manual records.
+  - **Plans:** 2 plans
   - Requirements: GROUP-01, GROUP-02, GROUP-03, GROUP-04
+  - Plans:
+    - [ ] 12-01-PLAN.md — Schedule classifier core: SidebarScheduleKind enum, SidebarScheduleClassifier, .schedule grouping mode, groupDefinitions branch, Cmd+6 shortcut
+    - [ ] 12-02-PLAN.md — Self-test coverage: time-of-day, frequency, evidence boundary, grouping integration tests
   - Canonical refs: `.planning/research/ARCHITECTURE.md`, `.planning/research/PITFALLS.md`
 
 - [ ] **Phase 13: Shippable Distribution** (independent of UI phases) — Codesigning, hardened runtime entitlements, notarization, DMG packaging, GitHub Release, release process documentation.
