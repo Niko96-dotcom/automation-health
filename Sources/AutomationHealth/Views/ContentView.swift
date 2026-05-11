@@ -46,7 +46,9 @@ struct ContentView: View {
                 selectedJobID: $store.selectedJobID,
                 lastScannedDescription: store.lastScannedDescription,
                 scanNotes: store.scanNotes,
-                isScanning: store.isScanning
+                isScanning: store.isScanning,
+                sidebarExpandAllOverride: $preferences.sidebarExpandAllOverride,
+                requestJobListFocus: $preferences.requestJobListFocus
             )
             .searchable(text: $searchText, placement: .sidebar)
             .navigationSplitViewColumnWidth(min: 280, ideal: 340)

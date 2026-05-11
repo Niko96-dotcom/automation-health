@@ -16,8 +16,13 @@ struct SidebarView: View {
     let lastScannedDescription: String
     let scanNotes: [ScanNote]
     let isScanning: Bool
+    @Binding var sidebarExpandAllOverride: Bool?
+    @Binding var requestJobListFocus: Bool
     @State private var keyboardNavigationTargetID: String?
     @FocusState private var focusedTarget: SidebarFocusTarget?
+    @State private var typeSelectBuffer = ""
+    @State private var typeSelectLastInput = Date.distantPast
+    @State private var typeSelectLastCharacter: Character? = nil
 
     private var visibleJobs: [SidebarJobSummary] {
         sections.flatMap(\.jobs)
@@ -25,6 +30,26 @@ struct SidebarView: View {
 
     private var allFilteredJobs: [SidebarJobSummary] {
         sections.flatMap(\.allJobs)
+    }
+
+    private var effectiveSections: [SidebarJobSection] {
+        guard let override = sidebarExpandAllOverride else {
+            return sections
+        }
+        return sections.map { section in
+            SidebarJobSection(
+                id: section.id,
+                title: section.title,
+                visibleCount: section.totalCount,
+                totalCount: section.totalCount,
+                isPersistentlyCollapsed: override ? false : true,
+                isEffectivelyCollapsed: override ? false : true,
+                isCollapsed: override ? false : true,
+                jobs: override ? section.allJobs : [],
+                allJobs: section.allJobs,
+                allJobIDs: section.allJobIDs
+            )
+        }
     }
 
     private var statusSummary: String {
@@ -69,11 +94,12 @@ struct SidebarView: View {
                             FilteredSidebarEmptyState()
                         }
 
-                        ForEach(sections) { section in
+                        ForEach(effectiveSections) { section in
                             SidebarSectionHeader(
                                 section: section,
                                 hasSearchQuery: hasSearchQuery
                             ) {
+                                sidebarExpandAllOverride = nil
                                 collapseState.toggle(section.id)
                             }
 
@@ -107,6 +133,46 @@ struct SidebarView: View {
                 .focused($focusedTarget, equals: .jobList)
                 .onKeyPress(.downArrow) { navigate(.next) }
                 .onKeyPress(.upArrow) { navigate(.previous) }
+                .onKeyPress(characters: .alphanumerics) { press in
+                    guard focusedTarget == .jobList else { return .ignored }
+                    guard let character = press.characters.first else { return .ignored }
+
+                    let now = Date()
+                    let elapsed = now.timeIntervalSince(typeSelectLastInput)
+
+                    if elapsed > 0.3 {
+                        typeSelectBuffer = ""
+                        typeSelectLastCharacter = nil
+                    }
+
+                    let isRepeat = (character == typeSelectLastCharacter)
+                    typeSelectLastInput = now
+                    typeSelectLastCharacter = character
+
+                    let targetID: String?
+
+                    if isRepeat && elapsed <= 0.3 {
+                        targetID = SidebarNavigation.typeToSelectNextMatch(
+                            for: typeSelectBuffer,
+                            in: sections,
+                            after: selectedJobID ?? ""
+                        )
+                    } else {
+                        typeSelectBuffer.append(character)
+                        targetID = SidebarNavigation.typeToSelectMatch(
+                            for: typeSelectBuffer,
+                            in: sections
+                        )
+                    }
+
+                    guard let targetID else {
+                        return .handled
+                    }
+
+                    keyboardNavigationTargetID = targetID
+                    selectedJobID = targetID
+                    return .handled
+                }
                 .onChange(of: keyboardNavigationTargetID) { _, targetID in
                     guard let targetID else {
                         return
@@ -114,6 +180,12 @@ struct SidebarView: View {
 
                     proxy.scrollTo(targetID, anchor: nil)
                     keyboardNavigationTargetID = nil
+                }
+                .onChange(of: requestJobListFocus) { _, shouldFocus in
+                    if shouldFocus {
+                        focusedTarget = .jobList
+                        requestJobListFocus = false
+                    }
                 }
             }
 
