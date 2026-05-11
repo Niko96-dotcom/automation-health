@@ -76,6 +76,11 @@ struct AutomationHealthApp: App {
                     preferences.groupingMode = .confidence
                 }
                 .keyboardShortcut("5", modifiers: [.command])
+
+                Button("Group by Schedule") {
+                    preferences.groupingMode = .schedule
+                }
+                .keyboardShortcut("6", modifiers: [.command])
             }
 
             CommandMenu("Automations") {
