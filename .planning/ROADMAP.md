@@ -56,7 +56,12 @@
   4. Running `stapler validate` against the DMG confirms a stapled notarization ticket.
   5. A tagged GitHub Release contains the signed and notarized DMG as a downloadable asset.
   6. A developer following the documented release process can produce a signed and notarized release using their own Developer ID credentials.
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — Entitlements file, release script with codesign+DMG+notarize+staple, and Makefile targets
+- [ ] 13-02-PLAN.md — GitHub Actions release workflow with certificate import, notarization, and GitHub Release creation
+- [ ] 13-03-PLAN.md — Release process documentation, .gitignore update, and README distribution status update
 **UI hint**: yes
 
 ### Phase 14: Sparkle Auto-Update Integration
@@ -68,7 +73,12 @@
   2. The app checks for updates against the GitHub Releases appcast feed and shows an update alert when a newer version is available.
   3. A user can download and install an update entirely from within the app, with the app relaunching to the new version.
   4. The EdDSA public key is embedded in the app bundle, and update signatures are verified before installation is offered.
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — Entitlements file, release script with codesign+DMG+notarize+staple, and Makefile targets
+- [ ] 13-02-PLAN.md — GitHub Actions release workflow with certificate import, notarization, and GitHub Release creation
+- [ ] 13-03-PLAN.md — Release process documentation, .gitignore update, and README distribution status update
 **UI hint**: yes
 
 ## Progress
