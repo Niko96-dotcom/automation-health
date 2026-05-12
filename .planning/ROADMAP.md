@@ -79,9 +79,12 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [x] 13-01-PLAN.md — Entitlements file, release script with codesign+DMG+notarize+staple, and Makefile targets
-- [x] 13-02-PLAN.md — GitHub Actions release workflow with certificate import, notarization, and GitHub Release creation
-- [x] 13-03-PLAN.md — Release process documentation, .gitignore update, and README distribution status update
+**Wave 1** *(independent)*
+- [ ] 14-01-PLAN.md — Sparkle 2 SPM dependency, UpdateStore ObservableObject, and EdDSA key generation script
+
+**Wave 2** *(depends on 14-01)*
+- [ ] 14-02-PLAN.md — Sparkle updater lifecycle in AutomationHealthApp, Check for Updates menu item, and Updates section in SettingsView
+- [ ] 14-03-PLAN.md — Appcast generation in release.sh and Sparkle setup in release documentation
 **UI hint**: yes
 
 ## Progress
@@ -91,4 +94,4 @@ Plans:
 | v1.0      | 3      | 8/8   | Complete    | 2026-05-08 |
 | v1.1      | 6      | 16/16 | Complete    | 2026-05-10 |
 | v1.2      | 3      | 8/8   | Complete    | 2026-05-11 |
-| v1.3      | 2      | 0/?   | Planned     | —          |
+| v1.3      | 2      | 3/6   | In Progress | —          |
