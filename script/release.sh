@@ -127,10 +127,31 @@ echo "=== Step 5: Create DMG with drag-to-install layout ==="
 mkdir -p "$ROOT_DIR/dist"
 TMP_DMG="$STAGING/tmp.dmg"
 
-hdiutil create -size 150m -volname "$DISPLAY_NAME" -fs HFS+ -attach "$TMP_DMG"
+# Create and attach the DMG.  Capture the disk device so we can detach it
+# cleanly later, and use -plist output for reliable parsing on any macOS.
+hdiutil_output="$(hdiutil create -size 150m -volname "$DISPLAY_NAME" -fs HFS+ -attach -plist "$TMP_DMG")"
+hdiutil_exit=$?
+if [ "$hdiutil_exit" -ne 0 ]; then
+  echo "Error: hdiutil create -attach failed (exit $hdiutil_exit)" >&2
+  exit 1
+fi
 
-cp -R "$APP_BUNDLE" "/Volumes/$DISPLAY_NAME/"
-ln -s /Applications "/Volumes/$DISPLAY_NAME/Applications"
+# Extract the dev-entry (e.g. /dev/disk4) from the plist output.
+DISK_ID="$(echo "$hdiutil_output" | plutil -extract "system-entities".0."dev-entry" raw -o - - 2>/dev/null || true)"
+if [ -z "$DISK_ID" ]; then
+  echo "Error: could not determine disk identifier from hdiutil create -plist output" >&2
+  exit 1
+fi
+
+# Confirm the mount point exists before writing to it.
+MOUNT_POINT="/Volumes/$DISPLAY_NAME"
+if [ ! -d "$MOUNT_POINT" ]; then
+  echo "Error: mount point $MOUNT_POINT not found for $DISK_ID" >&2
+  exit 1
+fi
+
+cp -R "$APP_BUNDLE" "$MOUNT_POINT/"
+ln -s /Applications "$MOUNT_POINT/Applications"
 
 osascript <<END_SCRIPT
 tell application "Finder"
@@ -151,7 +172,6 @@ tell application "Finder"
 end tell
 END_SCRIPT
 
-DISK_ID="$(hdiutil info | grep "/Volumes/$DISPLAY_NAME" | awk '{print $1}')"
 hdiutil detach "$DISK_ID" -force
 hdiutil convert "$TMP_DMG" -format UDZO -imagekey zlib-level=9 -o "$DMG_PATH"
 rm -f "$TMP_DMG"
