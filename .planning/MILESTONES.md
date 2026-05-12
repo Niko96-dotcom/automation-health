@@ -1,5 +1,21 @@
 # Milestones
 
+## v1.3 Shippable Distribution (Shipped: 2026-05-12)
+
+**Phases completed:** 2 phases, 7 plans, 10 tasks
+
+**Key accomplishments:**
+
+- One-liner:
+- Tag-triggered CI pipeline builds, signs, notarizes, and packages a signed DMG, then creates a GitHub Release with the downloadable artifact — all automated with no manual steps beyond pushing a version tag.
+- One-liner:
+- One-liner:
+- Sparkle auto-update integration: SPUUpdater lifecycle in app entry point, Check for Updates menu item, and Updates section in native Settings with version display, auto-check toggle, manual check button, and graceful error state.
+- Release pipeline extended with Sparkle appcast generation and complete Sparkle setup documentation for the release process
+- One-liner:
+
+---
+
 ## v1.2 Preferences, Polish, and Shippable Distribution (Shipped: 2026-05-11)
 
 **Phases completed:** 3 phases, 8 plans, 19 tasks

@@ -4,36 +4,23 @@
 
 Automation Health is a local macOS SwiftUI app for inspecting scheduled jobs on this Mac. It scans supported scheduler sources, presents a searchable sidebar of automations grouped by source, origin, health, trigger, confidence, or schedule, and shows detail needed to understand job health, timing, configuration, and recent output.
 
-v1.2 shipped persisted user preferences (grouping mode, collapse state, scan config), keyboard navigation (8 shortcuts + type-to-select), and schedule-based grouping. v1.3 targets the remaining distribution work: codesigning, notarization, DMG, GitHub Release, and Sparkle auto-update.
+v1.3 shipped signed and notarized DMG distribution via a fully automated CI pipeline (GitHub Actions) and Sparkle 2 auto-update integration against GitHub Releases.
 
 ## Core Value
 
 Users can quickly understand and navigate the health of their local scheduled automations without the app modifying those jobs.
 
-## Current Milestone: v1.3 Shippable Distribution
-
-**Goal:** Ship a signed, notarized, auto-updating downloadable release of Automation Health.
-
-**Target features:**
-- Codesigning with Developer ID and hardened runtime entitlements
-- Notarization recipe (notarytool + stapler) with CI automation
-- Signed + notarized DMG produced by the release pipeline
-- GitHub Release with downloadable artifact
-- Release process documentation with placeholder identifiers
-- Sparkle auto-update integration against GitHub Releases
-
 ## Current State
 
-**Shipped version:** v1.2 Preferences, Polish, and Shippable Distribution on 2026-05-11
+**Shipped version:** v1.3 Shippable Distribution on 2026-05-12
 
-v1.0 (3 phases, 8 plans) shipped sidebar grouping foundation, keyboard navigation, and polish. v1.1 (6 phases, 16 plans) shipped open source readiness, visual identity, inventory model, candidate discovery, sidebar grouping/collapse, and publication verification.
+v1.0 (3 phases, 8 plans) shipped sidebar grouping foundation, keyboard navigation, and polish. v1.1 (6 phases, 16 plans) shipped open source readiness, visual identity, inventory model, candidate discovery, sidebar grouping/collapse, and publication verification. v1.2 (3 phases, 8 plans) shipped preferences persistence, keyboard shortcuts/type-to-select, and schedule-based grouping.
 
-v1.2 completed 3 phases and 8 plans:
-- **Phase 10:** PreferencesStore with UserDefaults-backed @Published properties (grouping mode, collapse state, scan config), native macOS Settings scene (Cmd+,), Codable sidebar types, LICENSE with correct copyright, 3 self-tests
-- **Phase 11:** 8 keyboard shortcuts (Cmd+Shift+F/E/W, Cmd+1-6), Finder-style type-to-select with 300ms buffer and wrap-around cycling, expand/collapse override with manual reset, AppKit search field focus, Escape handler, 3 self-tests
-- **Phase 12:** SidebarScheduleKind (9 cases), SidebarScheduleClassifier (confidence-gated, time-of-day + frequency detection), .schedule grouping mode, Cmd+6 shortcut, evidence boundary preservation, 5 self-tests
+v1.3 completed 2 phases and 7 plans (plus 1 gap closure plan):
+- **Phase 13:** Signed and notarized DMG with CI pipeline — codesigning with Developer ID and hardened runtime, entitlements file, release script (build, sign, DMG, notarize via notarytool, staple), GitHub Actions release workflow with certificate import and notarization, GitHub Release creation, release process documentation (273 lines), Makefile dmg/release targets
+- **Phase 14:** Sparkle auto-update integration — Sparkle 2 SPM dependency (first external dependency), UpdateStore ObservableObject, Check for Updates menu item, Updates section in native Settings (version display, auto-check toggle, manual check button, graceful error state), EdDSA key generation script, appcast generation in release pipeline, CI injection of SPARKLE_EDDSA_PRIVATE_KEY and SU_PUBLIC_ED_KEY
 
-41/41 self-tests passing. 5,795 lines of Swift.
+42/42 self-tests passing. Package.swift includes Sparkle 2.9.1 as the sole external dependency.
 
 ## Requirements
 
@@ -78,17 +65,18 @@ v1.2 completed 3 phases and 8 plans:
 - [x] Schedule-based grouping classifies jobs into time-of-day or frequency buckets — shipped in Phase 12.
 - [x] Non-scheduled records appear in "No schedule evidence" bucket — shipped in Phase 12.
 - [x] Evidence boundaries preserved — non-scheduled records never claim schedule they don't have — shipped in Phase 12.
+- [x] **DIST-01**: The `.app` bundle is codesigned with a Developer ID from the build pipeline — shipped in Phase 13.
+- [x] **DIST-02**: Hardened runtime entitlements are configured for the signed app — shipped in Phase 13.
+- [x] **DIST-03**: A notarization recipe (notarytool + stapler) is documented and reproducible — shipped in Phase 13.
+- [x] **DIST-04**: A signed and notarized DMG is produced by the release pipeline — shipped in Phase 13.
+- [x] **DIST-05**: A GitHub Release delivers a downloadable artifact — shipped in Phase 13.
+- [x] **DIST-06**: Release process documentation covers signing and notarization with placeholder identifiers — shipped in Phase 13.
+- [x] **DIST-07**: CI-based notarization runs in GitHub Actions as part of the release pipeline — shipped in Phase 13.
+- [x] **DIST-08**: Sparkle auto-update checks GitHub Releases and presents update UI to the user — shipped in Phase 14.
 
 ### Active
 
-- [ ] **DIST-01**: The `.app` bundle is codesigned with a Developer ID from the build pipeline.
-- [ ] **DIST-02**: Hardened runtime entitlements are configured for the signed app.
-- [ ] **DIST-03**: A notarization recipe (notarytool + stapler) is documented and reproducible.
-- [ ] **DIST-04**: A signed and notarized DMG is produced by the release pipeline.
-- [ ] **DIST-05**: A GitHub Release delivers a downloadable artifact.
-- [ ] **DIST-06**: Release process documentation covers signing and notarization with placeholder identifiers.
-- [ ] **DIST-07**: CI-based notarization runs in GitHub Actions as part of the release pipeline.
-- [ ] **DIST-08**: Sparkle auto-update checks GitHub Releases and presents update UI to the user.
+_None. All requirements for v1.0 through v1.3 are validated. Run `/gsd-new-milestone` to define requirements for the next milestone._
 
 ### Out of Scope
 
@@ -99,13 +87,13 @@ v1.2 completed 3 phases and 8 plans:
 - A full design-system rewrite - polish the existing native SwiftUI app rather than replace the app shell.
 - Cloud sync, accounts, telemetry, or analytics — all preferences persist locally only.
 - iOS port or Mac Catalyst — macOS native only.
-- A separate preferences app or Settings scene redesign — use the native macOS Settings scene.
-- Custom ordering grouping mode — deferred to future milestone, drag-to-reorder is non-trivial in current LazyVStack layout.
+- Custom ordering grouping mode — deferred to future milestone.
 - In-app auto-update beyond Sparkle's standard GitHub Releases integration (custom update channels, delta updates).
+- Mac App Store distribution — sandbox entitlement conflicts with read-only scanner access to system paths.
 
 ## Context
 
-Automation Health is a brownfield SwiftPM macOS application with an existing codebase map in `.planning/codebase/`. The app is organized into `ActiveJobsCore` for scanner models and source adapters, `JobStore` and `JobPresentation` for UI state and display adaptation, and SwiftUI views for the app shell.
+Automation Health is a brownfield SwiftPM macOS application with an existing codebase map in `.planning/codebase/`. The app is organized into `ActiveJobsCore` for scanner models and source adapters, `JobStore` and `JobPresentation` for UI state and display adaptation, and SwiftUI views for the app shell. v1.3 added Sparkle 2 as the first external SPM dependency and a release pipeline (shell scripts + GitHub Actions) for signed/notarized DMG distribution.
 
 The relevant current ownership boundaries are:
 
@@ -114,13 +102,15 @@ The relevant current ownership boundaries are:
 - `Sources/AutomationHealth/Models/JobPresentation.swift` adapts scanner models into display names, source names, health values, grouped sidebar sections, and navigation targets.
 - `Sources/AutomationHealth/Stores/JobStore.swift` owns the selected job id and selected job lookup used by the detail view.
 - `Sources/AutomationHealth/Stores/PreferencesStore.swift` owns persisted preferences (grouping mode, collapse state, scan config) and transient bridge flags for keyboard shortcuts.
+- `Sources/AutomationHealth/Stores/UpdateStore.swift` owns Sparkle updater state (version, update availability, auto-check preference) and bridges KVO-to-Combine for SwiftUI observation.
+- `Sources/AutomationHealth/Views/SettingsView.swift` renders persisted preferences (grouping mode, scan config) and the new Updates section (version, auto-check, manual check).
 
 ## Constraints
 
 - **Platform**: macOS 14 or newer through SwiftPM - the app uses SwiftUI/AppKit APIs and should stay native.
 - **Architecture**: Keep scanner IO out of views - sidebar work should use presentation/store data, not direct filesystem reads.
 - **Scope**: Preserve read-only behavior - this project is about navigation and organization, not job management.
-- **Dependencies**: Avoid new third-party packages unless a later phase proves one is necessary - the current package has no external Swift dependencies.
+- **Dependencies**: Sparkle 2 is the sole external dependency (SPM, binary target).
 - **Testing**: Use the existing `ActiveJobsCoreSelfTest` and `script/ci.sh` workflow; add focused coverage where non-UI behavior moves into presentation helpers.
 
 ## Key Decisions
@@ -155,6 +145,13 @@ The relevant current ownership boundaries are:
 | Schedule classifier as file-private enum with static kind(for:) | Follows existing SidebarTriggerClassifier pattern, tested indirectly through sections() API. | Shipped in Phase 12 |
 | Time-of-day classification ranges: Morning (4-11), Afternoon (12-17), Evening (18-21), Night (0-3,22-23) | Standard macOS day-part intervals. | Shipped in Phase 12 |
 | Only .scheduled confidence jobs eligible for schedule classification | Evidence boundary: registered/candidate/manual always → No schedule evidence. | Shipped in Phase 12 |
+| Release pipeline via shell script + GitHub Actions | Single script for local and CI use, all credentials from env vars/github secrets, placeholder identifiers in docs. | Shipped in Phase 13 |
+| Sparkle 2 via SPM with branch "2.x" | First external dependency, binary target linked only to AutomationHealth executable. | Shipped in Phase 14 |
+| UpdateStore as @MainActor ObservableObject with KVO bridging | Follows existing PreferencesStore pattern, bridges SPUUpdater KVO to @Published for SwiftUI. | Shipped in Phase 14 |
+| Sparkle standard UI (SPUStandardUserDriver) | Native macOS update alert, no custom alert UI needed. | Shipped in Phase 14 |
+| "Check for Updates" in CommandGroup(after: .appInfo) | macOS standard placement for update menu items. | Shipped in Phase 14 |
+| EdDSA public key in Info.plist via SUPublicEDKey | Embedded by both release.sh (hard-fail if missing) and build_and_run.sh (optional for dev). | Shipped in Phase 14 |
+| SU_PUBLIC_ED_KEY stored as GitHub Secret alongside SPARKLE_EDDSA_PRIVATE_KEY | Config consistency — public key in CI secrets even though embedded in distributed binary. | Shipped in Phase 14 |
 
 ## Evolution
 
@@ -174,4 +171,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state.
 
 ---
-*Last updated: 2026-05-12 — v1.3 milestone started*
+*Last updated: 2026-05-12 after v1.3 milestone*
