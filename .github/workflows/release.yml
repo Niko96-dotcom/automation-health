@@ -77,20 +77,30 @@ jobs:
           # GITHUB_TOKEN is already set by Actions
 
       - name: Build, sign, notarize, and package DMG
-        run: ./script/release.sh
+        id: build
+        run: |
+          ./script/release.sh 2>&1 | tee /tmp/release-output.txt
+          # Extract the DMG path from the release script's success summary for
+          # use in later steps (avoids glob ambiguity when multiple DMGs exist).
+          DMG_PATH="$(grep '^DMG: ' /tmp/release-output.txt | tail -1 | sed 's/^DMG: //')"
+          if [ -z "$DMG_PATH" ]; then
+            DMG_PATH="$(ls dist/AutomationHealth-*.dmg 2>/dev/null | head -1)"
+          fi
+          echo "DMG_PATH=$DMG_PATH" >> "$GITHUB_ENV"
+          echo "Resolved DMG: $DMG_PATH"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
           name: automation-health-dmg
           path: dist/AutomationHealth-*.dmg
+          if-no-files-found: error
           retention-days: 30
 
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          DMG_FILE=$(ls dist/AutomationHealth-*.dmg | head -1)
           VERSION="${GITHUB_REF_NAME#v}"
           gh release create "$GITHUB_REF_NAME" \
             --title "Automation Health v$VERSION" \
@@ -110,12 +120,11 @@ jobs:
 
           See [README.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for source build instructions." \
             --verify-tag \
-            "$DMG_FILE"
+            "$DMG_PATH"
 
       - name: Verify release assets
         run: |
           echo "Release created: ${{ github.ref_name }}"
-          DMG_FILE=$(ls dist/AutomationHealth-*.dmg | head -1)
-          echo "DMG: $DMG_FILE"
-          ls -lh "$DMG_FILE"
-          xcrun stapler validate "$DMG_FILE" && echo "Staple ticket present" || echo "Warning: Staple ticket not found"
+          echo "DMG: $DMG_PATH"
+          ls -lh "$DMG_PATH"
+          xcrun stapler validate "$DMG_PATH" && echo "Staple ticket present" || echo "Warning: Staple ticket not found"
