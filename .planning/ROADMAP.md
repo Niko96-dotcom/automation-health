@@ -40,9 +40,36 @@
 
 ## Next Milestone: v1.3 Shippable Distribution
 
-- [ ] **Phase 13: Shippable Distribution** — Codesigning, hardened runtime entitlements, notarization, DMG packaging, GitHub Release, release process documentation.
-  - Requirements: DIST-02, DIST-03, DIST-04, DIST-05, DIST-06, DIST-07
-  - Canonical refs: `.planning/research/STACK.md`, `.planning/research/PITFALLS.md`
+- [ ] **Phase 13: Signed and Notarized DMG with CI Pipeline** — Static linking, entitlements, codesigning, DMG packaging, notarization, GitHub Release, release process docs, and CI automation.
+- [ ] **Phase 14: Sparkle Auto-Update Integration** — Sparkle 2 framework integration, auto-update UI, EdDSA signing, and end-to-end update flow against GitHub Releases.
+
+## Phase Details
+
+### Phase 13: Signed and Notarized DMG with CI Pipeline
+**Goal**: Users can download a Gatekeeper-compatible, signed and notarized DMG of Automation Health from GitHub Releases, built entirely by CI with no manual steps.
+**Depends on**: Nothing (first phase of v1.3)
+**Requirements**: DIST-01, DIST-02, DIST-03, DIST-04, DIST-05, DIST-06, DIST-07
+**Success Criteria** (what must be TRUE):
+  1. The `.app` bundle built from the release pipeline passes `spctl --assess --verbose` without Gatekeeper rejection on a non-development Mac.
+  2. The hardened runtime entitlement allows the app's `launchctl`-based scanner to execute without crashes or permission denials.
+  3. A `.dmg` file is produced by the release pipeline that, when opened, shows the Automation Health icon and an Applications folder alias for drag-to-install.
+  4. Running `stapler validate` against the DMG confirms a stapled notarization ticket.
+  5. A tagged GitHub Release contains the signed and notarized DMG as a downloadable asset.
+  6. A developer following the documented release process can produce a signed and notarized release using their own Developer ID credentials.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 14: Sparkle Auto-Update Integration
+**Goal**: Users with a running Automation Health app receive in-app update notifications and can install new versions published to GitHub Releases.
+**Depends on**: Phase 13
+**Requirements**: DIST-08
+**Success Criteria** (what must be TRUE):
+  1. The app displays its current version in an Updates section within the native macOS Settings window.
+  2. The app checks for updates against the GitHub Releases appcast feed and shows an update alert when a newer version is available.
+  3. A user can download and install an update entirely from within the app, with the app relaunching to the new version.
+  4. The EdDSA public key is embedded in the app bundle, and update signatures are verified before installation is offered.
+**Plans**: TBD
+**UI hint**: yes
 
 ## Progress
 
@@ -51,4 +78,4 @@
 | v1.0      | 3      | 8/8   | Complete    | 2026-05-08 |
 | v1.1      | 6      | 16/16 | Complete    | 2026-05-10 |
 | v1.2      | 3      | 8/8   | Complete    | 2026-05-11 |
-| v1.3      | 1      | 0/?   | Planned     | —          |
+| v1.3      | 2      | 0/?   | Planned     | —          |

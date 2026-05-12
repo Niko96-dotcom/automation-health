@@ -38,13 +38,13 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DIST-01 | — | — |
-| DIST-02 | — | — |
-| DIST-03 | — | — |
-| DIST-04 | — | — |
-| DIST-05 | — | — |
-| DIST-06 | — | — |
-| DIST-07 | — | — |
-| DIST-08 | — | — |
+| DIST-01 | Phase 13 | Pending |
+| DIST-02 | Phase 13 | Pending |
+| DIST-03 | Phase 13 | Pending |
+| DIST-04 | Phase 13 | Pending |
+| DIST-05 | Phase 13 | Pending |
+| DIST-06 | Phase 13 | Pending |
+| DIST-07 | Phase 13 | Pending |
+| DIST-08 | Phase 14 | Pending |
 
-*Traceability filled by roadmap.*
+*Traceability updated 2026-05-12 by roadmap.*
