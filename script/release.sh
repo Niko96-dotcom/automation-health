@@ -84,6 +84,14 @@ fi
 cp "$ICON_FILE" "$RESOURCES_DIR/$ICON_NAME.icns"
 
 echo "=== Step 3c: Write Info.plist ==="
+# Validate SUPublicEDKey is set for release builds
+if [ -z "${SU_PUBLIC_ED_KEY:-}" ]; then
+  echo "Error: SU_PUBLIC_ED_KEY is not set. The EdDSA public key is required for Sparkle update verification." >&2
+  echo "Generate keys: ./script/generate_sparkle_keys.sh" >&2
+  echo "The script outputs a base64-encoded public key. Set it via:" >&2
+  echo "  export SU_PUBLIC_ED_KEY='<base64-encoded-public-key>'" >&2
+  exit 1
+fi
 cat >"$CONTENTS/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -109,6 +117,8 @@ cat >"$CONTENTS/Info.plist" <<PLIST
   <string>$VERSION</string>
   <key>CFBundleVersion</key>
   <string>$VERSION</string>
+  <key>SUPublicEDKey</key>
+  <string>${SU_PUBLIC_ED_KEY:-MISSING_SU_PUBLIC_ED_KEY}</string>
 </dict>
 </plist>
 PLIST
