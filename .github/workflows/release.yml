@@ -83,6 +83,14 @@ jobs:
           echo "APPLE_NOTARY_KEY_ISSUER_ID=${{ secrets.APPLE_NOTARY_KEY_ISSUER_ID }}" >> $GITHUB_ENV
           # GITHUB_TOKEN is already set by Actions
 
+      - name: Set Sparkle signing key
+        env:
+          SPARKLE_EDDSA_PRIVATE_KEY: ${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}
+          SU_PUBLIC_ED_KEY: ${{ secrets.SU_PUBLIC_ED_KEY }}
+        run: |
+          echo "SPARKLE_EDDSA_PRIVATE_KEY=$SPARKLE_EDDSA_PRIVATE_KEY" >> $GITHUB_ENV
+          echo "SU_PUBLIC_ED_KEY=$SU_PUBLIC_ED_KEY" >> $GITHUB_ENV
+
       - name: Build, sign, notarize, and package DMG
         id: build
         run: |
@@ -127,7 +135,8 @@ jobs:
 
           See [README.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for source build instructions." \
             --verify-tag \
-            "$DMG_PATH"
+            "$DMG_PATH" \
+            dist/appcast.xml
 
       - name: Verify release assets
         run: |
