@@ -12,7 +12,15 @@ ICON_SOURCE="$ROOT_DIR/Assets/AppIcon/automation-health-icon-source.png"
 ICON_FILE="$ROOT_DIR/Assets/AppIcon/$ICON_NAME.icns"
 ICON_SCRIPT="$ROOT_DIR/script/generate_app_icon.sh"
 
-VERSION="${GITHUB_REF_NAME:-$(git -C "$ROOT_DIR" describe --tags --always --dirty)}"
+# Derive version from the nearest reachable tag (e.g. v1.3.0).
+# GITHUB_REF_NAME is unreliable on workflow_dispatch (could be a branch name).
+# Strip the leading 'v' so we get a clean version string like "1.3.0".
+RAW_VERSION="$(git -C "$ROOT_DIR" describe --tags --abbrev=0 2>/dev/null || true)"
+VERSION="${RAW_VERSION#v}"
+# If we still have nothing (shallow clone, no tags), fall back.
+if [ -z "$VERSION" ]; then
+  VERSION="0.0.0-dev"
+fi
 
 STAGING="$ROOT_DIR/.release-staging"
 APP_BUNDLE="$STAGING/package/$APP_NAME.app"
