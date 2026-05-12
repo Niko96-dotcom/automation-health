@@ -98,7 +98,7 @@ cat >"$CONTENTS/Info.plist" <<PLIST
   <key>CFBundleDisplayName</key>
   <string>$DISPLAY_NAME</string>
   <key>CFBundleIconFile</key>
-  <string>$ICON_NAME.icns</string>
+  <string>$ICON_NAME</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>LSMinimumSystemVersion</key>
