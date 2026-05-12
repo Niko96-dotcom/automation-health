@@ -8,19 +8,19 @@
 
 ### Build & Sign (enabling)
 
-- [ ] **DIST-01**: The `.app` bundle is codesigned with a Developer ID from the build pipeline.
-- [ ] **DIST-02**: Hardened runtime entitlements are configured for the signed app.
+- [x] **DIST-01**: The `.app` bundle is codesigned with a Developer ID from the build pipeline.
+- [x] **DIST-02**: Hardened runtime entitlements are configured for the signed app.
 
 ### Notarization & Packaging (artifact)
 
-- [ ] **DIST-03**: A notarization recipe (notarytool + stapler) is documented and reproducible.
-- [ ] **DIST-04**: A signed and notarized DMG is produced by the release pipeline.
+- [x] **DIST-03**: A notarization recipe (notarytool + stapler) is documented and reproducible.
+- [x] **DIST-04**: A signed and notarized DMG is produced by the release pipeline.
 
 ### CI & Release (automation)
 
-- [ ] **DIST-05**: A GitHub Release delivers a downloadable artifact.
-- [ ] **DIST-06**: Release process documentation covers signing and notarization with placeholder identifiers.
-- [ ] **DIST-07**: CI-based notarization runs in GitHub Actions as part of the release pipeline.
+- [x] **DIST-05**: A GitHub Release delivers a downloadable artifact.
+- [x] **DIST-06**: Release process documentation covers signing and notarization with placeholder identifiers.
+- [x] **DIST-07**: CI-based notarization runs in GitHub Actions as part of the release pipeline.
 
 ### Auto-Update (runtime)
 
@@ -38,13 +38,13 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DIST-01 | Phase 13 | Pending |
-| DIST-02 | Phase 13 | Pending |
-| DIST-03 | Phase 13 | Pending |
-| DIST-04 | Phase 13 | Pending |
-| DIST-05 | Phase 13 | Pending |
-| DIST-06 | Phase 13 | Pending |
-| DIST-07 | Phase 13 | Pending |
+| DIST-01 | Phase 13 | Complete |
+| DIST-02 | Phase 13 | Complete |
+| DIST-03 | Phase 13 | Complete |
+| DIST-04 | Phase 13 | Complete |
+| DIST-05 | Phase 13 | Complete |
+| DIST-06 | Phase 13 | Complete |
+| DIST-07 | Phase 13 | Complete |
 | DIST-08 | Phase 14 | Pending |
 
 *Traceability updated 2026-05-12 by roadmap.*
