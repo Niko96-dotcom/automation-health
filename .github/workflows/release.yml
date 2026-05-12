@@ -51,7 +51,14 @@ jobs:
 
       - name: Import Developer ID identity name
         run: |
-          DEVELOPER_IDENTITY=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+          # Use `security find-identity` to list valid codesigning identities,
+          # filter for Developer ID Application, exclude expired certificates,
+          # and take the first match.
+          DEVELOPER_IDENTITY=$(security find-identity -v -p codesigning build.keychain | \
+            grep "Developer ID Application" | \
+            grep -iv "EXPIRED" | \
+            head -1 | \
+            sed -E 's/.*"([^"]+)".*/\1/')
           echo "APPLE_DEVELOPER_IDENTITY=$DEVELOPER_IDENTITY" >> $GITHUB_ENV
           echo "Found identity: $DEVELOPER_IDENTITY"
 
