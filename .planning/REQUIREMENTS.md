@@ -24,7 +24,7 @@
 
 ### Auto-Update (runtime)
 
-- [ ] **DIST-08**: Sparkle auto-update checks GitHub Releases and presents update UI to the user.
+- [x] **DIST-08**: Sparkle auto-update checks GitHub Releases and presents update UI to the user.
 
 ## Out of Scope
 
@@ -45,6 +45,6 @@
 | DIST-05 | Phase 13 | Complete |
 | DIST-06 | Phase 13 | Complete |
 | DIST-07 | Phase 13 | Complete |
-| DIST-08 | Phase 14 | Pending |
+| DIST-08 | Phase 14 | Complete |
 
 *Traceability updated 2026-05-12 by roadmap.*

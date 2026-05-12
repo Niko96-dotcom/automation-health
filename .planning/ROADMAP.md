@@ -41,7 +41,7 @@
 ## Next Milestone: v1.3 Shippable Distribution
 
 - [x] **Phase 13: Signed and Notarized DMG with CI Pipeline** — Static linking, entitlements, codesigning, DMG packaging, notarization, GitHub Release, release process docs, and CI automation. (completed 2026-05-12)
-- [ ] **Phase 14: Sparkle Auto-Update Integration** — Sparkle 2 framework integration, auto-update UI, EdDSA signing, and end-to-end update flow against GitHub Releases.
+- [x] **Phase 14: Sparkle Auto-Update Integration** — Sparkle 2 framework integration, auto-update UI, EdDSA signing, and end-to-end update flow against GitHub Releases. (completed 2026-05-12)
 
 ## Phase Details
 
@@ -80,14 +80,14 @@ Plans:
 
 Plans:
 **Wave 1** *(independent)*
-- [ ] 14-01-PLAN.md — Sparkle 2 SPM dependency, UpdateStore ObservableObject, and EdDSA key generation script
+- [x] 14-01-PLAN.md — Sparkle 2 SPM dependency, UpdateStore ObservableObject, and EdDSA key generation script
 
 **Wave 2** *(depends on 14-01)*
-- [ ] 14-02-PLAN.md — Sparkle updater lifecycle in AutomationHealthApp, Check for Updates menu item, and Updates section in SettingsView
-- [ ] 14-03-PLAN.md — Appcast generation in release.sh and Sparkle setup in release documentation
+- [x] 14-02-PLAN.md — Sparkle updater lifecycle in AutomationHealthApp, Check for Updates menu item, and Updates section in SettingsView
+- [x] 14-03-PLAN.md — Appcast generation in release.sh and Sparkle setup in release documentation
 
 **Wave 3** *(depends on 14-03)*
-- [ ] 14-04-PLAN.md **(gap closure)** — Embed SUPublicEDKey in build script Info.plist templates, wire SPARKLE_EDDSA_PRIVATE_KEY injection and appcast.xml upload into CI release workflow
+- [x] 14-04-PLAN.md **(gap closure)** — Embed SUPublicEDKey in build script Info.plist templates, wire SPARKLE_EDDSA_PRIVATE_KEY injection and appcast.xml upload into CI release workflow
 **UI hint**: yes
 
 ## Progress
