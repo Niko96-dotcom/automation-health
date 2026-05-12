@@ -76,7 +76,7 @@ Plans:
   2. The app checks for updates against the GitHub Releases appcast feed and shows an update alert when a newer version is available.
   3. A user can download and install an update entirely from within the app, with the app relaunching to the new version.
   4. The EdDSA public key is embedded in the app bundle, and update signatures are verified before installation is offered.
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
 **Wave 1** *(independent)*
@@ -85,6 +85,9 @@ Plans:
 **Wave 2** *(depends on 14-01)*
 - [ ] 14-02-PLAN.md — Sparkle updater lifecycle in AutomationHealthApp, Check for Updates menu item, and Updates section in SettingsView
 - [ ] 14-03-PLAN.md — Appcast generation in release.sh and Sparkle setup in release documentation
+
+**Wave 3** *(depends on 14-03)*
+- [ ] 14-04-PLAN.md **(gap closure)** — Embed SUPublicEDKey in build script Info.plist templates, wire SPARKLE_EDDSA_PRIVATE_KEY injection and appcast.xml upload into CI release workflow
 **UI hint**: yes
 
 ## Progress
@@ -94,4 +97,4 @@ Plans:
 | v1.0      | 3      | 8/8   | Complete    | 2026-05-08 |
 | v1.1      | 6      | 16/16 | Complete    | 2026-05-10 |
 | v1.2      | 3      | 8/8   | Complete    | 2026-05-11 |
-| v1.3      | 2      | 3/6   | In Progress | —          |
+| v1.3      | 2      | 3/7   | In Progress | —          |
