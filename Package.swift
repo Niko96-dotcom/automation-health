@@ -13,6 +13,9 @@ let package = Package(
         .executable(name: "AutomationHealth", targets: ["AutomationHealth"]),
         .executable(name: "ActiveJobsCoreSelfTest", targets: ["ActiveJobsCoreSelfTest"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle", branch: "2.x")
+    ],
     targets: [
         .target(name: "ActiveJobsCore"),
         .target(
@@ -21,7 +24,7 @@ let package = Package(
         ),
         .executableTarget(
             name: "AutomationHealth",
-            dependencies: ["ActiveJobsCore", "AutomationHealthCore"]
+            dependencies: ["ActiveJobsCore", "AutomationHealthCore", "Sparkle"]
         ),
         .executableTarget(
             name: "ActiveJobsCoreSelfTest",
