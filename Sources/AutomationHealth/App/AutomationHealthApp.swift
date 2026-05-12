@@ -117,7 +117,7 @@ struct AutomationHealthApp: App {
         }
 
         Settings {
-            SettingsView(preferences: preferences)
+            SettingsView(preferences: preferences, updateStore: updateStore)
         }
     }
 }

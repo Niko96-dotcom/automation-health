@@ -1,8 +1,10 @@
+import Sparkle
 import SwiftUI
 import AutomationHealthCore
 
 struct SettingsView: View {
     @ObservedObject var preferences: PreferencesStore
+    @ObservedObject var updateStore: UpdateStore
 
     private var maxDepthBinding: Binding<Double> {
         Binding(
@@ -47,6 +49,41 @@ struct SettingsView: View {
                 Text("Limits the total number of candidate records produced by a single scan.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+
+            Section("Updates") {
+                if case .error(let message) = updateStore.updateState {
+                    LabeledContent("Update checking is unavailable") {
+                        Text("Unavailable")
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    LabeledContent("Current Version") {
+                        if case .checking = updateStore.updateState {
+                            HStack(spacing: 4) {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                    .frame(width: 16, height: 16)
+                                Text(updateStore.currentVersion)
+                            }
+                        } else {
+                            Text(updateStore.currentVersion)
+                        }
+                    }
+
+                    Toggle("Automatically check for updates", isOn: Binding(
+                        get: { updateStore.automaticallyChecksForUpdates },
+                        set: { updateStore.setAutomaticallyChecksForUpdates($0) }
+                    ))
+
+                    Button("Check for Updates") {
+                        updateStore.checkForUpdates()
+                    }
+                    .disabled(!updateStore.canCheckForUpdates || updateStore.updateState == .checking)
+                }
             }
         }
         .formStyle(.grouped)
