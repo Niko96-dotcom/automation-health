@@ -220,7 +220,63 @@ else
   exit $SPCTL_EXIT
 fi
 
-echo "=== Step 11: Success summary ==="
+echo "=== Step 11: Generate Sparkle appcast ==="
+
+# Only generate appcast for real releases (not dev versions).
+if [[ "$VERSION" == "0.0.0-dev" ]]; then
+  echo "Skipping appcast generation for dev version ($VERSION)."
+elif [ -z "${SPARKLE_EDDSA_PRIVATE_KEY:-}" ]; then
+  echo "Warning: SPARKLE_EDDSA_PRIVATE_KEY is not set. Appcast generation skipped." >&2
+  echo "Set SPARKLE_EDDSA_PRIVATE_KEY to the base64-encoded EdDSA private key." >&2
+  echo "Generate keys: ./script/generate_sparkle_keys.sh" >&2
+  echo "Export for CI: security find-generic-password -s 'Sparkle Private Key' -w | base64" >&2
+else
+  # Locate Sparkle tools from the generate_keys script cache, or try SPM checkout
+  SPARKLE_TOOLS_DIR="$ROOT_DIR/.sparkle-tools"
+  if [[ ! -d "$SPARKLE_TOOLS_DIR" ]]; then
+    SPARKLE_TOOLS_DIR="$ROOT_DIR/.build/checkouts/Sparkle"
+  fi
+
+  GENERATE_APPCAST="$(find "$SPARKLE_TOOLS_DIR" -name "generate_appcast" -type f -perm +111 2>/dev/null | head -1)"
+  if [[ -z "$GENERATE_APPCAST" ]]; then
+    echo "Warning: Could not find generate_appcast tool. Appcast generation skipped." >&2
+    echo "Run ./script/generate_sparkle_keys.sh first to cache Sparkle tools." >&2
+  else
+    # Decode the private key to a temporary file for signing
+    echo "$SPARKLE_EDDSA_PRIVATE_KEY" | base64 --decode > "$STAGING/sparkle-private-key"
+
+    # Create appcast directory with the current DMG
+    APPCAST_DIR="$STAGING/appcast"
+    mkdir -p "$APPCAST_DIR"
+    cp "$DMG_PATH" "$APPCAST_DIR/"
+
+    # Generate the appcast with EdDSA signing
+    # generate_appcast expects the private key via the -f flag (file path).
+    "$GENERATE_APPCAST" -f "$STAGING/sparkle-private-key" "$APPCAST_DIR" 2>&1 || {
+      echo "Warning: generate_appcast failed (see above). Continuing without appcast." >&2
+    }
+
+    # If appcast was generated, move it to dist/
+    if [[ -f "$APPCAST_DIR/appcast.xml" ]]; then
+      cp "$APPCAST_DIR/appcast.xml" "$ROOT_DIR/dist/appcast.xml"
+      echo "Appcast generated: dist/appcast.xml"
+
+      # Update the appcast to point to the GitHub Releases URL for this version
+      DMG_FILENAME="$(basename "$DMG_PATH")"
+      # The DMG will be uploaded to GitHub Releases at:
+      # https://github.com/nikomohr/AutomationHealth/releases/download/v{VERSION}/{DMG_FILENAME}
+      # Update enclosure URLs in the appcast to point to the final GitHub Releases URL
+      sed -i '' "s|file://$APPCAST_DIR/$DMG_FILENAME|https://github.com/nikomohr/AutomationHealth/releases/download/v$VERSION/$DMG_FILENAME|g" \
+        "$ROOT_DIR/dist/appcast.xml" 2>/dev/null || true
+      echo "Appcast URLs updated to GitHub Releases for v$VERSION"
+    fi
+
+    # Clean up sensitive files
+    rm -f "$STAGING/sparkle-private-key"
+  fi
+fi
+
+echo "=== Step 12: Success summary ==="
 DMG_SIZE="$(ls -lh "$DMG_PATH" | awk '{print $5}')"
 echo ""
 echo "=== Release Complete ==="
