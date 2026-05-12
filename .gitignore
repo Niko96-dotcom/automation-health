@@ -29,3 +29,6 @@ xcuserdata/
 .idea/
 .vscode/
 *.swp
+
+# Release staging
+.release-staging/

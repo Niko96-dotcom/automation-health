@@ -82,9 +82,17 @@ The committed source art lives at `Assets/AppIcon/automation-health-icon-source.
 
 ## Current Distribution Status
 
-Automation Health is currently distributed as source and built locally through `script/build_and_run.sh`. The generated `.app` is unsigned, unsandboxed, and not notarized.
+Automation Health ships as a signed and notarized DMG from [GitHub Releases](https://github.com/nikomohr/AutomationHealth/releases). Download the latest `AutomationHealth-*.dmg`, open it, and drag to your Applications folder.
 
-Signed and notarized release artifacts are out of scope for this milestone.
+The DMG is codesigned with a Developer ID, includes hardened runtime, and is notarized by Apple. macOS Gatekeeper allows it to run without security warnings.
+
+To produce a signed and notarized release from source (requires Apple Developer Program membership), see [docs/release-process.md](docs/release-process.md).
+
+You can also build and run locally without code signing:
+
+```sh
+./script/build_and_run.sh
+```
 
 ## Known Limitations
 
