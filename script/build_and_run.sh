@@ -59,6 +59,12 @@ cat >"$INFO_PLIST" <<PLIST
   <string>$MIN_SYSTEM_VERSION</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
+  <key>SUPublicEDKey</key>
+  <string>${SU_PUBLIC_ED_KEY:-}</string>
+  <key>CFBundleShortVersionString</key>
+  <string>0.0.0-dev</string>
+  <key>CFBundleVersion</key>
+  <string>0.0.0-dev</string>
 </dict>
 </plist>
 PLIST
