@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: help build test ci run verify debug logs clean
+.PHONY: help build test ci run verify debug logs clean dmg release
 
 help:
 	@printf "Automation Health developer targets\n"
@@ -15,6 +15,8 @@ help:
 	@printf "  make debug   Build an app bundle and launch lldb\n"
 	@printf "  make logs    Open the app and stream process logs\n"
 	@printf "  make clean   Remove local build artifacts\n"
+	@printf "  make dmg     Build a signed and notarized DMG (requires Apple Developer credentials)\n"
+	@printf "  make release Same as make dmg — build a signed and notarized DMG\n"
 
 build:
 	swift build
@@ -39,3 +41,9 @@ logs:
 
 clean:
 	rm -rf .build dist
+
+dmg:
+	./script/release.sh
+
+release:
+	./script/release.sh
