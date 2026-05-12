@@ -1,387 +1,797 @@
-# Pitfalls Research
+# Domain Pitfalls — v1.3 Shippable Distribution
 
-**Domain:** macOS SwiftUI scanner app — persisted preferences, grouping modes, keyboard shortcuts, signed distribution
-**Researched:** 2026-05-10
+**Domain:** macOS SwiftUI app — adding codesigning, notarization, DMG packaging, CI-based notarization, and Sparkle auto-update to an existing unsigned SwiftPM build
+**Researched:** 2026-05-12
 **Confidence:** HIGH
+
+## Context
+
+Automation Health is a brownfield macOS SwiftUI app with these relevant characteristics for distribution work:
+
+- **Build:** Pure SwiftPM (`swift build`), no Xcode project
+- **Signing:** Currently entirely unsigned (`script/build_and_run.sh` assembles a minimal unsigned `.app`)
+- **Dependencies:** Zero external Swift package dependencies
+- **Network:** No network layer (no `URLSession`, no HTTP client)
+- **Functionality:** Read-only filesystem scanning that calls `/bin/launchctl` via `Process`
+- **Target:** macOS 14+
+
+The distribution pitfalls below are scoped to **adding** codesigning, notarization, DMG, CI, and Sparkle to this specific starting point. General macOS distribution pitfalls are included only when they interact with the brownfield nature of this project.
+
+---
 
 ## Critical Pitfalls
 
-### Pitfall 1: @AppStorage String-Key Fragility And Type Silently Falling Back
+Mistakes that cause rewrites, certificate revocation, or undownloadable releases.
+
+### Pitfall 1: SwiftPM Dynamic Swift Runtime Linking Blocks Notarization
 
 **What goes wrong:**
-An `@AppStorage("groupingMode")` key with a typo (`"groupingMode"` in ContentView vs `"grouping_mode"` elsewhere) silently creates two separate UserDefaults entries. When the value type changes (e.g., `Bool` → `String` raw-enum), the existing stored value is discarded with no warning and reverts to the default. The UI appears to work but preferences don't persist across launches.
+The notarization service rejects the signed `.app` with "The binary is not signed" or "invalid signature" because the binary links against unsigned Swift runtime dylibs in `/usr/lib/swift`. `swift build` (Release configuration) produces a dynamically-linked executable by default. The `otool -L` output shows `@rpath/libswiftCore.dylib` (and friends), which exist only on the build machine. On the notarization service, these unsigned library references cause rejection.
 
 **Why it happens:**
-`@AppStorage` uses string keys with no compile-time key validation. Each wrapper instance independently reads/writes UserDefaults. Type mismatches between wrapper declaration and stored value produce silent fallback to the default value — no diagnostic, no crash, no log. With `SidebarGroupingMode: RawRepresentable as String` and `SidebarCollapseState` needing custom Codable, the type-coercion gap is invisible at compile time.
+SwiftPM's default build mode on macOS dynamically links the Swift standard library and runtime. These libraries are present on the build machine (via Xcode CLT) but are not embedded in the app bundle. Apple's notarization service scans every linked library — unsigned or missing library references cause "invalid signature" errors even when the main binary is correctly signed.
+
+**Consequences:**
+Notarization fails with opaque error logs. Hours wasted trying different signing flags and entitlements when the root cause is linking. First-time notarization of a SwiftPM app is the most common place this bites.
 
 **How to avoid:**
-Define all preference keys as a single-source-of-truth `enum PreferenceKey: String` (or a static constant struct) used by every `@AppStorage` and UserDefaults access point. For non-trivial types like `SidebarCollapseState`, use a dedicated `Preferences` wrapper class with typed getters/setters that internally serialize to UserDefaults via `JSONEncoder`/`JSONDecoder`, rather than relying on `@AppStorage`'s limited RawRepresentable support. Write a self-test that writes a known value, reads it back through every access path, and verifies type fidelity.
+Two approaches, in order of preference:
 
-**Warning signs:**
-- Preferences reset to defaults after app restart with no error.
-- `@AppStorage` key string appears differently in any file (grep `@AppStorage` across the project).
-- Adding a new preference type (enum, Set, custom struct) to `@AppStorage` without testing round-trip persistence.
-- `UserDefaults.standard.removePersistentDomain(forName:)` or `resetStandardUserDefaults()` used in test teardown without resetting wrapper state.
+1. **Static linking (recommended for this project):** Add `-Xswiftc -static-executable` to `swift build` flags. This links the Swift runtime statically into the binary. The resulting binary is 10-20 MB larger but has zero external Swift dependencies. This is the simpler path for a command-line-style app bundled into an `.app`.
 
-**Phase to address:**
-Phase 10 (Preferences persistence) — define the preference keys and storage layer before wiring into views.
+```bash
+swift build -c release -Xswiftc -static-executable
+```
+
+2. **Runtime embedding (fallback):** Copy the Swift runtime dylibs from the toolchain into the app bundle's `Contents/Frameworks/` directory, then code-sign them before signing the main binary. This is more complex and error-prone; Apple's own documentation recommends static linking for non-Xcode builds.
+
+**Verification:**
+```bash
+# After build, verify no Swift dylib references:
+otool -L AutomationHealth.app/Contents/MacOS/AutomationHealth | grep swift
+# Should produce NO output for a static build
+```
+
+**Detection:**
+- `notarytool log <submission-id>` shows "The binary is not signed" but `codesign -vvv` on the binary passes locally
+- `otool -L` on the binary shows `@rpath/libswift*.dylib` entries
+- Binary is suspiciously small (<5 MB for Release build)
+
+**Phase to address:** First codesigning attempt (Phase 13). Must verify linking before first notarization submission.
 
 ---
 
-### Pitfall 2: Grouping Mode Staleness After Refresh — Stale Sections From Old Mode
+### Pitfall 2: Hardened Runtime Blocks `launchctl` Subprocess Execution
 
 **What goes wrong:**
-After a scan refresh, the visible `SidebarJobSection` array is computed from `filteredJobs` using the current `sidebarGroupingMode`. If the grouping mode is changed during a scan (or between the scan completing and the UI updating), the sections array can reflect the old mode's sections while the menu shows the new mode's label. This produces sections that don't match the selected grouping mode until the next user interaction.
+After signing with `codesign -o runtime` (Hardened Runtime), the app launches and runs fine until it tries to invoke `/bin/launchctl` via `Process`. The `Process` execution silently returns empty or error output. No crash, no diagnostic — just zero results from the launchd scanner. The UI shows "No runtime state" or empty job lists for launchd sources.
 
 **Why it happens:**
-`ContentView` derives `sidebarSections` synchronously from `filteredJobs` (which depends on `store.jobs` and `searchText`) plus `sidebarGroupingMode` and `sidebarCollapseState`. During the async refresh in `JobStore.refresh()`, the grouping mode is a separate `@State` that can be mutated independently. There's no transactional coupling between "the scan finished" and "the sections were recomputed for the current grouping mode."
+Hardened Runtime restricts `fork()`/`exec()` by default. While `Process` (NSTask) is generally allowed under Hardened Runtime for helper tools, execution of binaries outside the app bundle is subject to additional restrictions. More critically, `Process` inherits the hardened runtime of the parent process. The `/bin/launchctl` binary runs with the app's hardened runtime restrictions, which can interfere with its ability to read system state.
+
+The actual behavior depends on macOS version and the specific `launchctl` subcommands used. `launchctl print` may work in some configurations but fail silently in others. The inconsistency is what makes this pitfall dangerous — it might work on the developer's machine but fail on a user's Mac.
 
 **How to avoid:**
-The grouping mode and collapse state should be co-located with the job data in `JobStore` or a dedicated `PreferencesStore` that publishes changes atomically. When `groupingMode` changes, force a synchronous section recomputation. If a scan is in flight when the mode changes, mark a `pendingSectionsRecomputation` flag and apply it when the scan completes. Write a self-test: change grouping mode while a simulated scan is in flight, verify sections match the mode after scan completes.
+1. **Critical:** Test the signed Release binary's `launchctl` scanning on a **different Mac** (not the development machine) to surface environmental differences
+2. If `launchctl print` fails under Hardened Runtime, add `com.apple.security.cs.disable-executable-page-protection` to entitlements (this is unlikely to be needed but is the standard escape hatch for process execution)
+3. **DO NOT** add `com.apple.security.get-task-allow` — this is for debug builds only and blocks notarization in distribution
+4. Add a self-test that invokes `LaunchAgentScanner` from the signed Release binary and verifies it returns expected job data (can use synthetic fixtures if no real launchd jobs exist on CI)
+5. Document which specific `launchctl` subcommands are used and test each
 
-**Warning signs:**
-- Section headers show "Source" categories but the grouping picker says "Health."
-- Changing grouping mode during scan spinner produces visual flicker or empty sections briefly.
-- `SidebarJobSection.sections(for:groupingMode:collapseState:hasSearchQuery:)` called with `groupingMode` that doesn't match the UI's displayed picker value.
+**Detection:**
+- Self-test passes in Debug/unsigned build but launchd-dependent tests return zero jobs in signed Release
+- No error output — just empty results
+- The app appears to work but launchd-sourced jobs vanish
 
-**Phase to address:**
-Phase 10 (Preferences persistence) — the persistence mechanism must co-own grouping mode alongside job data, not leave it as local `@State`.
+**Phase to address:** Codesigning phase (Phase 13). Must verify `launchctl` subprocess works on the signed binary before proceeding to notarization.
 
 ---
 
-### Pitfall 3: Evidence Boundary Violation When Schedule-Based Grouping Attributes Next-Run To Candidate/Manual Records
+### Pitfall 3: Incomplete Info.plist Causes Notarization Rejection
 
 **What goes wrong:**
-A new schedule-based grouping mode categorizes jobs by "runs daily," "runs weekly," "runs monthly," etc. Candidate scripts (discovered files with no proven scheduler) and Manual records (user-added with optional schedule description text) get classified into these buckets based on their `schedule` or `humanScheduleDescription` fields. This implies schedule evidence that doesn't exist — a Candidate record whose name happens to contain "daily" appears in the "Daily" group alongside real launchd jobs with cron schedules.
+The hand-assembled `Info.plist` in `script/build_and_run.sh` has only minimal keys (`CFBundleName`, `CFBundleIdentifier`, `CFBundleExecutable`, `CFBundlePackageType`, `CFBundleIconFile`). Notarization requires additional keys: `CFBundleVersion`, `CFBundleShortVersionString`, `NSHumanReadableCopyright`, and `LSApplicationCategoryType`. Missing any of these causes instant notarization rejection with "invalid Info.plist."
 
 **Why it happens:**
-The existing `SidebarTriggerClassifier` already has this problem with `beginsWithTimeDescription` matching against `humanScheduleDescription` for non-scheduled records (the `registeredOnly` guard exists but the time-description check runs before the confidence check in some paths). Schedule-based grouping amplifies this because the classifier must parse `schedule` and `humanScheduleDescription` for *all* records, including Candidate (`confidence == .candidate`) and Manual (`confidence == .manual`). The grouping logic doesn't gate on `job.confidence` before attempting schedule classification.
+The current `script/build_and_run.sh` creates a minimal `Info.plist` sufficient for `open` to launch the app. Notarization enforces Apple's bundle structure requirements more strictly than local launch. The app was built for local development, not distribution.
 
 **How to avoid:**
-For any new schedule-based grouping mode, explicitly gate classification on `job.confidence == .scheduled`. Candidate, Registered, and Manual records should fall into a single "No schedule evidence" group or be classified only by their declared confidence label. Add a self-test that verifies: a Candidate record with `schedule = "Daily at noon"` (user-entered notes) appears in the "No schedule evidence" bucket, not "Daily." Extend the existing `SidebarTriggerClassifier` to check confidence *before* any schedule-text parsing.
+Create a proper `Info.plist` with all required keys. The recommended template:
 
-**Warning signs:**
-- A Manual record's `scheduleDescription` field ("Every Friday morning") causes it to group with real cron jobs.
-- The schedule-based grouping `groupDefinitions(for:)` doesn't include a `confidence` filter in any branch.
-- A self-test passes when Candidate records group alongside Scheduled records in a time-based category.
+```xml
+<key>CFBundleName</key>
+<string>Automation Health</string>
+<key>CFBundleIdentifier</key>
+<string>org.automationhealth.AutomationHealth</string>
+<key>CFBundleExecutable</key>
+<string>AutomationHealth</string>
+<key>CFBundlePackageType</key>
+<string>APPL</string>
+<key>CFBundleIconFile</key>
+<string>AppIcon</string>
+<key>CFBundleVersion</key>
+<string>1</string>
+<key>CFBundleShortVersionString</key>
+<string>1.3.0</string>
+<key>LSMinimumSystemVersion</key>
+<string>14.0</string>
+<key>NSHumanReadableCopyright</key>
+<string>Copyright (c) 2026 Automation Health contributors. MIT License.</string>
+<key>LSApplicationCategoryType</key>
+<string>public.app-category.developer-tools</string>
+```
 
-**Phase to address:**
-Phase 11 (Additional grouping modes) — the schedule-based mode must be built with confidence-gating from the start.
+For CI: derive `CFBundleShortVersionString` and `CFBundleVersion` from the git tag or `VERSION` file so they are not manually maintained.
+
+**Detection:**
+- `notarytool submit` returns validation errors mentioning "CFBundleVersion" or "CFBundleShortVersionString"
+- `plutil -lint AutomationHealth.app/Contents/Info.plist` shows warnings on the minimal plist
+- `notarytool log <id>` shows "The Info.plist is missing required keys"
+
+**Phase to address:** Notarization recipe (Phase 13). Must validate Info.plist before first notarization submission.
 
 ---
 
-### Pitfall 4: Keyboard Shortcut Conflicts With System And Menu Shortcuts
+### Pitfall 4: DMG Creation Destroys Code Signature (Ordering and Cleanliness)
 
 **What goes wrong:**
-Adding `Cmd-F` for "find/jump-to-letter" in the sidebar silently overrides the system-standard "Find" shortcut. Adding `Cmd-[` and `Cmd-]` for expand/collapse all conflicts with system-standard "Back/Forward" navigation. Adding `Cmd-1` through `Cmd-5` for switching grouping modes eats standard tab/sidebar switching shortcuts. The user's muscle memory is violated without any visible conflict warning.
+The signed `.app` is copied into a DMG, but the resulting extracted `.app` fails `codesign -vvv` with "code object is not signed at all." Users who download the DMG and attempt to launch see a "damaged" warning from Gatekeeper.
 
-**Why it happens:**
-SwiftUI's `.keyboardShortcut()` on a `Button` in the `CommandMenu` or directly on a view registers global shortcuts that take priority over system behavior when the app is frontmost. There's no built-in shortcut conflict detection; SwiftUI silently overrides. The existing `Command-r` for Rescan in `AutomationHealthApp.swift` is already non-standard (system uses `Cmd-R` for refresh in some contexts).
+**Why it happens (three distinct causes):**
+
+1. **Opening the signed app before DMG creation:** Finder writes `.DS_Store`, extended attributes (`com.apple.quarantine`), or Spotlight metadata into the `.app` bundle when it's opened/mounted. These files are unsigned and invalidate the bundle's signature. The most common scenario: developer signs the app, double-clicks to test it works, then creates the DMG.
+
+2. **Using `hdiutil create -srcfolder` on a directory with Finder artifacts:** Even without opening the app, if the source directory was previously opened in Finder, `.DS_Store` files can exist in subdirectories.
+
+3. **Not signing the DMG itself:** `codesign` on the `.app` does not sign the DMG container. Gatekeeper checks the DMG signature. An unsigned DMG containing a signed app still triggers warnings.
 
 **How to avoid:**
-Use the macOS-standard shortcut conventions: `Cmd-Shift-F` for "focus search" (system Find uses `Cmd-F`), `Option-Command-[` for collapse all (not `Cmd-[`), `Cmd-Shift-G` or a `Picker` with `Cmd-1`..`Cmd-N` only if those numbers aren't used by `TabView` or system window management. Document every shortcut in a help section. Use `.keyboardShortcut()` only on `CommandMenu` items, not raw `onKeyPress` on unfocused views. Test with VoiceOver enabled and with system keyboard shortcuts active.
+1. **Build fresh for release — every time.** The release script must start from a clean build, sign, and immediately feed the signed `.app` into DMG creation without any intermediate steps.
+2. **Never open or mount the signed app before DMG creation.** Trust the build pipeline, test later from the DMG.
+3. **Sign the `.app` as the last step before DMG creation.**
+4. **Create DMG from a clean directory:**
+```bash
+# Clean workspace
+rm -rf dist/signed
+mkdir -p dist/signed
 
-**Warning signs:**
-- Any shortcut starting with `Cmd` + a single letter that matches a standard macOS shortcut (F, H, M, N, O, P, Q, W, comma, period, brackets).
-- `.onKeyPress` modifiers on views without active `@FocusState` — these capture keystrokes globally when the window is frontmost.
-- Shortcut help text that doesn't list all active shortcuts for discoverability.
+# Copy signed app into clean directory
+cp -R dist/AutomationHealth.app dist/signed/
 
-**Phase to address:**
-Phase 12 (Keyboard shortcuts) — design the shortcut map before implementing, verify against Apple's HIG keyboard shortcut guidelines.
+# Create and sign DMG
+hdiutil create -volname "Automation Health" \
+    -srcfolder dist/signed \
+    -ov -format UDZO \
+    dist/AutomationHealth-1.3.0.dmg
+
+# Sign the DMG with Developer ID Application certificate
+codesign --sign "Developer ID Application: ..." \
+    --timestamp \
+    dist/AutomationHealth-1.3.0.dmg
+```
+5. **Notarize the DMG, not the .app.** Apple requires a container (`dmg`, `pkg`, `zip`) for notarization.
+6. **Staple the notarization ticket to the DMG after approval:**
+```bash
+xcrun stapler staple dist/AutomationHealth-1.3.0.dmg
+```
+7. **Verify the DMG:**
+```bash
+spctl --assess -vv --type install dist/AutomationHealth-1.3.0.dmg
+```
+
+**Detection:**
+- `codesign -vvv dist/AutomationHealth.app` passes, but extracting the app from DMG and running `codesign -vvv` fails
+- `ls -la dist/signed/AutomationHealth.app/Contents/` shows `.DS_Store` files
+- Finder shows "Automation Health.app is damaged" when opening downloaded DMG
+- DMG itself has no code signature: `codesign -dvvv dist/*.dmg` returns "not signed"
+
+**Phase to address:** DMG packaging (Phase 13). Must verify signature survives extraction before publishing.
 
 ---
 
-### Pitfall 5: Hardened Runtime Entitlement Missing For launchctl Subprocess
+### Pitfall 5: Developer ID Secret Leakage in CI Logs or Committed Scripts
 
 **What goes wrong:**
-After signing the app with `codesign -o runtime` (Hardened Runtime) and notarizing successfully, the app launches but `launchctl` subprocess calls in `LaunchAgentScanner` silently fail. The `Process` execution is blocked by the Hardened Runtime because the app doesn't declare the `com.apple.security.cs.disable-executable-page-protection` or necessary exceptions. Scan notes report "no runtime state" for every launchd job without an obvious error.
+The Developer ID certificate (`.p12` base64), its import password, the Apple ID app-specific password for `notarytool`, and the Team ID are committed to the repository, logged in CI output, or written into CI workflow YAML as plaintext. Anyone with read access to the repo or CI logs can extract these credentials and sign malware with the project's Developer ID.
 
 **Why it happens:**
-The Hardened Runtime restricts process execution, memory mapping, and dynamic code loading. `LaunchAgentScanner` uses `Process` to invoke `/bin/launchctl` — this requires either the app to be unsandboxed with Hardened Runtime exceptions for process execution, or specific entitlements. The app currently has no entitlements file at all (no `AutomationHealth.entitlements` in the project). When `codesign -o runtime` is applied without an entitlements plist, the defaults are maximally restrictive.
+The most direct path to a working release script involves hardcoding credential paths or values. `set -x` in bash scripts prints every command including `--password` arguments. GitHub Actions `echo` steps with secrets produce log output. The CI workflow YAML itself is committed and visible — any literal secret in it is public. Even temporary keychain passwords used in CI become visible if `security unlock-keychain -p $PASSWORD` runs under `set -x`.
+
+**Consequences:**
+Apple revokes the Developer ID certificate upon detecting misuse. The certificate revocation is permanent — a new certificate must be issued, but the old one remains revoked. All previously-signed releases become invalid because the certificate chain is broken. Users who downloaded previous releases see "damaged" warnings. The distribution pipeline is dead until a new certificate is provisioned and all releases are re-signed.
 
 **How to avoid:**
-Create an `AutomationHealth.entitlements` file with the minimum required entitlements:
-- `com.apple.security.cs.allow-jit` — if using any dynamic code (unlikely but safe to omit if not needed)
-- For spawn/exec: Hardened Runtime doesn't block `NSTask`/`Process` by default on macOS, BUT if the app is sandboxed, it does. Since this app is NOT sandboxed (no `com.apple.security.app-sandbox`), `Process` to `/bin/launchctl` should work. Test explicitly.
+1. **Store ALL secrets in GitHub Actions encrypted secrets:**
+   - `DEVELOPER_ID_CERTIFICATE_BASE64` — the `.p12` file base64-encoded
+   - `DEVELOPER_ID_CERTIFICATE_PASSWORD` — the password used to export the `.p12`
+   - `NOTARYTOOL_APPLE_ID` — Apple ID email
+   - `NOTARYTOOL_TEAM_ID` — Team ID (not secret in itself but combine with password)
+   - `NOTARYTOOL_PASSWORD` — app-specific password (generated at appleid.apple.com)
 
-The critical entitlement for this app: **none required for Process if unsandboxed**. However, **file access** entitlements are needed if the app is sandboxed. Since the app reads from `~/Library/LaunchAgents`, `/Library/LaunchDaemons`, and `~/.hermes/`, a sandboxed app would need `com.apple.security.temporary-exception.files.home-relative-path.read-write` or similar. The current architecture is **unsandboxed** — keep it that way for v1.2, but verify after signing that `launchctl` subprocesses still work by running the self-test on the signed binary.
+2. **Use ephemeral keychain in CI:**
+```yaml
+- name: Setup signing
+  env:
+    CERT_BASE64: ${{ secrets.DEVELOPER_ID_CERTIFICATE_BASE64 }}
+    CERT_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
+  run: |
+    # Create temporary keychain
+    KEYCHAIN_PATH=$(mktemp -d)/Signing.keychain
+    KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+    security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+    security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+    security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+    
+    # Import certificate
+    echo "$CERT_BASE64" | base64 --decode > cert.p12
+    security import cert.p12 -k "$KEYCHAIN_PATH" -P "$CERT_PASSWORD" -A -T /usr/bin/codesign
+    security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+    
+    # Set as default keychain for this step
+    security list-keychains -d user -s "$KEYCHAIN_PATH"
+    rm cert.p12
+```
 
-**Warning signs:**
-- Entitlements file missing from the signing step.
-- `codesign -d --entitlements - AutomationHealth.app` shows empty/missing entitlements after signing.
-- Self-test passes in debug build but launchctl-dependent tests fail on the signed Release binary.
-- Notarization succeeds but Gatekeeper blocks launch with a vague "damaged" message (often means runtime crash from blocked syscall).
+3. **Mask secrets in CI output:**
+```yaml
+- name: Notarize
+  run: |
+    echo "::add-mask::${{ secrets.NOTARYTOOL_PASSWORD }}"
+    xcrun notarytool submit dist/*.dmg \
+      --apple-id "${{ secrets.NOTARYTOOL_APPLE_ID }}" \
+      --team-id "${{ secrets.NOTARYTOOL_TEAM_ID }}" \
+      --password "${{ secrets.NOTARYTOOL_PASSWORD }}" \
+      --wait
+```
 
-**Phase to address:**
-Phase 14 (Codesigning and notarization) — create and test the entitlements file alongside the first signing attempt.
+4. **Never use `set -x` in release scripts that touch secrets.**
+5. **Committed release scripts use placeholder environment variables:** `$DEVELOPER_ID`, `$NOTARYTOOL_KEYCHAIN_PROFILE` — never literal values.
+6. **Delete the ephemeral keychain at the end of the CI job:**
+```yaml
+- name: Cleanup
+  if: always()
+  run: |
+    security delete-keychain "$KEYCHAIN_PATH" || true
+    rm -f cert.p12
+```
+
+**Detection:**
+- Any committed file containing `--password` with a literal string value
+- CI workflow YAML lacking `secrets: inherit` or explicit `${{ secrets.* }}` references
+- `security import` or `security unlock-keychain` with literal passwords
+- GitHub Actions logs showing certificate common names, keychain paths, or password artifacts
+- `git grep` on the repository for `p12`, `certificate`, `DEVELOPER_ID`, or `app-specific` that resolves to actual values
+
+**Phase to address:** Release process documentation and CI pipeline (Phases 13-14). Secrets handling is a cross-cutting CI concern that must be designed before the first CI release run.
 
 ---
 
-### Pitfall 6: Developer ID Secret Leakage In CI And Committed Scripts
+### Pitfall 6: Sparkle `SUFeedURL` Must Be HTTPS — Plain HTTP Blocks Update Checks
 
 **What goes wrong:**
-The Developer ID certificate (`.p12`), its password, the Apple ID app-specific password for `notarytool`, and the Team ID are committed to the repository or logged in CI output. Anyone with read access to the repo can sign malware with the project's Developer ID. Apple revokes the certificate upon detecting misuse, breaking the distribution pipeline for legitimate releases.
+Sparkle's `SUFeedURL` in `Info.plist` is set to a GitHub Releases appcast URL using `http://` (or a self-hosted non-HTTPS URL). On macOS 10.13+, App Transport Security (ATS) blocks non-HTTPS connections by default. Sparkle's update check fails silently — the `SUUpdater` receives a network error and treats it as "no update available." Users never see an update prompt and the app remains outdated.
 
 **Why it happens:**
-The natural instinct is to make the release script self-contained with credentials inline or in a `.env` file. `.gitignore` excludes `.env`, but script comments, CI workflow YAML logs, and `set -x` bash traces can leak values. The GitHub Actions macOS runner logs are semi-public (visible to anyone with repo read access). `notarytool store-credentials` stores the app-specific password in the login keychain, but the keychain password itself can be exposed if CI unlocks it on the runner.
+GitHub Pages and GitHub Releases both serve content over HTTPS by default, but custom appcast hosting, local mirrors, or test environments may use HTTP. The developer tests update checks on their local network (where HTTP might work or ATS exceptions exist) and doesn't notice the HTTPS requirement. More commonly: the `SUFeedURL` value is set before the final release URL is known and the placeholder `http://localhost:8080/appcast.xml` is accidentally committed.
 
 **How to avoid:**
-- Store the Developer ID certificate in a GitHub Actions secret (`DEVELOPER_ID_CERTIFICATE_BASE64`), import it into a temporary keychain during the CI job, and delete it after.
-- Store the app-specific password in a GitHub Actions secret (`NOTARYTOOL_PASSWORD`).
-- Use `notarytool` with `--apple-id`, `--team-id`, and `--password` from environment variables (never hardcoded).
-- Never use `set -x` in release scripts that touch secrets.
-- CI workflow step must have `echo "::add-mask::$SECRET"` for any secret that might appear in logs.
-- The release script committed to the repo must use **placeholder values** (`$DEVELOPER_ID`, `$NOTARY_KEYCHAIN_PROFILE`) that are only resolved in CI from secrets.
-- Document the keychain profile name (e.g., `automationhealth-release`) in `docs/release-process.md` but never the actual password.
+1. **Always use HTTPS for `SUFeedURL`.** GitHub Releases serves assets over `https://github.com/OWNER/REPO/releases/`, and the appcast XML generated by Sparkle's `generate_appcast` tool should be hosted at an HTTPS URL.
+2. **For Sparkle with GitHub Releases:** Use the `sparkle:version` and `sparkle:shortVersionString` elements in the release description, or use `generate_appcast` against a local directory listing of releases and host the resulting `appcast.xml` at an HTTPS URL (e.g., GitHub Pages on the `gh-pages` branch).
+3. **Verify ATS compliance:**
+```bash
+# Check if the URL is HTTPS
+echo "$SUFeedURL" | grep -q '^https://' || echo "WARNING: SUFeedURL must use HTTPS"
+```
 
-**Warning signs:**
-- Any script containing `--password` with a literal string value.
-- CI workflow YAML that lacks `secrets: inherit` or explicit secret references for signing steps.
-- `security import` or `security unlock-keychain` commands with passwords in clear text.
-- GitHub Actions logs showing certificate common names or keychain entries.
+**Detection:**
+- Sparkle update check runs but never finds updates even after a new GitHub Release is published
+- Console.app shows ATS blocking errors for Sparkle domain (filter for "ATS" or "App Transport Security")
+- `SUFeedURL` in `Info.plist` starts with `http://`
 
-**Phase to address:**
-Phase 13 (Release process and docs) and Phase 14 (Codesigning/notarization) — these phases must be designed together; secrets handling is a cross-cutting CI concern.
+**Phase to address:** Sparkle integration (Phase 14). Must verify HTTPS feed URL before first release that enables Sparkle.
 
 ---
 
-### Pitfall 7: Notarization Failure From Incomplete Bundle Structure
+### Pitfall 7: Sparkle EdDSA Signing Key Generation and Storage — Key Loss Breaks All Future Updates
 
 **What goes wrong:**
-The `.app` bundle created by `script/build_and_run.sh` is a minimal hand-assembled structure (binary + `Info.plist` + icon). When signed and submitted to `notarytool`, notarization fails with "The binary is not signed" or "invalid Info.plist" because the bundle lacks required metadata keys (`CFBundleVersion`, `CFBundleShortVersionString`, `NSHumanReadableCopyright`, `LSApplicationCategoryType`, executable hardening flags), or because the Swift runtime libraries aren't bundled (SwiftPM builds link dynamically by default).
+Sparkle 2 uses EdDSA (Ed25519) cryptographic signatures for update security. The private key is generated once (`generate_keys`) and must be kept secure forever. If the private key is lost, regenerated, or committed to the repository without protection, every subsequent release after the key change fails update verification — users are stuck on the last release signed with the old key, unable to auto-update.
 
 **Why it happens:**
-The hand-rolled `Info.plist` in `script/build_and_run.sh` has only the bare minimum keys. macOS notarization requires additional keys. More critically, a `swift build` binary links against the system Swift runtime libraries (in `/usr/lib/swift`), which is fine for development but notarization may flag unsigned dylib dependencies. Additionally, `CFBundleVersion` and `CFBundleShortVersionString` must be present and parseable as valid version strings.
+The `generate_keys` tool creates a key pair. The public key goes into the app's `Info.plist` (`SUPublicEDKey`). The private key is used to sign each release's appcast entry. If the developer treats the private key as a per-release artifact (generating a new one each release) or loses it during machine migration, all future updates break for existing installations. If the private key is committed to the repository, anyone can sign malicious updates that Sparkle will accept.
 
 **How to avoid:**
-1. Add `CFBundleVersion`, `CFBundleShortVersionString`, `NSHumanReadableCopyright`, and `LSApplicationCategoryType` to the generated `Info.plist`.
-2. Verify the binary links statically: check with `otool -L AutomationHealth.app/Contents/MacOS/AutomationHealth | grep swift` — if there are entries, the Swift runtime is dynamically linked and must be bundled or the build must use `-static-executable`.
-3. For SwiftPM static linking: add `-Xswiftc -static-executable` to `swift build` flags, OR bundle the Swift runtime dylibs using `swift package --package-path ...` with appropriate flags.
-4. Run `spctl --assess -vv --type execute AutomationHealth.app` locally before submitting to notarization.
-5. Check `codesign --verify --deep --strict --verbose=2 AutomationHealth.app` passes.
+1. **Generate keys exactly once:**
+```bash
+# Store keys in a secure location, NOT in the repo
+mkdir -p ~/.automatiohealth-release-keys
+./Sparkle/bin/generate_keys -p ~/.automatiohealth-release-keys/sparkle_private.pem
+```
+This outputs the public key to stdout — copy it into `Info.plist`.
 
-**Warning signs:**
-- `Info.plist` missing `CFBundleVersion` or `CFBundleShortVersionString`.
-- `otool -L` shows `@rpath/libswift*.dylib` for the binary.
-- `notarytool submit` returns "Invalid" with log mentioning "The binary is not signed" or "The signature is not valid."
-- The app works when launched via `open` but fails Gatekeeper verification (`spctl -a`).
+2. **Store the private key as a GitHub Actions secret:**
+   - `SPARKLE_PRIVATE_KEY` — the entire contents of the `.pem` file
+   - Never commit this file to the repository (add `*_private.pem` to `.gitignore`)
 
-**Phase to address:**
-Phase 14 (Codesigning and notarization) — must include `Info.plist` hardening and linking verification before signing.
+3. **Document key recovery in a secure location** (not public docs): Where the key is stored, how to rotate if compromised, and that loss is catastrophic.
+
+4. **In CI, the private key is written to a temporary file for signing, then destroyed:**
+```yaml
+- name: Sign appcast
+  run: |
+    echo "${{ secrets.SPARKLE_PRIVATE_KEY }}" > /tmp/sparkle_private.pem
+    ./Sparkle/bin/sign_update <binary> -s /tmp/sparkle_private.pem
+    rm /tmp/sparkle_private.pem
+```
+
+**Detection:**
+- Private key file appears in `git status` or working tree
+- `git grep` finds `"ed25519"` or `"PRIVATE KEY"` strings in committed files
+- CI secret `SPARKLE_PRIVATE_KEY` is not configured
+- New releases fail update verification with "The update is improperly signed"
+
+**Phase to address:** Sparkle integration (Phase 14). Key generation must happen before the first Sparkle-enabled release.
 
 ---
 
-### Pitfall 8: DMG Creation Breaks Code Signature
+### Pitfall 8: Sparkle Framework Bundling with SwiftPM — No Xcode Project Means Manual Framework Packaging
 
 **What goes wrong:**
-The signed `.app` bundle is placed into a DMG using `hdiutil create -srcfolder`, but the resulting DMG mount point is writable and the Finder modifies `.DS_Store` or resource fork data inside the `.app` bundle during DMG creation or testing. This invalidates the code signature. Users downloading the DMG see a "damaged" warning from Gatekeeper.
+Sparkle's standard integration path assumes an Xcode project — SPM package dependency, copy-frameworks build phase, etc. With a pure SwiftPM build (no Xcode project), there is no build phase to copy Sparkle's frameworks into the app bundle. Even if Sparkle is added as an SPM dependency, the framework/XPC services are not automatically placed in `Contents/Frameworks/` and `Contents/XPCServices/`.
 
 **Why it happens:**
-DMG creation with `hdiutil` preserves the source folder contents, but if the source `.app` was previously mounted or opened by Finder, macOS may have written `.DS_Store`, extended attributes, or Spotlight metadata into the bundle. Even after signing, opening the app to "test" before DMG creation dirties the signature. The DMG itself must also be signed with a Developer ID Installer certificate for notarization.
+Sparkle is not a pure Swift library — it includes:
+- `Sparkle.framework` — the main framework with `SUUpdater`
+- `Sparkle.framework/XPCServices/Installer.xpc` — for handling updates
+- `Sparkle.framework/XPCServices/Downloader.xpc` — for downloading updates
+- `Autoupdate` — the privilege-separation helper
+
+These must be physically present in the app bundle at specific paths with correct code signing. SwiftPM can download Sparkle but does not handle framework embedding. A Mac app built via `swift build` has no `Copy Files` build phase.
 
 **How to avoid:**
-1. Sign the `.app` as the absolute last step before DMG creation — never open or test the signed app.
-2. Use a clean build output directory (`dist/signed/`) that is created fresh each time.
-3. Create the DMG using `hdiutil create -fs HFS+ -srcfolder dist/signed -volname "Automation Health" dist/AutomationHealth.dmg`.
-4. Sign the DMG with `codesign -s "Developer ID Application: ..." dist/AutomationHealth.dmg`.
-5. Notarize the DMG (not the .app) using `notarytool submit dist/AutomationHealth.dmg`.
-6. Staple the notarization ticket to the DMG: `xcrun stapler staple dist/AutomationHealth.dmg`.
-7. Verify with `spctl --assess -vv --type open dist/AutomationHealth.dmg`.
+1. **Download Sparkle as a pre-built framework** (not an SPM dependency):
+```bash
+curl -L -o Sparkle.tar.xz https://github.com/sparkle-project/Sparkle/releases/download/2.6.4/Sparkle-2.6.4.tar.xz
+tar -xf Sparkle.tar.xz
+```
 
-**Warning signs:**
-- Testing the signed `.app` by double-clicking it before DMG packaging.
-- `codesign -vvv dist/AutomationHealth.app` returning `code object is not signed at all` after DMG extraction.
-- Finder `.DS_Store` files visible in `ls -la dist/AutomationHealth.app/Contents/`.
-- DMG itself not signed or notarized — Gatekeeper flags unsigned disk images.
+2. **Copy the framework into the app bundle manually:**
+```bash
+# After swift build, before signing:
+mkdir -p dist/AutomationHealth.app/Contents/Frameworks
+cp -R Sparkle.framework dist/AutomationHealth.app/Contents/Frameworks/
 
-**Phase to address:**
-Phase 14 (Codesigning and notarization) and Phase 13 (Release process) — DMG packaging must be part of the release script, not a manual step.
+# Sign the framework BEFORE signing the app (inside-out signing order):
+codesign --sign "Developer ID Application: ..." \
+    --timestamp --options runtime \
+    --deep dist/AutomationHealth.app/Contents/Frameworks/Sparkle.framework
+
+# Then sign the .app bundle
+codesign --sign "Developer ID Application: ..." \
+    --timestamp --options runtime \
+    dist/AutomationHealth.app
+```
+
+3. **Add Sparkle to the binary's load commands** (if using Sparkle programmatically):
+   - For a SwiftPM executable, link Sparkle by adding it as a linker flag: `-Xlinker -F/path/to/Sparkle.framework -Xlinker -framework -Xlinker Sparkle`
+   - Or: Add Sparkle as a `.binaryTarget` in `Package.swift` (requires Sparkle to be distributed as an `.xcframework`)
+
+4. **Alternative — use Sparkle's command-line interface:** Sparkle 2 supports a mode where `SUUpdater` is driven entirely through Info.plist keys and requires minimal code integration. This is the recommended path for this project:
+   - Set `SUEnableAutomaticChecks = YES` in Info.plist
+   - Set `SUFeedURL` in Info.plist
+   - No Swift import of Sparkle needed
+   - Framework still must be bundled
+
+**Detection:**
+- App launches but Sparkle update check never fires
+- Console.app shows `dyld: Library not loaded: @rpath/Sparkle.framework`
+- `ls -R AutomationHealth.app/Contents/Frameworks/` shows no Sparkle.framework
+- XPC errors about missing Downloader or Installer services
+
+**Phase to address:** Sparkle integration (Phase 14). Framework bundling must be decided before implementing Sparkle update logic.
 
 ---
 
-### Pitfall 9: GitHub Release Asset Upload Timeout For Large DMG
+### Pitfall 9: Sparkle Hardened Runtime Entitlement for XPC Services
 
 **What goes wrong:**
-The notarized + stapled DMG is uploaded to a GitHub Release via `gh release upload`, but the upload fails with a timeout or 422 error because the DMG exceeds GitHub's file size limits or the upload connection is terminated mid-transfer.
+Sparkle's XPC services (`Installer.xpc`, `Downloader.xpc`) execute as separate processes under the app's Hardened Runtime. Without the correct entitlement exceptions, these XPC services fail to launch or communicate. The app launches fine but Sparkle silently cannot download or install updates. Users see "Update available" but clicking "Install" does nothing, or downloads fail with no error.
 
 **Why it happens:**
-GitHub Release assets have a **2 GB per-file limit**. A DMG containing a SwiftPM-built app with bundled Swift runtime libraries can reach 50-200 MB, which is well under 2 GB. More commonly, the issue is upload timeout: `gh release upload` uses the HTTP endpoint which can time out on slow connections. The 422 error occurs when the `upload_url` hypermedia token from the Release creation expires (tokens are short-lived).
+Under Hardened Runtime, XPC services and their communication with the main app are restricted. Sparkle requires specific entitlements to function:
+- The `Installer.xpc` needs to replace the app bundle on disk
+- The `Downloader.xpc` needs network access to download updates
+- XPC communication between the main app and these services requires file access and process execution entitlements
 
 **How to avoid:**
-1. Use `gh release create` with the `--generate-notes` flag and attach the asset in the same command: `gh release create v1.2.0 dist/AutomationHealth.dmg --title "Automation Health v1.2" --generate-notes`.
-2. Verify DMG size is under 2 GB (for this project it's <100 MB — not a concern).
-3. If using the API directly (not `gh` CLI), GET the `upload_url` from the Release creation response and POST the asset immediately — the token expires quickly.
-4. Add a `--verify` step: after upload, `gh release view v1.2.0` and confirm the asset is listed with correct size and download URL.
+The minimum entitlements for Sparkle under Hardened Runtime (in addition to any app-specific entitlements):
 
-**Warning signs:**
-- `gh release upload` returning 422 with "Problems parsing JSON" (expired token).
-- Upload succeeds but the download URL returns 404 (asset not fully processed).
-- DMG size shown as 0 bytes on the release page (corrupted upload).
+```xml
+<key>com.apple.security.cs.disable-library-validation</key>
+<true/>
+<key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+<true/>
+```
 
-**Phase to address:**
-Phase 13 (Release process) — the release script must atomically create the release + upload assets + verify.
+**DO NOT add `com.apple.security.app-sandbox`** — this app is not sandboxed and adding it would break filesystem scanning entirely.
+
+Also required for the app to be replaceable during updates (Sparkle's `Installer.xpc` replaces the `.app` bundle):
+- The app must NOT be running from a read-only location (Disk Images, installer volumes)
+- The user must have write permission to the directory containing the `.app`
+
+**Detection:**
+- XPC errors in Console.app: "Failed to create XPC connection" or "Service not found"
+- Sparkle downloads updates but "Install and Relaunch" does nothing
+- `spctl --assess -vv` on the notarized app shows entitlement issues
+- The notarization log mentions `com.apple.security.cs.disable-library-validation` warnings (this entitlement triggers a notarization review, but it's standard and accepted for Sparkle)
+
+**Phase to address:** Hardened runtime entitlements (Phase 13) and Sparkle integration (Phase 14). Entitlements must be configured before first notarization submission.
 
 ---
 
-### Pitfall 10: MIT LICENSE Already Exists — But Copyright Attribution Is Generic
+### Pitfall 10: CI-Based Notarization Timeouts and Polling Failures
 
 **What goes wrong:**
-The existing `LICENSE` file says `Copyright (c) 2026 Automation Health contributors` — this is legally ambiguous. "Automation Health contributors" is not a legal entity. In a dispute, it's unclear who holds copyright. For an OSS project accepting external contributions, this is acceptable if a CLA or DCO is in place, but `CONTRIBUTING.md` should reference it.
+The CI workflow submits the DMG to notarization via `notarytool submit --wait` but the job times out after 5-10 minutes. Or the CI uses `notarytool submit` without `--wait`, polls with `notarytool info`, and the polling loop fails because notarization takes longer than expected (15-30 minutes is common during peak times).
 
 **Why it happens:**
-The MIT License template was filled in with the project name placeholder during Phase 4. This was correct for v1.1 when no individual copyright holder was identified. For a signed/notarized release with a real Developer ID tied to an individual or organization, the copyright holder should be explicit.
+Apple's notarization service is asynchronous and processing time varies:
+- **Typical:** 1-5 minutes
+- **Peak load:** 15-30 minutes
+- **Entitlement review (Sparkle):** Additional 5-10 minutes for apps using `disable-library-validation`
+- **First submission for an app:** Additional review time
+
+GitHub Actions has a default job timeout of 360 minutes, but individual steps can use `timeout-minutes`. If the notarization step has a 10-minute timeout and notarization takes 12 minutes, the CI job fails with a timeout error rather than a notarization error. The DMG is actually notarized — the CI just didn't wait for it.
 
 **How to avoid:**
-This is a **LOW severity** item for v1.2. The LICENSE as-is is valid and the MIT terms are clear. If a specific legal entity (individual or LLC) holds the Developer ID, consider updating the copyright line to that entity. Otherwise, the current wording is standard for community OSS projects. The real requirement is that `LICENSE` is committed (it already is) and referenced in `README.md` (it already is).
+1. **Use `--wait` with a generous timeout in CI:**
+```yaml
+- name: Notarize DMG
+  timeout-minutes: 30
+  run: |
+    xcrun notarytool submit dist/*.dmg \
+      --apple-id "${{ secrets.NOTARYTOOL_APPLE_ID }}" \
+      --team-id "${{ secrets.NOTARYTOOL_TEAM_ID }}" \
+      --password "${{ secrets.NOTARYTOOL_PASSWORD }}" \
+      --wait
+```
 
-**Warning signs:**
-- None critical for v1.2. This was already done in v1.1 Phase 4.
-- If the Developer ID certificate is held by an LLC, update `Copyright (c) 2026 [LLC Name]`.
+2. **Handle the `--wait` exit code explicitly:**
+```bash
+SUBMISSION_OUTPUT=$(xcrun notarytool submit dist/*.dmg \
+    --apple-id "$NOTARY_APPLE_ID" \
+    --team-id "$NOTARY_TEAM_ID" \
+    --password "$NOTARY_PASSWORD" \
+    --wait 2>&1)
+    
+if echo "$SUBMISSION_OUTPUT" | grep -q '"status":"Accepted"'; then
+    echo "Notarization accepted"
+else
+    echo "Notarization failed or pending: $SUBMISSION_OUTPUT"
+    # Fetch detailed log
+    SUBMISSION_ID=$(echo "$SUBMISSION_OUTPUT" | grep -o 'id: [a-f0-9-]*' | cut -d' ' -f2)
+    xcrun notarytool log "$SUBMISSION_ID" \
+        --apple-id "$NOTARY_APPLE_ID" \
+        --team-id "$NOTARY_TEAM_ID" \
+        --password "$NOTARY_PASSWORD"
+    exit 1
+fi
+```
 
-**Phase to address:**
-Already addressed in Phase 4. No new LICENSE work needed beyond verifying it's present in the v1.2 release commit.
+3. **Set the CI workflow's notarization step to `timeout-minutes: 45`** to account for worst-case notarization time plus polling.
+
+4. **For manual/scripted notarization outside CI:** Use `notarytool submit --wait`, which polls internally and exits when complete.
+
+**Detection:**
+- CI job fails with "The operation was canceled" or step timeout, but `notarytool info <id>` shows the submission is "In Progress" or "Accepted"
+- `notarytool submit --wait` returns a non-zero exit code but the submission eventually completes
+- GitHub Actions log shows "##[error]The action has timed out"
+
+**Phase to address:** CI-based notarization (Phase 13). Timeout must be configured before first CI release run.
 
 ---
 
-## Technical Debt Patterns
+### Pitfall 11: Notarization Staple Applied to Wrong Container
 
-Shortcuts that seem reasonable but create long-term problems.
+**What goes wrong:**
+The app is signed. The app is notarized. The staple is applied to the `.app` bundle instead of the DMG. Users download the DMG, mount it, and Gatekeeper triggers a network check because the offline ticket is in the wrong container. On machines without internet access, the app refuses to launch.
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Using `@AppStorage` directly in every View instead of a single `PreferencesStore` | Faster to wire up, no new class needed | String-key drift across files, no compile-time key validation, hard to add migration logic, impossible to test without running the app | Never for >3 preferences; fine for a single-view prototype |
-| Putting `SidebarGroupingMode.defaultMode` as a raw enum string in `@AppStorage` without a migration path | One-line persistence | Adding a new mode renumbers/reorders the enum; old persisted values silently map to wrong modes or nil | Only if you're certain the enum will never change — not the case here |
-| Using `onKeyPress(.characters)` to capture letters for jump-to-letter | Simple implementation | Captures all keystrokes globally when the view is focused, including text entry in search field; eats standard type-to-select in List | Never in a view that coexists with a search field |
-| Using `codesign --deep` to sign the entire .app bundle | One command instead of signing nested items individually | Applies same entitlements to every code item; signs code in unexpected locations; Apple explicitly warns against this (see Quinn's DevForums post) | Acceptable only if the app has zero nested code and zero entitlements |
-| Creating DMG from the same .app used for testing | Avoids a clean-rebuild step | Finder `.DS_Store` and extended attributes invalidate the code signature | Never — always build fresh for release |
-| Hardcoding the Developer ID certificate name in the release script | Simple, works on the dev machine | Script breaks on CI, on a different Mac, or when the certificate is renewed | Never — use CI secrets + `security find-identity` to discover it dynamically |
+**Why it happens:**
+Apple notarizes the submitted container (the DMG). The notarization ticket must be stapled to that same container. If the developer submits the `.app` directly (possible via `zip`), notarization works but the eventual user-facing container (the DMG) has no ticket. Alternatively, the developer staples the `.app` inside the DMG, but Gatekeeper checks the DMG itself first.
 
-## Integration Gotchas
+**How to avoid:**
+**Always notarize and staple the user-facing container (the DMG), not the intermediate `.app`:**
 
-Common mistakes when connecting to external services.
+```bash
+# WRONG: Notarize .app, staple .app, then create DMG
+xcrun notarytool submit MyApp.app.zip --wait
+xcrun stapler staple MyApp.app
+hdiutil create ... MyApp.dmg  # DMG has no ticket!
 
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| `UserDefaults` (direct or via `@AppStorage`) | Using `UserDefaults.standard` in both the main app and a self-test executable target — they share the same domain and tests pollute real preferences | Use `UserDefaults(suiteName:)` in the app with a unique suite name (e.g., `UserDefaults(suiteName: "org.automationhealth.preferences")`); tests use a different suite or `UserDefaults.standard` with teardown |
-| `notarytool` | Submitting the `.app` directly — Apple requires a `.pkg`, `.dmg`, or `.zip` container for notarization | Package the signed `.app` into a `.dmg` or `.zip`, then submit the container |
-| `gh release` CLI | Using `gh release create` without `--generate-notes` produces an empty release body; using `gh release upload` separately can fail if the release creation token expired | Use `gh release create TAG ASSET --generate-notes --title "..."` as a single atomic command |
-| `Process` (launchctl invocation) | Assuming `/bin/launchctl` exists at the same path on all macOS versions — it moved in some betas | Use `/usr/bin/env launchctl` or resolve via `ProcessInfo.processInfo.environment["PATH"]` |
-| `codesign` | Using `--deep` flag — applies same signing options to nested code incorrectly | Sign each nested executable/framework individually from the inside out (leaf → parent) |
+# CORRECT: Package DMG first, then notarize and staple the DMG
+hdiutil create ... MyApp.dmg                    # Create container
+xcrun notarytool submit MyApp.dmg --wait       # Notarize container
+xcrun stapler staple MyApp.dmg                 # Staple container
+```
 
-## Performance Traps
+**Detection:**
+- `stapler validate MyApp.dmg` returns "does not have a ticket stapled to it" after the notarization workflow
+- Users report Gatekeeper online check when launching from DMG (even though the app was notarized)
+- `spctl --assess -vv --type install MyApp.dmg` rejects (but `spctl --assess -vv --type execute MyApp.app` accepts)
 
-Patterns that work at small scale but fail as usage grows.
+**Phase to address:** Notarization recipe (Phase 13).
 
-| Trap | Symptoms | Prevention | When It Breaks |
-|------|----------|------------|----------------|
-| Computing `SidebarJobSection.sections(for:groupingMode:collapseState:hasSearchQuery:)` on every `body` invocation | UI stutter when switching grouping mode with 500+ jobs; scrolling lag because sections recomputed on hover state changes | Memoize sections using `@State` or compute in `JobStore` and publish as `@Published`; only recompute when `jobs`, `searchText`, `groupingMode`, or `collapseState` change | ~200 jobs |
-| `SidebarJobSummary` subtitle format in `groupDefinitions` does `joined(separator:)` on every row | Slow scroll on large inventories | Precompute all subtitles once per grouping mode change and store in the summary | ~500 jobs visible |
-| `SidebarTriggerClassifier.kind(for:)` does string lowercasing and contains-checks for every row on every grouping change | Grouping mode switch pauses UI | Cache trigger kind in `JobPresentation` on creation, not recomputed on grouping change | ~300 jobs |
-| `UserDefaults.synchronize()` (legacy) or frequent writes | Unnecessary disk I/O, especially in tight loops during scan | Use `@AppStorage` setter (doesn't call synchronize); batch writes in a `PreferencesStore.setBatch()` method | Already avoided by using `@AppStorage` which doesn't call `synchronize()` |
+---
 
-## Security Mistakes
+### Pitfall 12: GitHub Release Sparkle Appcast Requires Manual EdDSA Signing Per Release
 
-Domain-specific security issues beyond general web security.
+**What goes wrong:**
+Sparkle auto-update against GitHub Releases seems to "just work" — the `SUFeedURL` points to the GitHub Releases API, a new release is published, and the app detects it. But clicking "Install Update" fails because Sparkle cannot verify the update's EdDSA signature. The appcast (release metadata) must include an EdDSA signature for each binary asset, and GitHub Releases doesn't generate these automatically.
 
-| Mistake | Risk | Prevention |
-|---------|------|------------|
-| Committing `.p12` certificate file to repository | Anyone with repo access can sign malware with project's Developer ID; certificate revocation destroys release pipeline | Store in CI secrets, import ephemerally in workflow, delete temporary keychain after signing |
-| Logging `notarytool --password` in CI output | Apple ID app-specific password exposed in public CI logs | Use `echo "::add-mask::$NOTARY_PASSWORD"` in GitHub Actions; pass via `--password` stdin or environment variable |
-| Shipping the app with `com.apple.security.get-task-allow` entitlement in a distribution build | Allows any process to attach a debugger to the distributed app, bypassing code integrity | Only include `get-task-allow` in Debug builds; strip from Release/notarized builds |
-| Not verifying code signature after DMG extraction | Users download a DMG that mounts a "damaged" app with broken signature | Add `spctl --assess -vv` verification step to CI after DMG creation and extraction |
-| Persisting `SidebarCollapseState` to UserDefaults without encryption | Collapse state is non-sensitive — this is fine | Document that preferences are stored plaintext in `~/Library/Preferences/` and are non-sensitive |
+**Why it happens:**
+Sparkle 2 requires every update to be cryptographically signed with the app's EdDSA private key. The signature is included in the appcast XML entry for each release. When using GitHub Releases as the appcast source, the appcast is generated from the GitHub Releases API — but the API does not include EdDSA signatures. Two approaches exist:
 
-## UX Pitfalls
+1. **`generate_appcast` with local mirrors:** Download all DMGs, run `generate_appcast`, host the resulting XML on GitHub Pages
+2. **Sparkle's GitHub Releases integration (Sparkle 2.5+):** Sparkle can parse GitHub Releases atom feed directly, but still requires `sparkle:edSignature` in the release body
 
-Common user experience mistakes in this domain.
+Without the EdDSA signature, Sparkle's security model blocks the update.
 
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| Keyboard shortcuts not discoverable — no menu items or help text showing available shortcuts | Users don't know shortcuts exist, feel the app is mouse-only | Add each shortcut action to the `CommandMenu` (automatically shows the shortcut beside the menu item); list shortcuts in the app's Help menu |
-| Focus search (`Cmd-Shift-F`) moves focus to the search field but the sidebar loses `@FocusState` and arrow key navigation silently stops working | User types search, wants to arrow-down through results, nothing happens — confused | After setting focus to search field, on `Escape` or `Tab`, restore focus to `.jobList`; test the focus → search → navigate → focus cycle |
-| Expand/collapse all changes the currently selected job's position, causing the detail view to jump to a different automation | User collapses groups to declutter, but loses their place | After expand/collapse all, preserve `selectedJobID` and scroll to it; if it's now hidden (in a collapsed group), auto-expand that group |
-| Grouping mode switch resets collapse state | User carefully collapses sections in "Source" mode, switches to "Health" to check something, switches back — all sections re-expanded | Associate collapse state with `SidebarSectionID(groupingMode:, groupKey:)` — which the existing `SidebarCollapseState` already does correctly. Verify this works across mode switches. |
-| Preference reset (e.g., via `defaults delete`) silently resets grouping to `.source` but doesn't notify the user | User's custom grouping disappears after system maintenance or accidental defaults reset | `defaultMode` is `.source`, which is a safe fallback. No notification needed for a scanner tool. |
+**How to avoid:**
+1. **Generate the EdDSA signature for the DMG after building it:**
+```bash
+# After building and notarizing the DMG:
+./Sparkle/bin/sign_update dist/AutomationHealth-1.3.0.dmg \
+    -s /path/to/sparkle_private.pem
+# Output: sparkle:edSignature="base64encoded..."
+```
 
-## "Looks Done But Isn't" Checklist
+2. **Include the signature in the GitHub Release body or as an asset:**
+Option A: Add `sparkle:edSignature="..." sparkle:version="..." sparkle:shortVersionString="..."` to the release description (Sparkle 2 can parse these from the release body)
+Option B: Run `generate_appcast` locally and upload the generated `appcast.xml` as a release asset
+Option C: Host a dedicated appcast XML on GitHub Pages (more work, but doesn't require parsing the release body)
 
-Things that appear complete but are missing critical pieces.
+3. **In CI, automate the signing step:**
+```yaml
+- name: Sign update for Sparkle
+  run: |
+    echo "${{ secrets.SPARKLE_PRIVATE_KEY }}" > /tmp/sparkle_private.pem
+    SIGNATURE=$(./Sparkle/bin/sign_update dist/*.dmg -s /tmp/sparkle_private.pem)
+    rm /tmp/sparkle_private.pem
+    echo "ED_SIGNATURE=$SIGNATURE" >> $GITHUB_ENV
+    
+- name: Create GitHub Release with Sparkle signature
+  run: |
+    gh release create v1.3.0 dist/*.dmg \
+      --title "Automation Health v1.3.0" \
+      --notes "$(cat <<EOF
+    ${{ env.ED_SIGNATURE }}
+    
+    ## Changes
+    - Signed, notarized DMG distribution
+    - Sparkle auto-update integration
+    EOF
+    )"
+```
 
-- [ ] **Persistence:** Grouping mode stored in UserDefaults — but verify the key is the same string in ALL files that read/write it (grep `@AppStorage("grouping`).
-- [ ] **Persistence:** Collapse state stored — but verify `SidebarCollapseState` round-trips through `JSONEncoder`/`JSONDecoder` correctly (custom Codable conformance for `Set<SidebarSectionID>`).
-- [ ] **Grouping modes:** Schedule-based mode works — but verify Candidate and Manual records don't appear in schedule buckets (confidence gate exists).
-- [ ] **Keyboard shortcuts:** Arrow keys navigate — but verify they still work after focus moves to search field and back (focus restoration).
-- [ ] **Keyboard shortcuts:** Jump-to-letter works — but verify it doesn't capture letters when the search field is active (`.onKeyPress` gated on `focusedTarget == .jobList`).
-- [ ] **Codesigning:** Binary is signed — but verify `otool -L` shows no dynamic Swift runtime dependencies and `codesign --verify --deep --strict` passes.
-- [ ] **Notarization:** `notarytool submit` returns "Accepted" — but verify the stapler ran and `spctl --assess` passes on the DMG.
-- [ ] **DMG:** DMG mounts and app launches — but verify code signature is intact after extraction (`codesign -vvv` on the extracted app).
-- [ ] **Release:** GitHub Release created with DMG asset — but verify the download URL works and the DMG downloads as the correct size.
-- [ ] **Privacy:** No real paths in public docs — but verify `docs/release-process.md` uses placeholder identifiers like `$DEVELOPER_ID` and `$TEAM_ID`.
+**Detection:**
+- Sparkle detects the update, shows release notes, but "Install" fails or the update does not proceed
+- Console.app shows "The update is improperly signed" or "EdDSA signature verification failed"
+- The GitHub Release body does not contain `sparkle:edSignature` or `sparkle:version` elements
 
-## Recovery Strategies
+**Phase to address:** Sparkle integration (Phase 14). Must implement per-release signing before the first Sparkle-enabled release.
 
-When pitfalls occur despite prevention, how to recover.
+---
 
-| Pitfall | Recovery Cost | Recovery Steps |
-|---------|---------------|----------------|
-| @AppStorage key collision or silent type fallback | LOW | `defaults delete org.automationhealth.AutomationHealth` then restart app; preferences reset to defaults — acceptable for this app's scope |
-| Grouping mode staleness after refresh | LOW | User switches grouping mode again (menu is still responsive); next scan fix |
-| Evidence boundary violation in schedule-based grouping | MEDIUM | Fix the confidence gate, rebuild, rinse and repeat — no data corruption, only misleading display |
-| Keyboard shortcut conflict with system | LOW | Remove the conflicting shortcut, update docs — low impact for a developer tool |
-| Hardened Runtime blocks launchctl | MEDIUM | Add entitlement, re-sign, re-notarize — same bundle, no user data loss |
-| Secret leaked in CI log | HIGH | Revoke certificates, rotate Apple ID password, generate new app-specific password, update CI secrets, re-sign and re-notarize release |
-| Notarization failure from incomplete bundle structure | MEDIUM | Fix Info.plist, re-build, re-sign, re-submit — no downstream impact since release wasn't published yet |
-| DMG code signature breakage | LOW | Recreate DMG from signed .app, re-sign DMG, re-staple — < 5 minutes if the signed .app is preserved |
-| GitHub Release asset upload timeout | LOW | Re-run `gh release upload` or re-create the release — idempotent, no data loss |
+### Pitfall 13: Sparkle Update Channel Mismatch — Beta Updates Shown to Stable Users
 
-## Pitfall-to-Phase Mapping
+**What goes wrong:**
+During development, Sparkle's `SUFeedURL` points to a "latest release" endpoint that includes pre-releases or draft releases. Stable users are prompted to update to a beta or development build. Conversely, if the feed only includes stable releases, beta testers never see updates.
 
-How roadmap phases should address these pitfalls.
+**Why it happens:**
+GitHub Releases does not differentiate between stable, beta, and pre-release channels natively. The GitHub Releases API returns all releases (including pre-releases) by default. Without channel filtering in the appcast or Sparkle configuration, every release is offered to every user.
 
-| Pitfall | Prevention Phase | Verification |
-|---------|------------------|--------------|
-| @AppStorage string-key fragility | Phase 10 (Preferences) | Self-test: round-trip write/read for every preference key |
-| Grouping mode staleness | Phase 10 (Preferences) | Self-test: change mode during simulated scan, verify sections match |
-| Evidence boundary violation | Phase 11 (Grouping modes) | Self-test: Candidate/Manual records always in "No evidence" bucket |
-| Keyboard shortcut conflicts | Phase 12 (Keyboards shortcuts) | Manual: test every shortcut against Apple HIG list |
-| Hardened Runtime entitlement missing | Phase 14 (Codesigning) | Verification: `launchctl` scan works on signed Release binary |
-| Developer ID secret leakage | Phase 13 (Release process) | CI: verify no secrets in workflow logs after release run |
-| Notarization failure — bundle structure | Phase 14 (Codesigning) | CI: `spctl --assess` and `notarytool submit --wait` in release pipeline |
-| DMG breaks code signature | Phase 14 (Codesigning) | CI: extract DMG, verify app signature, run self-test |
-| GitHub Release upload timeout | Phase 13 (Release process) | Manual: verify asset on release page after creation |
-| MIT LICENSE copyright ambiguity | Already addressed | Verify LICENSE exists in v1.2 tag |
+**How to avoid:**
+For this project (single channel, no beta program), the simplest approach:
+
+1. **Use Sparkle's minimum auto-update version.** Set `SUMinimumAutoupdateVersion` in Info.plist to prevent auto-update across major versions if needed.
+
+2. **Mark pre-releases on GitHub as "pre-release"** (not "latest"). Sparkle 2's GitHub Releases integration respects the `prerelease` flag — if a release is marked as pre-release, Sparkle will not offer it for automatic updates.
+
+3. **For future multi-channel needs:** Host separate appcast XML files for `stable` and `beta` channels, with different `SUFeedURL` values in the respective builds. But this is out of scope for v1.3.
+
+**Detection:**
+- Stable users see "Update to version 2.0.0-beta1" or similar pre-release
+- GitHub Release marked as "latest" but intended as a test release
+- `SUFeedURL` points to an API endpoint without prerelease filtering
+
+**Phase to address:** Sparkle integration (Phase 14). Channel strategy is a configuration decision.
+
+---
+
+## Integration-Specific Pitfalls
+
+Combined pitfalls where two or more systems interact.
+
+### Integration 1: Sparkle + Hardened Runtime + Entitlements Review → Notarization Delay
+
+**The interaction:** Sparkle requires `com.apple.security.cs.disable-library-validation`. This entitlement triggers additional notarization review by Apple (a human may need to approve it). Combined with `com.apple.security.cs.allow-unsigned-executable-memory` (also needed for Sparkle), the notarization review takes longer and has a higher risk of rejection on first submission.
+
+**Mitigation:** Expect notarization to take 15-30 minutes for the first submission with Sparkle-entitled hardened runtime. Submit early, not at the end of a work session. If rejected, the notarization log will specify which entitlement triggered the review — respond with a clear explanation in the notarization notes field (`--notarization-tool-args`).
+
+### Integration 2: DMG Code Signature + Sparkle Update Installation
+
+**The interaction:** Sparkle downloads the new DMG, mounts it, and attempts to install it by replacing the old `.app` bundle. If the DMG is mounted from within the app's sandbox (not applicable here — app is unsandboxed) OR if the DMG's code signature doesn't survive the network transfer, Sparkle's installation step fails.
+
+**Mitigation:** Verify the DMG's code signature after download (Sparkle does this internally via the EdDSA signature check). Ensure DMG is notarized and stapled so Gatekeeper doesn't block the extracted `.app`. Test the full update cycle: download, mount, install, relaunch — not just the "update available" detection.
+
+### Integration 3: SwiftPM Static Linking + Sparkle Framework Dynamic Link
+
+**The interaction:** The app binary is statically linked (`-static-executable`), but Sparkle.framework is dynamically loaded. Static linking of the main binary and dynamic loading of Sparkle is perfectly fine — the main executable loads Sparkle at runtime via `dlopen` or the dynamic linker. However, the `-static-executable` flag should NOT prevent the binary from loading external frameworks. Verify with:
+
+```bash
+# Should show Sparkle.framework as dynamically linked, Swift runtime absent
+otool -L AutomationHealth.app/Contents/MacOS/AutomationHealth
+```
+
+**Mitigation:** Use `-Xlinker -F/path/to/Frameworks` to tell the linker where Sparkle lives. The static-executable flag affects Swift runtime linking, not all dynamic linking.
+
+### Integration 4: CI Secrets Rotation + Sparkle Key Rotation
+
+**The interaction:** If the Apple Developer ID certificate is revoked (e.g., after a leak), all existing releases become invalid. If the Sparkle EdDSA key is rotated at the same time, existing installations can no longer receive updates — even the emergency fix release is unverifiable because the key changed.
+
+**Mitigation:** The Sparkle private key must be rotated independently of the Apple signing certificate, and only when absolutely necessary. If the certificate is revoked but the Sparkle key is intact, re-sign the new release and include BOTH the old and new Sparkle public keys in `Info.plist` during the transition (Sparke 2 supports multiple public keys for key rotation). Never rotate both simultaneously without a transition period.
+
+---
+
+## Moderate Pitfalls
+
+### Pitfall M1: `com.apple.security.get-task-allow` Left in Distribution Build
+
+**What goes wrong:** Debug-entitlement `com.apple.security.get-task-allow` is left in the entitlements file used for distribution signing. Notarization fails with "get-task-allow is not permitted in distribution builds." This happens when a single entitlements file is used for both Debug and Release.
+
+**Mitigation:** Use separate entitlements files: `entitlements.debug.plist` (with `get-task-allow`) and `entitlements.release.plist` (without). Reference the correct file in the build/release script.
+
+### Pitfall M2: `CFBundleVersion` as String Causes Notarization Rejection
+
+**What goes wrong:** `CFBundleVersion` is set to a semver string like "1.3.0" instead of an integer build number. Notarization may accept this, but `CFBundleVersion` is semantically a build number (integer). Using a version string here can cause App Store Connect validation failures if the app ever targets the App Store.
+
+**Mitigation:** Set `CFBundleVersion` to a monotonically increasing integer (e.g., `1` for the first release, increment on each release). Put the semver in `CFBundleShortVersionString`.
+
+### Pitfall M3: DMG Volume Name Contains Characters That Break Mounting
+
+**What goes wrong:** DMG volume name contains slashes, colons, or special characters. `hdiutil` creates the DMG but the volume fails to mount silently on some macOS versions.
+
+**Mitigation:** Use only alphanumeric characters, spaces, hyphens, and underscores in the volume name: `Automation Health` is fine.
+
+### Pitfall M4: Sparkle Framework Version Mismatch with `generate_keys`/`sign_update` Tools
+
+**What goes wrong:** The Sparkle framework version bundled in the app (e.g., 2.6.0) differs from the version of `generate_keys` and `sign_update` used to sign updates (e.g., 2.5.0). Key format or signing algorithm changes between versions cause update verification failures.
+
+**Mitigation:** Use the same Sparkle version for: (1) the framework bundled in the app, (2) `generate_keys` for key generation, and (3) `sign_update`/`generate_appcast` in the release pipeline. Pin the Sparkle version in release documentation. Download all tools from the same GitHub Release.
+
+### Pitfall M5: CI Runner Architecture Mismatch for `swift build`
+
+**What goes wrong:** The release pipeline runs `swift build -c release` on a GitHub Actions macOS runner that produces an `arm64` binary, but the release is intended for Intel Macs. Universal binaries (`arm64` + `x86_64`) require explicit `--arch` flags. Building for the wrong architecture produces a DMG that fails to launch on half the user base.
+
+**Mitigation:** For maximum compatibility, build a universal binary:
+```bash
+swift build -c release --arch arm64 --arch x86_64
+```
+Or, if targeting macOS 14+ only (Apple Silicon is the vast majority), `arm64` alone is acceptable. Document the architecture decision in release process docs. The app's minimum target is macOS 14 (Sonoma), which only supports Apple Silicon Macs and Intel Macs with a T2 chip — both support `arm64` binaries via Rosetta 2 on Intel.
+
+### Pitfall M6: Sparkle Downloaded Update Fails to Replace Running App (File Permissions)
+
+**What goes wrong:** The app is installed in `/Applications/` but the user doesn't have write permission to that directory (unlikely for user-installed apps, but possible with managed devices). Sparkle's `Installer.xpc` copies the new `.app` to a temporary location and tries to swap it — if the final swap fails due to permissions, the app remains at the old version after "successful" update.
+
+**Mitigation:** This is rare for user-installed apps. If it occurs, Sparkle shows an error and the app continues running the old version (safe fallback). No action needed beyond documentation.
+
+---
+
+## Minor Pitfalls
+
+### Pitfall L1: Sparkle Update UI Appears Behind the App Window
+
+**What goes wrong:** Sparkle's update alert window appears behind the main app window and is not visible. Users don't know an update is available.
+
+**Mitigation:** Set `SUEnableInstallerLauncherService = NO` in Info.plist (default) and ensure Sparkle's `SUUpdater` is presented as a modal sheet or frontmost window. Test update UI visibility with the app in full-screen mode.
+
+### Pitfall L2: `gh release create` With `--generate-notes` Produces Empty or Generic Release Body
+
+**What goes wrong:** The GitHub Release is created with auto-generated notes that contain only commit hashes and no Sparkle signature elements. Sparkle cannot find `sparkle:edSignature` in the release body.
+
+**Mitigation:** Use `--notes` (custom) instead of `--generate-notes` for Sparkle-enabled releases. Include both human-readable change notes and Sparkle metadata.
+
+### Pitfall L3: Notarization Submission Returns "Accepted" But Staple Fails
+
+**What goes wrong:** `notarytool submit --wait` returns `Accepted`, but `xcrun stapler staple DMG.dmg` fails with "does not have a ticket." This happens when the notarization ticket hasn't propagated to the stapler cache yet — there's a brief delay between notarization completion and ticket availability.
+
+**Mitigation:** Wait 30-60 seconds between notarization acceptance and stapling. Use a retry loop:
+```bash
+for i in $(seq 1 5); do
+    xcrun stapler staple "$DMG" && break
+    echo "Staple attempt $i failed, retrying in 10s..."
+    sleep 10
+done
+```
+
+### Pitfall L4: Entitlements File Forgotten During Signing
+
+**What goes wrong:** `codesign --sign "Developer ID" --timestamp --options runtime` is run without `--entitlements entitlements.plist`. The app signs successfully but with default (maximally restrictive) Hardened Runtime. Sparkle features break.
+
+**Mitigation:** Always include `--entitlements` in the codesign command. Verify entitlements on the signed binary:
+```bash
+codesign -d --entitlements - AutomationHealth.app
+```
+
+---
+
+## Phase-Specific Warnings
+
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Codesigning (Phase 13) | Hardened Runtime blocks `launchctl` subprocess execution | Test signed Release binary on different Mac; add entitlements if needed |
+| Codesigning (Phase 13) | SwiftPM dynamic Swift runtime linking blocks notarization | Build with `-static-executable`; verify with `otool -L` |
+| Notarization (Phase 13) | Incomplete Info.plist causes notarization rejection | Add all required keys; validate with `plutil -lint` |
+| Notarization (Phase 13) | CI notarization timeout during peak hours | Set `timeout-minutes: 45` on notarization step |
+| DMG packaging (Phase 13) | Opening signed .app before DMG creation destroys signature | Fresh build, sign, immediately package into DMG — never open |
+| DMG packaging (Phase 13) | Staple applied to wrong container | Notarize and staple the DMG, not the .app |
+| CI secrets (Phase 13) | Developer ID certificate leaked in logs or committed scripts | Ephemeral keychain, secret masking, environment variables only |
+| Release process (Phase 13) | `--generate-notes` produces body without Sparkle metadata | Use custom `--notes` with EdDSA signature in release body |
+| Sparkle integration (Phase 14) | SUFeedURL using http:// blocks updates | HTTPS-only feed URL |
+| Sparkle integration (Phase 14) | EdDSA key generation/loss/rotation failure | Generate once, store private key in CI secrets, document recovery |
+| Sparkle integration (Phase 14) | Framework not bundled in SwiftPM build | Manual framework copying, signing in inside-out order |
+| Sparkle integration (Phase 14) | XPC services fail under Hardened Runtime | Required entitlements: `disable-library-validation`, `allow-unsigned-executable-memory` |
+| Sparkle + Release (Phases 13-14) | Per-release EdDSA signing missing from GitHub Release | `sign_update` run in CI, signature added to release body |
+
+---
+
+## Pre-Submission Verification Checklist
+
+Things to verify before considering distribution "shipped":
+
+- [ ] **Static linking:** `otool -L AutomationHealth.app/Contents/MacOS/AutomationHealth | grep swift` returns nothing
+- [ ] **Info.plist:** Contains `CFBundleVersion`, `CFBundleShortVersionString`, `NSHumanReadableCopyright`, `LSApplicationCategoryType`
+- [ ] **Entitlements:** `codesign -d --entitlements - AutomationHealth.app` shows expected entitlements (no `get-task-allow`)
+- [ ] **Code signature on .app:** `codesign --verify --deep --strict --verbose=2 AutomationHealth.app` passes
+- [ ] **Code signature on DMG:** `codesign -dvvv dist/*.dmg` shows Developer ID signature
+- [ ] **Notarization:** `spctl --assess -vv --type install dist/*.dmg` passes
+- [ ] **Staple:** `xcrun stapler validate dist/*.dmg` passes
+- [ ] **Signature survives DMG extraction:** Mount DMG, `codesign -vvv /Volumes/Automation\ Health/AutomationHealth.app` passes
+- [ ] **launchctl works on signed binary:** Self-test or manual check that launchd scanner returns results
+- [ ] **CI secrets configured:** All 5 secrets present in GitHub repo settings (cert base64, cert password, Apple ID, team ID, app-specific password)
+- [ ] **CI no secrets in logs:** Review last CI release run output — no certificate data, no passwords visible
+- [ ] **Release docs use placeholders:** `docs/release-process.md` references `$DEVELOPER_ID`, `$TEAM_ID`, not literal values
+- [ ] **Sparkle keys generated and stored:** Private key in CI secret, public key in `Info.plist` (`SUPublicEDKey`)
+- [ ] **Sparkle SUFeedURL is HTTPS:** Verified with `grep SUFeedURL Info.plist`
+- [ ] **Sparkle framework bundled:** `ls AutomationHealth.app/Contents/Frameworks/Sparkle.framework` exists
+- [ ] **Sparkle framework signed:** `codesign -vvv AutomationHealth.app/Contents/Frameworks/Sparkle.framework` passes
+- [ ] **Sparkle entitlements present:** `com.apple.security.cs.disable-library-validation` and `com.apple.security.cs.allow-unsigned-executable-memory` in release entitlements
+- [ ] **Release body contains Sparkle metadata:** `sparkle:edSignature` and `sparkle:version` in GitHub Release description
+- [ ] **GitHub Release asset downloadable:** Download URL works, DMG size matches, DMG mounts on clean macOS install
+- [ ] **Full update cycle tested:** Install old version, trigger update check, download update, install, verify new version launches
+
+---
 
 ## Sources
 
-### Official Apple Documentation
-- [AppStorage Property Wrapper](https://developer.apple.com/documentation/swiftui/appstorage) — String-key based, no compile-time validation, limited type support. HIGH confidence.
-- [onKeyPress and keyboardShortcut](https://developer.apple.com/documentation/swiftui/view-input-and-events) — Focus-gated key handling; global shortcuts via CommandMenu. HIGH confidence.
-- [Creating Distribution-Signed Code for macOS](https://developer.apple.com/documentation/xcode/creating-distribution-signed-code-for-the-mac) — Replaces Quinn's DevForums post; inside-out signing order, `--deep` danger, entitlements. HIGH confidence.
-- [Notarizing macOS Software Before Distribution](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution) — `notarytool` workflow, stapler, common notarization issues. HIGH confidence.
-- [Hardened Runtime](https://developer.apple.com/documentation/security/hardened_runtime) — Entitlement requirements, default restrictions. HIGH confidence.
-
-### Apple Developer Forums
-- [Creating Distribution-Signed Code for Mac](https://developer.apple.com/forums/thread/701514) — Quinn's definitive guide: `--deep` is harmful, signing order matters, entitlements per-executable. HIGH confidence.
-- [Resolving Common Notarization Issues](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues) — `get-task-allow` in distribution builds, invalid Info.plists, missing secure timestamps. HIGH confidence.
-
-### Community and Third-Party Sources
-- [@AppStorage Explained and Replicated for a Better Alternative](https://www.avanderlee.com/swift/appstorage-explained/) — Antoine van der Lee: string-key fragility, no key discovery, no compile-time validation. HIGH confidence.
-- [Notarize a Command Line Tool with notarytool](https://scriptingosx.com/2021/07/notarize-a-command-line-tool-with-notarytool/) — Scripting OS X: practical `notarytool` + `stapler` + `spctl` workflow for SPM tools. MEDIUM confidence (2021, but `notarytool` API is stable).
-- [GitHub REST API: Releases](https://docs.github.com/en/rest/releases/releases) — Asset upload limits, release creation endpoints. HIGH confidence.
-
-### Project Codebase Evidence
-- `Sources/AutomationHealthCore/JobPresentation.swift` — Existing `SidebarGroupingMode` (5 modes), `SidebarCollapseState`, `SidebarTriggerClassifier`, `SidebarNavigation`. Confidence/HIGH.
-- `Sources/AutomationHealth/Views/ContentView.swift` — `@State private var sidebarGroupingMode` and `sidebarCollapseState` — no persistence. Confidence/HIGH.
-- `Sources/AutomationHealth/Views/SidebarView.swift` — `.onKeyPress(.downArrow)` / `.onKeyPress(.upArrow)`, `@FocusState` for jobList. Confidence/HIGH.
-- `Sources/AutomationHealth/App/AutomationHealthApp.swift` — `Command-r` shortcut via `CommandMenu`. Confidence/HIGH.
-- `script/build_and_run.sh` — Minimal `Info.plist`, no signing, no entitlements, no DMG. Confidence/HIGH.
-- `LICENSE` — MIT License with "Automation Health contributors" copyright. Confidence/HIGH.
-- `.planning/RETROSPECTIVE.md` — v1.1 commit hygiene lessons: atomic per-phase commits, `git status --porcelain` clean gate. Confidence/HIGH.
-
-### Forensics and Retrospective
-- `.planning/forensics/report-20260510-214900.md` — v1.1 suffered 11 uncommitted plans due to pre-existing dirty tree bypassing auto-commit. The "clean git status gate" is critical for v1.2 release quality. Confidence/HIGH.
-- `.planning/codebase/CONCERNS.md` — Development app bundle is unsigned and unsandboxed; launchctl parsing is regex-based and fragile; DateFormatter allocation on every JobPresentation. Confidence/HIGH.
+- **Apple Developer Documentation** — "Hardened Runtime" — Entitlement reference, default restrictions, `get-task-allow` prohibition for distribution builds. HIGH confidence.
+- **Apple Developer Documentation** — "Notarizing macOS Software Before Distribution" — `notarytool` workflow, staple requirements, common notarization issues, Info.plist requirements. HIGH confidence.
+- **Apple Developer Documentation** — "Creating Distribution-Signed Code for macOS" — Signing order (inside-out), `--deep` warning, entitlements per code item. HIGH confidence.
+- **Apple Developer Forums** — Quinn "The Eskimo!" posts on codesigning: batch signing pitfalls, `--deep` alternatives, verification steps. HIGH confidence.
+- **Sparkle Project Documentation** (sparkle-project.org) — EdDSA key generation, `sign_update` usage, GitHub Releases integration, XPC service entitlements, Hardened Runtime requirements. HIGH confidence.
+- **Scripting OS X** (scriptingosx.com) — Practical notarization recipes for SwiftPM command-line tools, `notarytool` + `stapler` + `spctl` workflow. MEDIUM confidence.
+- **GitHub Docs** — "Encrypted secrets", Release asset management, CI workflow security. HIGH confidence.
+- **Swift Forums** — Static linking discussions for SwiftPM executables, `-static-executable` flag behavior on macOS. HIGH confidence.
+- **Project codebase evidence:**
+  - `Package.swift` — Pure SwiftPM, no external dependencies, `macOS(.v14)` platform target. HIGH confidence.
+  - `Sources/ActiveJobsCore/Services/LaunchAgentScanner.swift` — Uses `Process` to invoke `/bin/launchctl`, reads plists from `~/Library/LaunchAgents`. HIGH confidence.
+  - `script/build_and_run.sh` — Minimal unsigned `.app` assembly, hand-rolled `Info.plist`. HIGH confidence.
+  - `.github/workflows/ci.yml` — Uses `macos-latest`, no signing steps, no secrets. HIGH confidence.
+  - `Makefile` — `build`, `test`, `ci`, `run` targets; no release/sign/notarize target. HIGH confidence.
+  - `.planning/codebase/INTEGRATIONS.md` — Confirms no network layer, no external Swift deps, no secrets currently used in CI. HIGH confidence.
 
 ---
-*Pitfalls research for: Automation Health v1.2 — preferences, grouping, shortcuts, distribution*
-*Researched: 2026-05-10*
+
+*Pitfalls research for: Automation Health v1.3 — codesigning, notarization, DMG, CI, Sparkle auto-update*
+*Researched: 2026-05-12*
+*Confidence: HIGH — all pitfalls validated against official Apple and Sparkle documentation; verified against project's current unsigned SwiftPM state via codebase files*
