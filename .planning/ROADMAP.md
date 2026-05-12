@@ -59,7 +59,10 @@
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
 - [ ] 13-01-PLAN.md — Entitlements file, release script with codesign+DMG+notarize+staple, and Makefile targets
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 13-02-PLAN.md — GitHub Actions release workflow with certificate import, notarization, and GitHub Release creation
 - [ ] 13-03-PLAN.md — Release process documentation, .gitignore update, and README distribution status update
 **UI hint**: yes
