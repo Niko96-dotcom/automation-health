@@ -210,7 +210,15 @@ xcrun stapler staple "$DMG_PATH"
 
 echo "=== Step 10: Verify stapled DMG ==="
 xcrun stapler validate "$DMG_PATH"
-spctl --assess --verbose --type install "$DMG_PATH" || echo "Warning: spctl assessment requires a non-development Mac or cleared assessment history"
+if spctl --assess --verbose --type install "$DMG_PATH"; then
+  echo "Gatekeeper assessment: passed"
+else
+  SPCTL_EXIT=$?
+  echo "Error: spctl assessment failed with exit code $SPCTL_EXIT" >&2
+  echo "This may be normal on development Macs or if assessment history is stale." >&2
+  echo "Verify on a clean non-development Mac before distributing." >&2
+  exit $SPCTL_EXIT
+fi
 
 echo "=== Step 11: Success summary ==="
 DMG_SIZE="$(ls -lh "$DMG_PATH" | awk '{print $5}')"
