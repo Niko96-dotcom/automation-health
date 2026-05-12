@@ -40,7 +40,7 @@
 
 ## Next Milestone: v1.3 Shippable Distribution
 
-- [ ] **Phase 13: Signed and Notarized DMG with CI Pipeline** — Static linking, entitlements, codesigning, DMG packaging, notarization, GitHub Release, release process docs, and CI automation.
+- [x] **Phase 13: Signed and Notarized DMG with CI Pipeline** — Static linking, entitlements, codesigning, DMG packaging, notarization, GitHub Release, release process docs, and CI automation. (completed 2026-05-12)
 - [ ] **Phase 14: Sparkle Auto-Update Integration** — Sparkle 2 framework integration, auto-update UI, EdDSA signing, and end-to-end update flow against GitHub Releases.
 
 ## Phase Details
@@ -60,11 +60,11 @@
 
 Plans:
 **Wave 1**
-- [ ] 13-01-PLAN.md — Entitlements file, release script with codesign+DMG+notarize+staple, and Makefile targets
+- [x] 13-01-PLAN.md — Entitlements file, release script with codesign+DMG+notarize+staple, and Makefile targets
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 13-02-PLAN.md — GitHub Actions release workflow with certificate import, notarization, and GitHub Release creation
-- [ ] 13-03-PLAN.md — Release process documentation, .gitignore update, and README distribution status update
+- [x] 13-02-PLAN.md — GitHub Actions release workflow with certificate import, notarization, and GitHub Release creation
+- [x] 13-03-PLAN.md — Release process documentation, .gitignore update, and README distribution status update
 **UI hint**: yes
 
 ### Phase 14: Sparkle Auto-Update Integration
@@ -79,9 +79,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 13-01-PLAN.md — Entitlements file, release script with codesign+DMG+notarize+staple, and Makefile targets
-- [ ] 13-02-PLAN.md — GitHub Actions release workflow with certificate import, notarization, and GitHub Release creation
-- [ ] 13-03-PLAN.md — Release process documentation, .gitignore update, and README distribution status update
+- [x] 13-01-PLAN.md — Entitlements file, release script with codesign+DMG+notarize+staple, and Makefile targets
+- [x] 13-02-PLAN.md — GitHub Actions release workflow with certificate import, notarization, and GitHub Release creation
+- [x] 13-03-PLAN.md — Release process documentation, .gitignore update, and README distribution status update
 **UI hint**: yes
 
 ## Progress
