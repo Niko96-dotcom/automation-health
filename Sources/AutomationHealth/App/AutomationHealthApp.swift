@@ -1,4 +1,5 @@
 import AppKit
+import Sparkle
 import SwiftUI
 import ActiveJobsCore
 
@@ -14,11 +15,25 @@ struct AutomationHealthApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var preferences: PreferencesStore
     @StateObject private var store: JobStore
+    @StateObject private var updateStore: UpdateStore
 
     init() {
         let prefs = PreferencesStore()
         _preferences = StateObject(wrappedValue: prefs)
         _store = StateObject(wrappedValue: JobStore(preferences: prefs))
+
+        let updaterDelegate = UpdateStoreDelegate() // store: will be set below
+
+        let userDriver = SPUStandardUserDriver(hostBundle: Bundle.main, delegate: nil)
+        let sparkleUpdater = SPUUpdater(
+            hostBundle: Bundle.main,
+            applicationBundle: Bundle.main,
+            userDriver: userDriver,
+            delegate: updaterDelegate
+        )
+        let store = UpdateStore(updater: sparkleUpdater)
+        updaterDelegate.store = store
+        _updateStore = StateObject(wrappedValue: store)
     }
 
     var body: some Scene {
@@ -30,8 +45,18 @@ struct AutomationHealthApp: App {
                         store.refresh()
                     }
                 }
+                .task {
+                    updateStore.startUpdater()
+                }
         }
         .commands {
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates\u{2026}") {
+                    updateStore.checkForUpdates()
+                }
+                .disabled(!updateStore.canCheckForUpdates)
+            }
+
             CommandMenu("View") {
                 Button("Focus Search Field") {
                     preferences.requestSearchFieldFocus = true

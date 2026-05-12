@@ -73,24 +73,34 @@ final class UpdateStore: ObservableObject {
 /// transitions updateState for events KVO does not cover (found/not-found/error).
 @MainActor
 final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
-    private let store: UpdateStore
+    var store: UpdateStore?
 
-    init(store: UpdateStore) {
-        self.store = store
+    /// Provides the appcast feed URL for the Sparkle updater.
+    /// Uses the GitHub Releases pattern established in Phase 13.
+    /// Dev builds (suffixed with -dev or version 0.0.0) return nil
+    /// because no corresponding release appcast exists to check against.
+    func feedURLString(for updater: SPUUpdater) -> String? {
+        guard let info = Bundle.main.infoDictionary,
+              let version = info["CFBundleShortVersionString"] as? String,
+              !version.hasSuffix("-dev"),
+              !version.contains("0.0.0") else {
+            return nil
+        }
+        return "https://github.com/nikomohr/AutomationHealth/releases/download/v\(version)/appcast.xml"
     }
 
     /// Called when Sparkle discovers a valid update in the appcast.
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        store.updateState = .updateAvailable(version: item.displayVersionString)
+        store?.updateState = .updateAvailable(version: item.displayVersionString)
     }
 
     /// Called when Sparkle completes a check and finds no update.
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: Error) {
-        store.updateState = .upToDate
+        store?.updateState = .upToDate
     }
 
     /// Called when the update driver aborts with an error (e.g. download failure).
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
-        store.updateState = .error(message: error.localizedDescription)
+        store?.updateState = .error(message: error.localizedDescription)
     }
 }
