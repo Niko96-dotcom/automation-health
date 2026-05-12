@@ -32,3 +32,6 @@ xcuserdata/
 
 # Release staging
 .release-staging/
+
+# Sparkle key generation tool cache
+.sparkle-tools/
