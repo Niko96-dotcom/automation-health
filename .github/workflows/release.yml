@@ -1,0 +1,121 @@
+name: Automation Health Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build, sign, notarize, and release
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      TZ: Europe/Berlin
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Show toolchain
+        run: swift --version
+
+      - name: Import Apple Developer certificate
+        env:
+          APPLE_DEVELOPER_CERTIFICATE_P12: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12 }}
+          APPLE_DEVELOPER_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
+        run: |
+          if [ -z "$APPLE_DEVELOPER_CERTIFICATE_P12" ]; then
+            echo "APPLE_DEVELOPER_CERTIFICATE_P12 secret is not set"
+            echo "Generate it: base64 -i ~/Downloads/developerID_application.p12 | tr -d '\n' | pbcopy"
+            exit 1
+          fi
+          echo "$APPLE_DEVELOPER_CERTIFICATE_P12" | base64 --decode > certificate.p12
+          security create-keychain -p actions build.keychain
+          security list-keychains -d user -s build.keychain login.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p actions build.keychain
+          security import certificate.p12 -k build.keychain -P "$APPLE_DEVELOPER_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k actions build.keychain
+          security find-identity -v build.keychain
+          rm certificate.p12
+
+      - name: Import Developer ID identity name
+        run: |
+          DEVELOPER_IDENTITY=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "APPLE_DEVELOPER_IDENTITY=$DEVELOPER_IDENTITY" >> $GITHUB_ENV
+          echo "Found identity: $DEVELOPER_IDENTITY"
+
+      - name: Write App Store Connect API key
+        env:
+          APPLE_NOTARY_KEY: ${{ secrets.APPLE_NOTARY_KEY }}
+        run: |
+          if [ -z "$APPLE_NOTARY_KEY" ]; then
+            echo "APPLE_NOTARY_KEY secret is not set"
+            echo "Create an App Store Connect API Key at: https://appstoreconnect.apple.com/access/integrations/api"
+            exit 1
+          fi
+          mkdir -p ~/.appstoreconnect
+          echo "$APPLE_NOTARY_KEY" > ~/.appstoreconnect/AuthKey.p8
+          chmod 600 ~/.appstoreconnect/AuthKey.p8
+          echo "APPLE_NOTARY_KEY_FILE=$HOME/.appstoreconnect/AuthKey.p8" >> $GITHUB_ENV
+
+      - name: Set notarization credentials
+        run: |
+          echo "APPLE_DEVELOPER_TEAM_ID=${{ secrets.APPLE_DEVELOPER_TEAM_ID }}" >> $GITHUB_ENV
+          echo "APPLE_NOTARY_KEY_ID=${{ secrets.APPLE_NOTARY_KEY_ID }}" >> $GITHUB_ENV
+          echo "APPLE_NOTARY_KEY_ISSUER_ID=${{ secrets.APPLE_NOTARY_KEY_ISSUER_ID }}" >> $GITHUB_ENV
+          # GITHUB_TOKEN is already set by Actions
+
+      - name: Build, sign, notarize, and package DMG
+        run: ./script/release.sh
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: automation-health-dmg
+          path: dist/AutomationHealth-*.dmg
+          retention-days: 30
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DMG_FILE=$(ls dist/AutomationHealth-*.dmg | head -1)
+          VERSION="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" \
+            --title "Automation Health v$VERSION" \
+            --notes "## Automation Health v$VERSION
+
+          ### Installation
+
+          1. Download the DMG below
+          2. Open the DMG
+          3. Drag Automation Health to your Applications folder
+
+          ### Verification
+
+          This release is signed and notarized by Apple. macOS Gatekeeper will allow it to run without security warnings.
+
+          ### Building from Source
+
+          See [README.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for source build instructions." \
+            --verify-tag \
+            "$DMG_FILE"
+
+      - name: Verify release assets
+        run: |
+          echo "Release created: ${{ github.ref_name }}"
+          DMG_FILE=$(ls dist/AutomationHealth-*.dmg | head -1)
+          echo "DMG: $DMG_FILE"
+          ls -lh "$DMG_FILE"
+          xcrun stapler validate "$DMG_FILE" && echo "Staple ticket present" || echo "Warning: Staple ticket not found"
