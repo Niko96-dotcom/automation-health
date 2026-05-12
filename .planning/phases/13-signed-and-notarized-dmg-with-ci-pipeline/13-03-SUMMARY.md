@@ -22,8 +22,8 @@ key-files:
 affected:
   - docs/release-process.md — references script/release.sh and .github/workflows/release.yml
   - README.md — links to docs/release-process.md and GitHub Releases
-duration_seconds: 0
-completed_date: ""
+duration_seconds: 180
+completed_date: "2026-05-12"
 ---
 
 # Phase 13 Plan 03: Release Documentation and Distribution Status Summary
