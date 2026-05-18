@@ -69,6 +69,9 @@ cat >"$INFO_PLIST" <<PLIST
 </plist>
 PLIST
 
+"$ROOT_DIR/script/embed_sparkle_framework.sh" "$APP_BUNDLE" debug
+codesign --force --deep --sign - "$APP_BUNDLE" >/dev/null 2>&1 || true
+
 open_app() {
   /usr/bin/open -n "$APP_BUNDLE"
 }

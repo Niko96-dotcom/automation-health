@@ -123,6 +123,9 @@ cat >"$CONTENTS/Info.plist" <<PLIST
 </plist>
 PLIST
 
+echo "=== Step 3d: Embed Sparkle.framework ==="
+"$ROOT_DIR/script/embed_sparkle_framework.sh" "$APP_BUNDLE" release
+
 echo "=== Step 4: Codesign .app bundle with hardened runtime ==="
 codesign --deep --force --verify --verbose \
   --sign "$APPLE_DEVELOPER_IDENTITY" \
