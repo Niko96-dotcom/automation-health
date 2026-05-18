@@ -86,7 +86,7 @@ final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
               !version.contains("0.0.0") else {
             return nil
         }
-        return "https://github.com/nikomohr/AutomationHealth/releases/download/v\(version)/appcast.xml"
+        return "https://github.com/Niko96-dotcom/automation-health/releases/download/v\(version)/appcast.xml"
     }
 
     /// Called when Sparkle discovers a valid update in the appcast.

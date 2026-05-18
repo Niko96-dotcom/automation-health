@@ -82,7 +82,7 @@ The committed source art lives at `Assets/AppIcon/automation-health-icon-source.
 
 ## Current Distribution Status
 
-Automation Health ships as a signed and notarized DMG from [GitHub Releases](https://github.com/nikomohr/AutomationHealth/releases). Download the latest `AutomationHealth-*.dmg`, open it, and drag to your Applications folder.
+Automation Health ships as a signed and notarized DMG from [GitHub Releases](https://github.com/Niko96-dotcom/automation-health/releases). Download the latest `AutomationHealth-*.dmg`, open it, and drag to your Applications folder.
 
 The DMG is codesigned with a Developer ID, includes hardened runtime, and is notarized by Apple. macOS Gatekeeper allows it to run without security warnings.
 
