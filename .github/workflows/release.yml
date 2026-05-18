@@ -91,6 +91,19 @@ jobs:
           echo "SPARKLE_EDDSA_PRIVATE_KEY=$SPARKLE_EDDSA_PRIVATE_KEY" >> $GITHUB_ENV
           echo "SU_PUBLIC_ED_KEY=$SU_PUBLIC_ED_KEY" >> $GITHUB_ENV
 
+      - name: Download Sparkle tools for appcast
+        run: |
+          SPARKLE_VERSION="2.9.1"
+          SPARKLE_ZIP="Sparkle-for-Swift-Package-Manager.zip"
+          SPARKLE_URL="https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/${SPARKLE_ZIP}"
+          SPARKLE_DL_DIR="$GITHUB_WORKSPACE/.sparkle-tools"
+          if [[ ! -f "$SPARKLE_DL_DIR/bin/generate_appcast" ]]; then
+            mkdir -p "$SPARKLE_DL_DIR"
+            curl -fsSL -o "$SPARKLE_DL_DIR/$SPARKLE_ZIP" "$SPARKLE_URL"
+            unzip -q -o "$SPARKLE_DL_DIR/$SPARKLE_ZIP" -d "$SPARKLE_DL_DIR"
+          fi
+          test -x "$(find "$SPARKLE_DL_DIR" -name generate_appcast -type f | head -1)"
+
       - name: Build, sign, notarize, and package DMG
         id: build
         run: |
@@ -135,8 +148,12 @@ jobs:
 
           See [README.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for source build instructions." \
             --verify-tag \
-            "$DMG_PATH" \
-            dist/appcast.xml
+            "$DMG_PATH"
+          if [[ -f dist/appcast.xml ]]; then
+            gh release upload "$GITHUB_REF_NAME" dist/appcast.xml
+          else
+            echo "Warning: dist/appcast.xml not found; Sparkle auto-update feed was not attached." >&2
+          fi
 
       - name: Verify release assets
         run: |
