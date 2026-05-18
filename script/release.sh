@@ -278,7 +278,10 @@ else
       # The DMG will be uploaded to GitHub Releases at:
       # https://github.com/Niko96-dotcom/automation-health/releases/download/v{VERSION}/{DMG_FILENAME}
       # Update enclosure URLs in the appcast to point to the final GitHub Releases URL
-      sed -i '' "s|file://$APPCAST_DIR/$DMG_FILENAME|https://github.com/Niko96-dotcom/automation-health/releases/download/v$VERSION/$DMG_FILENAME|g" \
+      RELEASE_URL="https://github.com/Niko96-dotcom/automation-health/releases/download/v$VERSION/$DMG_FILENAME"
+      sed -i '' \
+        -e "s|file://$APPCAST_DIR/$DMG_FILENAME|$RELEASE_URL|g" \
+        -e "s|url=\"$DMG_FILENAME\"|url=\"$RELEASE_URL\"|g" \
         "$ROOT_DIR/dist/appcast.xml" 2>/dev/null || true
       echo "Appcast URLs updated to GitHub Releases for v$VERSION"
     fi
