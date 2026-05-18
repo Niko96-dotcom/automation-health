@@ -263,9 +263,8 @@ else
     mkdir -p "$APPCAST_DIR"
     cp "$DMG_PATH" "$APPCAST_DIR/"
 
-    # Generate the appcast with EdDSA signing
-    # generate_appcast expects the private key via the -f flag (file path).
-    "$GENERATE_APPCAST" -f "$STAGING/sparkle-private-key" "$APPCAST_DIR" 2>&1 || {
+    # Generate the appcast with EdDSA signing (--ed-key-file, not legacy -f DSA).
+    "$GENERATE_APPCAST" --ed-key-file "$STAGING/sparkle-private-key" "$APPCAST_DIR" 2>&1 || {
       echo "Warning: generate_appcast failed (see above). Continuing without appcast." >&2
     }
 
