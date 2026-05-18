@@ -130,9 +130,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          gh release create "$GITHUB_REF_NAME" \
-            --title "Automation Health v$VERSION" \
-            --notes "## Automation Health v$VERSION
+          RELEASE_NOTES="## Automation Health v$VERSION
 
           ### Installation
 
@@ -146,14 +144,25 @@ jobs:
 
           ### Building from Source
 
-          See [README.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for source build instructions." \
-            --verify-tag \
-            "$DMG_PATH"
+          See [README.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/README.md) for source build instructions."
+
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME already exists; uploading assets only."
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "Automation Health v$VERSION" \
+              --notes "$RELEASE_NOTES" \
+              --verify-tag \
+              "$DMG_PATH"
+          fi
+
+          UPLOAD_ASSETS=("$DMG_PATH")
           if [[ -f dist/appcast.xml ]]; then
-            gh release upload "$GITHUB_REF_NAME" dist/appcast.xml
+            UPLOAD_ASSETS+=(dist/appcast.xml)
           else
             echo "Warning: dist/appcast.xml not found; Sparkle auto-update feed was not attached." >&2
           fi
+          gh release upload "$GITHUB_REF_NAME" "${UPLOAD_ASSETS[@]}" --clobber
 
       - name: Verify release assets
         run: |
