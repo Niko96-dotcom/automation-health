@@ -44,8 +44,12 @@ final class UpdateStore: ObservableObject {
         updater.publisher(for: \.sessionInProgress)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] inProgress in
+                guard let self else { return }
                 if inProgress {
-                    self?.updateState = .checking
+                    updateState = .checking
+                } else if case .checking = updateState {
+                    // Sparkle clears sessionInProgress before delegate callbacks in some paths.
+                    updateState = .idle
                 }
             }
             .store(in: &cancellables)
@@ -75,8 +79,11 @@ final class UpdateStore: ObservableObject {
 final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
     var store: UpdateStore?
 
+    private static let releaseAppcastFeedURL =
+        "https://github.com/Niko96-dotcom/automation-health/releases/latest/download/appcast.xml"
+
     /// Provides the appcast feed URL for the Sparkle updater.
-    /// Uses the GitHub Releases pattern established in Phase 13.
+    /// Uses the latest GitHub Release asset so older installed versions can discover new builds.
     /// Dev builds (suffixed with -dev or version 0.0.0) return nil
     /// because no corresponding release appcast exists to check against.
     func feedURLString(for updater: SPUUpdater) -> String? {
@@ -86,7 +93,7 @@ final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
               !version.contains("0.0.0") else {
             return nil
         }
-        return "https://github.com/Niko96-dotcom/automation-health/releases/download/v\(version)/appcast.xml"
+        return Self.releaseAppcastFeedURL
     }
 
     /// Called when Sparkle discovers a valid update in the appcast.
@@ -96,11 +103,36 @@ final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
 
     /// Called when Sparkle completes a check and finds no update.
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: Error) {
-        store?.updateState = .upToDate
+        store?.applyUpdateCheckResult(error)
+    }
+
+    /// Called when the update driver finishes an update check cycle.
+    func updater(
+        _ updater: SPUUpdater,
+        didFinishUpdateCycleFor updateCheck: SPUUpdateCheck,
+        error: (any Error)?
+    ) {
+        guard let store else { return }
+        if let error {
+            store.applyUpdateCheckResult(error)
+        } else if case .checking = store.updateState {
+            store.updateState = .idle
+        }
     }
 
     /// Called when the update driver aborts with an error (e.g. download failure).
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
         store?.updateState = .error(message: error.localizedDescription)
+    }
+}
+
+extension UpdateStore {
+    fileprivate func applyUpdateCheckResult(_ error: Error) {
+        let nsError = error as NSError
+        if nsError.domain == SUSparkleErrorDomain, nsError.code == SUError.noUpdateError.rawValue {
+            updateState = .upToDate
+        } else {
+            updateState = .error(message: error.localizedDescription)
+        }
     }
 }
