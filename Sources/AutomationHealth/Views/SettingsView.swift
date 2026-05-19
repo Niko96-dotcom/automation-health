@@ -52,7 +52,15 @@ struct SettingsView: View {
             }
 
             Section("Updates") {
-                if case .error(let message) = updateStore.updateState {
+                if let reason = updateStore.updatesUnavailableReason {
+                    LabeledContent("Update checking is unavailable") {
+                        Text("Unavailable")
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(reason)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else if case .error(let message) = updateStore.updateState {
                     LabeledContent("Update checking is unavailable") {
                         Text("Unavailable")
                             .foregroundStyle(.secondary)

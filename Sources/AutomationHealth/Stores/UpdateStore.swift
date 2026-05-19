@@ -17,6 +17,7 @@ final class UpdateStore: ObservableObject {
     @Published var canCheckForUpdates: Bool = false
     @Published var updateState: UpdateState = .idle
     @Published var automaticallyChecksForUpdates: Bool = true
+    @Published var updatesUnavailableReason: String?
 
     let updater: SPUUpdater
 
@@ -27,13 +28,22 @@ final class UpdateStore: ObservableObject {
             ?? "Unknown"
         self.automaticallyChecksForUpdates = updater.automaticallyChecksForUpdates
         self.canCheckForUpdates = updater.canCheckForUpdates
+        updatesUnavailableReason = Self.updatesUnavailableReasonIfAny()
     }
 
     func startUpdater() {
+        if let reason = updatesUnavailableReason {
+            canCheckForUpdates = false
+            automaticallyChecksForUpdates = false
+            updater.automaticallyChecksForUpdates = false
+            return
+        }
+
         do {
             try updater.start()
         } catch {
             updateState = .error(message: error.localizedDescription)
+            canCheckForUpdates = false
             return
         }
 
@@ -127,6 +137,23 @@ final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
 }
 
 extension UpdateStore {
+    static func updatesUnavailableReasonIfAny() -> String? {
+        guard let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+            return "This build has no bundle version."
+        }
+
+        if version.hasSuffix("-dev") || version.contains("0.0.0") {
+            return "Local development builds do not check for updates. Install a release from GitHub Releases to use Sparkle."
+        }
+
+        guard let publicKey = Bundle.main.infoDictionary?["SUPublicEDKey"] as? String,
+              !publicKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return "This build has no Sparkle public key configured."
+        }
+
+        return nil
+    }
+
     fileprivate func applyUpdateCheckResult(_ error: Error) {
         let nsError = error as NSError
         if nsError.domain == SUSparkleErrorDomain, nsError.code == SUError.noUpdateError.rawValue {

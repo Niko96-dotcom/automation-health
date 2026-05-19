@@ -59,8 +59,16 @@ cat >"$INFO_PLIST" <<PLIST
   <string>$MIN_SYSTEM_VERSION</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
+PLIST
+
+if [ -n "${SU_PUBLIC_ED_KEY:-}" ]; then
+  cat >>"$INFO_PLIST" <<PLIST
   <key>SUPublicEDKey</key>
-  <string>${SU_PUBLIC_ED_KEY:-}</string>
+  <string>$SU_PUBLIC_ED_KEY</string>
+PLIST
+fi
+
+cat >>"$INFO_PLIST" <<PLIST
   <key>CFBundleShortVersionString</key>
   <string>0.0.0-dev</string>
   <key>CFBundleVersion</key>
