@@ -1,4 +1,3 @@
-import Sparkle
 import SwiftUI
 import AutomationHealthCore
 
@@ -80,6 +79,12 @@ struct SettingsView: View {
                         } else {
                             Text(updateStore.currentVersion)
                         }
+                    }
+
+                    if let statusMessage = updateStore.checkStatusMessage {
+                        Text(statusMessage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
 
                     Toggle("Automatically check for updates", isOn: Binding(

@@ -86,6 +86,17 @@ final class UpdateStore: NSObject, ObservableObject {
         updater.automaticallyChecksForUpdates = enabled
     }
 
+    var checkStatusMessage: String? {
+        switch updateState {
+        case .upToDate:
+            return "You're up to date."
+        case .updateAvailable(let version):
+            return "Update available: \(version). Use Check for Updates to install."
+        case .idle, .checking, .error:
+            return nil
+        }
+    }
+
     private var cancellables = Set<AnyCancellable>()
 }
 
