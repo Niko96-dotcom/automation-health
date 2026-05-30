@@ -19,6 +19,16 @@ struct SettingsView: View {
         )
     }
 
+    private var updatesBlockedMessage: String? {
+        if let reason = updateStore.updatesUnavailableReason {
+            return reason
+        }
+        if case .error(let message) = updateStore.updateState {
+            return message
+        }
+        return nil
+    }
+
     var body: some View {
         Form {
             Section("Default View") {
@@ -51,20 +61,12 @@ struct SettingsView: View {
             }
 
             Section("Updates") {
-                if let reason = updateStore.updatesUnavailableReason {
+                if let blockedMessage = updatesBlockedMessage {
                     LabeledContent("Update checking is unavailable") {
                         Text("Unavailable")
                             .foregroundStyle(.secondary)
                     }
-                    Text(reason)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else if case .error(let message) = updateStore.updateState {
-                    LabeledContent("Update checking is unavailable") {
-                        Text("Unavailable")
-                            .foregroundStyle(.secondary)
-                    }
-                    Text(message)
+                    Text(blockedMessage)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
