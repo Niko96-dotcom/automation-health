@@ -99,8 +99,7 @@ final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
     func feedURLString(for updater: SPUUpdater) -> String? {
         guard let info = Bundle.main.infoDictionary,
               let version = info["CFBundleShortVersionString"] as? String,
-              !version.hasSuffix("-dev"),
-              !version.contains("0.0.0") else {
+              !UpdateStore.isLocalDevelopmentVersion(version) else {
             return nil
         }
         return Self.releaseAppcastFeedURL
@@ -137,12 +136,16 @@ final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
 }
 
 extension UpdateStore {
+    static func isLocalDevelopmentVersion(_ version: String) -> Bool {
+        version.hasSuffix("-dev") || version == "0.0.0-dev" || version == "0.0.0"
+    }
+
     static func updatesUnavailableReasonIfAny() -> String? {
         guard let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
             return "This build has no bundle version."
         }
 
-        if version.hasSuffix("-dev") || version.contains("0.0.0") {
+        if Self.isLocalDevelopmentVersion(version) {
             return "Local development builds do not check for updates. Install a release from GitHub Releases to use Sparkle."
         }
 
