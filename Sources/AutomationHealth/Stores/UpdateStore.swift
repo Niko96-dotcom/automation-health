@@ -21,18 +21,21 @@ final class UpdateStore: ObservableObject {
 
     let updater: SPUUpdater
 
-    init(updater: SPUUpdater) {
+    private let policy: UpdatePolicy
+
+    init(updater: SPUUpdater, policy: UpdatePolicy = .current()) {
         self.updater = updater
+        self.policy = policy
         self.currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
             ?? Bundle.main.infoDictionary?["CFBundleVersion"] as? String
             ?? "Unknown"
         self.automaticallyChecksForUpdates = updater.automaticallyChecksForUpdates
         self.canCheckForUpdates = updater.canCheckForUpdates
-        updatesUnavailableReason = Self.updatesUnavailableReasonIfAny()
+        updatesUnavailableReason = policy.unavailableReason
     }
 
     func startUpdater() {
-        if let reason = updatesUnavailableReason {
+        if updatesUnavailableReason != nil {
             canCheckForUpdates = false
             automaticallyChecksForUpdates = false
             updater.automaticallyChecksForUpdates = false
@@ -89,20 +92,14 @@ final class UpdateStore: ObservableObject {
 final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
     var store: UpdateStore?
 
-    private static let releaseAppcastFeedURL =
-        "https://github.com/Niko96-dotcom/automation-health/releases/latest/download/appcast.xml"
+    private let policy: UpdatePolicy
 
-    /// Provides the appcast feed URL for the Sparkle updater.
-    /// Uses the latest GitHub Release asset so older installed versions can discover new builds.
-    /// Dev builds (suffixed with -dev or version 0.0.0) return nil
-    /// because no corresponding release appcast exists to check against.
+    init(policy: UpdatePolicy = .current()) {
+        self.policy = policy
+    }
+
     func feedURLString(for updater: SPUUpdater) -> String? {
-        guard let info = Bundle.main.infoDictionary,
-              let version = info["CFBundleShortVersionString"] as? String,
-              !UpdateStore.isLocalDevelopmentVersion(version) else {
-            return nil
-        }
-        return Self.releaseAppcastFeedURL
+        policy.feedURLString
     }
 
     /// Called when Sparkle discovers a valid update in the appcast.
@@ -136,27 +133,6 @@ final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
 }
 
 extension UpdateStore {
-    static func isLocalDevelopmentVersion(_ version: String) -> Bool {
-        version.hasSuffix("-dev") || version == "0.0.0-dev" || version == "0.0.0"
-    }
-
-    static func updatesUnavailableReasonIfAny() -> String? {
-        guard let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
-            return "This build has no bundle version."
-        }
-
-        if Self.isLocalDevelopmentVersion(version) {
-            return "Local development builds do not check for updates. Install a release from GitHub Releases to use Sparkle."
-        }
-
-        guard let publicKey = Bundle.main.infoDictionary?["SUPublicEDKey"] as? String,
-              !publicKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return "This build has no Sparkle public key configured."
-        }
-
-        return nil
-    }
-
     fileprivate func applyUpdateCheckResult(_ error: Error) {
         let nsError = error as NSError
         if nsError.domain == SUSparkleErrorDomain, nsError.code == SUError.noUpdateError.rawValue {
