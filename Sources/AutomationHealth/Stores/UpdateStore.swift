@@ -12,25 +12,37 @@ enum UpdateState: Equatable {
 }
 
 @MainActor
-final class UpdateStore: ObservableObject {
+final class UpdateStore: NSObject, ObservableObject {
     @Published var currentVersion: String = ""
     @Published var canCheckForUpdates: Bool = false
     @Published var updateState: UpdateState = .idle
     @Published var automaticallyChecksForUpdates: Bool = true
     @Published var updatesUnavailableReason: String?
 
-    let updater: SPUUpdater
-
+    private var updater: SPUUpdater!
     private let policy: UpdatePolicy
 
-    init(updater: SPUUpdater, policy: UpdatePolicy = .current()) {
-        self.updater = updater
+    static func make(bundle: Bundle = .main) -> UpdateStore {
+        UpdateStore(policy: .current(bundle: bundle), bundle: bundle)
+    }
+
+    private init(policy: UpdatePolicy, bundle: Bundle) {
         self.policy = policy
-        self.currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-            ?? Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+        super.init()
+
+        let userDriver = SPUStandardUserDriver(hostBundle: bundle, delegate: nil)
+        self.updater = SPUUpdater(
+            hostBundle: bundle,
+            applicationBundle: bundle,
+            userDriver: userDriver,
+            delegate: self
+        )
+
+        currentVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String
+            ?? bundle.infoDictionary?["CFBundleVersion"] as? String
             ?? "Unknown"
-        self.automaticallyChecksForUpdates = updater.automaticallyChecksForUpdates
-        self.canCheckForUpdates = updater.canCheckForUpdates
+        automaticallyChecksForUpdates = updater.automaticallyChecksForUpdates
+        canCheckForUpdates = updater.canCheckForUpdates
         updatesUnavailableReason = policy.unavailableReason
     }
 
@@ -60,9 +72,6 @@ final class UpdateStore: ObservableObject {
                 guard let self else { return }
                 if inProgress {
                     updateState = .checking
-                } else if case .checking = updateState {
-                    // Sparkle clears sessionInProgress before delegate callbacks in some paths.
-                    updateState = .idle
                 }
             }
             .store(in: &cancellables)
@@ -77,63 +86,39 @@ final class UpdateStore: ObservableObject {
         updater.automaticallyChecksForUpdates = enabled
     }
 
-    // MARK: - Private
-
     private var cancellables = Set<AnyCancellable>()
 }
 
-// MARK: - Sparkle Delegate Bridge
-
-/// Bridges SPUUpdaterDelegate callbacks to UpdateStore's published state.
-/// Instantiated by AutomationHealthApp (plan 14-02) and passed as the
-/// SPUUpdater's delegate.  UpdateStore observes KVO properties; the delegate
-/// transitions updateState for events KVO does not cover (found/not-found/error).
-@MainActor
-final class UpdateStoreDelegate: NSObject, SPUUpdaterDelegate {
-    var store: UpdateStore?
-
-    private let policy: UpdatePolicy
-
-    init(policy: UpdatePolicy = .current()) {
-        self.policy = policy
-    }
-
+extension UpdateStore: SPUUpdaterDelegate {
     func feedURLString(for updater: SPUUpdater) -> String? {
         policy.feedURLString
     }
 
-    /// Called when Sparkle discovers a valid update in the appcast.
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
-        store?.updateState = .updateAvailable(version: item.displayVersionString)
+        updateState = .updateAvailable(version: item.displayVersionString)
     }
 
-    /// Called when Sparkle completes a check and finds no update.
     func updaterDidNotFindUpdate(_ updater: SPUUpdater, error: Error) {
-        store?.applyUpdateCheckResult(error)
+        applyUpdateCheckResult(error)
     }
 
-    /// Called when the update driver finishes an update check cycle.
     func updater(
         _ updater: SPUUpdater,
         didFinishUpdateCycleFor updateCheck: SPUUpdateCheck,
         error: (any Error)?
     ) {
-        guard let store else { return }
         if let error {
-            store.applyUpdateCheckResult(error)
-        } else if case .checking = store.updateState {
-            store.updateState = .idle
+            applyUpdateCheckResult(error)
+        } else if case .checking = updateState {
+            updateState = .idle
         }
     }
 
-    /// Called when the update driver aborts with an error (e.g. download failure).
     func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
-        store?.updateState = .error(message: error.localizedDescription)
+        updateState = .error(message: error.localizedDescription)
     }
-}
 
-extension UpdateStore {
-    fileprivate func applyUpdateCheckResult(_ error: Error) {
+    private func applyUpdateCheckResult(_ error: Error) {
         let nsError = error as NSError
         if nsError.domain == SUSparkleErrorDomain, nsError.code == SUError.noUpdateError.rawValue {
             updateState = .upToDate

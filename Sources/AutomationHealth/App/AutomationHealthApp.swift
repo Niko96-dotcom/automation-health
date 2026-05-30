@@ -1,5 +1,4 @@
 import AppKit
-import Sparkle
 import SwiftUI
 import ActiveJobsCore
 
@@ -22,18 +21,7 @@ struct AutomationHealthApp: App {
         _preferences = StateObject(wrappedValue: prefs)
         _store = StateObject(wrappedValue: JobStore(preferences: prefs))
 
-        let updaterDelegate = UpdateStoreDelegate() // store: will be set below
-
-        let userDriver = SPUStandardUserDriver(hostBundle: Bundle.main, delegate: nil)
-        let sparkleUpdater = SPUUpdater(
-            hostBundle: Bundle.main,
-            applicationBundle: Bundle.main,
-            userDriver: userDriver,
-            delegate: updaterDelegate
-        )
-        let store = UpdateStore(updater: sparkleUpdater)
-        updaterDelegate.store = store
-        _updateStore = StateObject(wrappedValue: store)
+        _updateStore = StateObject(wrappedValue: UpdateStore.make())
     }
 
     var body: some Scene {
