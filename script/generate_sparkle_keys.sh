@@ -2,37 +2,26 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SPARKLE_VERSION="2.9.1"
-SPARKLE_ZIP="Sparkle-for-Swift-Package-Manager.zip"
-SPARKLE_URL="https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_VERSION}/${SPARKLE_ZIP}"
-SPARKLE_DL_DIR="$ROOT_DIR/.sparkle-tools"
+# shellcheck source=sparkle_tools.sh
+source "$ROOT_DIR/script/sparkle_tools.sh"
 
 echo "=== Sparkle EdDSA Key Generator ==="
 echo ""
 
-# Step 1: Download Sparkle release if not already cached
-if [[ ! -d "$SPARKLE_DL_DIR" ]]; then
-  echo "=== Downloading Sparkle ${SPARKLE_VERSION} tools ==="
-  mkdir -p "$SPARKLE_DL_DIR"
-  curl -fsSL -o "$SPARKLE_DL_DIR/$SPARKLE_ZIP" "$SPARKLE_URL"
-  unzip -q -o "$SPARKLE_DL_DIR/$SPARKLE_ZIP" -d "$SPARKLE_DL_DIR"
-  echo "Sparkle tools extracted to $SPARKLE_DL_DIR"
-else
-  echo "Sparkle tools already cached at $SPARKLE_DL_DIR"
-fi
+TOOLS_DIR="$(ensure_sparkle_tools "$ROOT_DIR")"
+echo "Using Sparkle tools at $TOOLS_DIR"
+echo ""
 
-# Step 2: Locate generate_keys binary
-GENERATE_KEYS="$(find "$SPARKLE_DL_DIR" -name "generate_keys" -type f -perm +111 2>/dev/null | head -1)"
+GENERATE_KEYS="$(find_sparkle_tool "$ROOT_DIR" generate_keys)"
 if [[ -z "$GENERATE_KEYS" ]]; then
   echo "Error: Could not find generate_keys binary in Sparkle release." >&2
-  echo "Check $SPARKLE_DL_DIR for contents." >&2
+  echo "Check $TOOLS_DIR for contents." >&2
   exit 1
 fi
 
 echo "=== Running generate_keys ==="
 echo ""
 
-# Run generate_keys
 PUBLIC_KEY="$("$GENERATE_KEYS" 2>/dev/null)"
 GEN_EXIT=$?
 
@@ -67,4 +56,4 @@ echo ""
 echo "3. Save the output as GitHub Secret: SPARKLE_EDDSA_PRIVATE_KEY"
 echo ""
 echo "4. Clean up Sparkle tools when done:"
-echo "   rm -rf $SPARKLE_DL_DIR"
+echo "   rm -rf $TOOLS_DIR"

@@ -14,7 +14,7 @@ let package = Package(
         .executable(name: "ActiveJobsCoreSelfTest", targets: ["ActiveJobsCoreSelfTest"])
     ],
     dependencies: [
-        .package(url: "https://github.com/sparkle-project/Sparkle", branch: "2.x")
+        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.9.1")
     ],
     targets: [
         .target(name: "ActiveJobsCore"),

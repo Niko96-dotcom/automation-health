@@ -244,13 +244,10 @@ elif [ -z "${SPARKLE_EDDSA_PRIVATE_KEY:-}" ]; then
   echo "Generate keys: ./script/generate_sparkle_keys.sh" >&2
   echo "Export for CI: security find-generic-password -s 'Sparkle Private Key' -w | base64" >&2
 else
-  # Locate Sparkle tools from the generate_keys script cache, or try SPM checkout
-  SPARKLE_TOOLS_DIR="$ROOT_DIR/.sparkle-tools"
-  if [[ ! -d "$SPARKLE_TOOLS_DIR" ]]; then
-    SPARKLE_TOOLS_DIR="$ROOT_DIR/.build/checkouts/Sparkle"
-  fi
-
-  GENERATE_APPCAST="$(find "$SPARKLE_TOOLS_DIR" -name "generate_appcast" -type f -perm +111 2>/dev/null | head -1)"
+  # shellcheck source=sparkle_tools.sh
+  source "$ROOT_DIR/script/sparkle_tools.sh"
+  ensure_sparkle_tools "$ROOT_DIR" >/dev/null
+  GENERATE_APPCAST="$(find_sparkle_tool "$ROOT_DIR" generate_appcast)"
   if [[ -z "$GENERATE_APPCAST" ]]; then
     echo "Warning: Could not find generate_appcast tool. Appcast generation skipped." >&2
     echo "Run ./script/generate_sparkle_keys.sh first to cache Sparkle tools." >&2
