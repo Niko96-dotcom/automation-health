@@ -4,8 +4,8 @@ milestone: v1.3
 milestone_name: Shippable Distribution
 status: Awaiting next milestone
 stopped_at: v1.3 roadmap created
-last_updated: "2026-05-12T09:54:03.541Z"
-last_activity: 2026-05-12 — Milestone v1.3 completed and archived
+last_updated: "2026-05-19T08:04:00.000Z"
+last_activity: 2026-05-19 — v1.3 shipped to GitHub Releases (DMG + appcast); release CI green
 progress:
   total_phases: 2
   completed_phases: 2
@@ -133,7 +133,7 @@ Items acknowledged and deferred at milestone close on 2026-05-11:
 | verification_gap | Phase 11: 11-VERIFICATION.md | human_needed | v1.2 close |
 | verification_gap | Phase 12: 12-VERIFICATION.md | human_needed | v1.2 close |
 | Distribution | Signed/notarized release artifact | Resolved | v1.3 scoping |
-| verification_gap | Phase 14: 14-VERIFICATION.md | human_needed | v1.3 close |
+| verification_gap | Phase 14: 14-VERIFICATION.md | human_needed | v1.3 close — install DMG from release, test Check for Updates |
 
 Previously deferred items now resolved in v1.2:
 
@@ -150,4 +150,6 @@ Resume file: None
 
 ## Operator Next Steps
 
+- v1.3 release: https://github.com/Niko96-dotcom/automation-health/releases/tag/v1.3
+- Optional UAT: install DMG, open Settings → Updates → Check for Updates
 - Start the next milestone with /gsd-new-milestone
