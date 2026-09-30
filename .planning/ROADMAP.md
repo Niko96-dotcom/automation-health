@@ -1,5 +1,7 @@
 # Roadmap: Automation Health
 
+**Retired on 2026-09-30.** This roadmap records completed historical milestones. The final maintenance release is v1.3.2; see [the retirement record](../docs/retirement.md). There is no active planning workflow.
+
 ## Milestones
 
 - ✅ **v1.0 Sidebar Navigation** — Phases 1-3 shipped 2026-05-08; 8 plans, 23 tasks. Archives: [roadmap](milestones/v1.0-ROADMAP.md), [requirements](milestones/v1.0-REQUIREMENTS.md), [audit](milestones/v1.0-MILESTONE-AUDIT.md).
@@ -39,8 +41,6 @@
 
 </details>
 
-</details>
-
 <details>
 <summary>✅ v1.3 Shippable Distribution (Phases 13-14) — shipped 2026-05-12</summary>
 
@@ -51,7 +51,7 @@
 
 ## Next Milestone
 
-_None planned. Run `/gsd-new-milestone` to start the next milestone._
+_None planned. The project is retired._
 
 ## Progress
 

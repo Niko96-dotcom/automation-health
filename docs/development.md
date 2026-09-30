@@ -2,6 +2,8 @@
 
 Run commands from the repo root.
 
+The upstream project was retired on 2026-09-30. These commands remain available for maintaining a fork or reproducing the archived source. See [the retirement record](retirement.md).
+
 ## Common Commands
 
 Show available developer targets:
@@ -71,7 +73,8 @@ Verify that the generated local app bundle contains and declares the icon:
 - `Package.swift`: SwiftPM manifest.
 - `Makefile`: short aliases for build, test, CI, app launch, logs, and cleanup.
 - `Sources/ActiveJobsCore`: scheduler scanners, shared models, and support helpers.
-- `Sources/AutomationHealth`: SwiftUI app, views, store, and presentation model.
+- `Sources/AutomationHealthCore`: presentation models, grouping, and navigation helpers shared with the self-test.
+- `Sources/AutomationHealth`: SwiftUI app, views, preferences, job store, and Sparkle update store.
 - `Sources/ActiveJobsCoreSelfTest`: executable self-test target.
 - `script/ci.sh`: local and CI quality gate.
 - `script/test.sh`: test runner used by the CI gate.
@@ -88,9 +91,9 @@ Verify that the generated local app bundle contains and declares the icon:
 
 ## Local App Bundle Status
 
-`script/build_and_run.sh` generates `dist/AutomationHealth.app` for local development. The generated bundle is unsigned, unsandboxed, and not notarized.
+`script/build_and_run.sh` generates `dist/AutomationHealth.app` for local development. The generated bundle is ad-hoc signed, unsandboxed, and not notarized. Its version is `0.0.0-dev`, and Sparkle update checks are disabled with an explanation in Settings.
 
-Signed and notarized distribution remains out of scope for this milestone.
+Developer ID signing, notarization, DMG packaging, and appcast generation belong to the separate release workflow described in [the release process](release-process.md).
 
 ## Notes
 

@@ -1,5 +1,9 @@
 # Automation Health
 
+**Retired on 2026-09-30.** Development is complete and this repository is preserved as an archive. No further features, maintenance releases, or support are planned. The MIT license remains in effect.
+
+The final maintenance release is [v1.3.2](https://github.com/Niko96-dotcom/automation-health/releases/tag/v1.3.2). It includes the updater fixes that were already on `main` but absent from v1.3.1. See [the retirement record](docs/retirement.md) for verification evidence and remaining limitations.
+
 Automation Health is a local macOS SwiftUI app for inspecting automation records on this Mac. It collects records from supported scheduler sources, bounded candidate script folders, and app-owned manual metadata, then shows detail needed to understand what each automation is configured to do.
 
 The app is intentionally read-only and local for real automations. It scans scheduler definitions and readable output on this Mac, keeps scan data on this Mac, and does not create, edit, enable, disable, or delete real jobs. Manual records are app-owned metadata only.
@@ -77,12 +81,12 @@ Build the local app bundle:
 
 The generated bundle is written to `dist/AutomationHealth.app`.
 
-App icon assets are generated locally from committed source art; see docs/development.md for regeneration steps.
+App icon assets are generated locally from committed source art; see [development documentation](docs/development.md) for regeneration steps.
 The committed source art lives at `Assets/AppIcon/automation-health-icon-source.png`.
 
 ## Current Distribution Status
 
-Automation Health ships as a signed and notarized DMG from [GitHub Releases](https://github.com/Niko96-dotcom/automation-health/releases). Download the latest `AutomationHealth-*.dmg`, open it, and drag to your Applications folder.
+The final signed and notarized DMG is retained in [GitHub Releases](https://github.com/Niko96-dotcom/automation-health/releases/tag/v1.3.2). Download `AutomationHealth-1.3.2.dmg`, open it, and drag to your Applications folder. Older v1.3 and v1.3.1 installations can report a missing appcast URL; install v1.3.2 directly to receive the existing updater fixes.
 
 The DMG is codesigned with a Developer ID, includes hardened runtime, and is notarized by Apple. macOS Gatekeeper allows it to run without security warnings.
 
@@ -114,7 +118,7 @@ You can also build and run locally without code signing:
 
 ## Contributing
 
-Start with [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/development.md](docs/development.md) for the local workflow, pull request checklist, and CI details.
+This repository is retired and does not accept new issues or pull requests. The archived [contributor guide](CONTRIBUTING.md) and [development documentation](docs/development.md) remain available for anyone maintaining a fork.
 
 Scanner contributors should also read [docs/architecture.md](docs/architecture.md), [docs/scheduled-job-sources.md](docs/scheduled-job-sources.md), and [docs/scanner-extension-guide.md](docs/scanner-extension-guide.md).
 

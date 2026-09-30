@@ -1,8 +1,12 @@
 # Support
 
+Automation Health was retired on 2026-09-30. The archived repository does not accept new issues or provide ongoing support. Existing source, release assets, and documentation remain available under the MIT license. See [the retirement record](docs/retirement.md).
+
 Automation Health is a local, best-effort inspection tool for scheduled jobs. Support is focused on the app, scanner behavior, documentation, and contributor workflow.
 
 ## Where To Ask
+
+The following routing is retained for maintainers of active forks:
 
 - Use the bug report issue form for reproducible app, scanner, build, or documentation problems.
 - Use the feature request issue form for new scanner sources, UI ideas, or workflow improvements.
@@ -16,4 +20,4 @@ Support cannot diagnose private local automations from raw output. If a report n
 
 ## Response Expectations
 
-This project does not promise 24/7 support or guaranteed response times. Maintainers and contributors will triage reports as availability allows.
+The retired upstream project will not triage new reports. Contact the maintainer of an active fork for its support policy.

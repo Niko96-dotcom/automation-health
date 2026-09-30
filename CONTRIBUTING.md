@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for improving Automation Health. This project is a small SwiftPM macOS app, so the workflow is intentionally lightweight and scriptable.
+Automation Health was retired on 2026-09-30 and no longer accepts issues or pull requests. The MIT license permits forks. This guide preserves the development workflow for anyone maintaining their own copy; see [the retirement record](docs/retirement.md).
 
 ## Requirements
 
@@ -58,4 +58,4 @@ When scanner behavior changes, update `ActiveJobsCoreSelfTest` with fixture-driv
 
 ## CI
 
-GitHub Actions runs `./script/ci.sh` on pushes to `main`, pull requests, and manual dispatch. Dependabot checks GitHub Actions updates weekly.
+The retained GitHub Actions workflow runs `./script/ci.sh` on pushes to `main`, pull requests, and manual dispatch in an active fork. Recurring Dependabot updates were removed at retirement. Workflows do not run in the archived upstream repository.

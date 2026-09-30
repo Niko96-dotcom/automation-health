@@ -1,5 +1,7 @@
 # Codebase Concerns
 
+Historical codebase snapshot. Findings below predate the closing sweep and are not a current audit verdict. See [the retirement record](../../docs/retirement.md) for checks performed and limitations retained at retirement.
+
 **Analysis Date:** 2026-05-08
 
 ## Tech Debt

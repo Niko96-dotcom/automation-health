@@ -1,5 +1,7 @@
 # Automation Health
 
+**Retired on 2026-09-30.** No next milestone is planned. This file and the milestone/codebase documents below are historical records; [the retirement record](../docs/retirement.md) contains the closing verification and limitations.
+
 ## What This Is
 
 Automation Health is a local macOS SwiftUI app for inspecting scheduled jobs on this Mac. It scans supported scheduler sources, presents a searchable sidebar of automations grouped by source, origin, health, trigger, confidence, or schedule, and shows detail needed to understand job health, timing, configuration, and recent output.
@@ -12,7 +14,7 @@ Users can quickly understand and navigate the health of their local scheduled au
 
 ## Current State
 
-**Shipped version:** v1.3 Shippable Distribution on 2026-05-12
+**Final maintenance release:** v1.3.2. The v1.3 distribution milestone below was completed in May 2026.
 
 v1.0 (3 phases, 8 plans) shipped sidebar grouping foundation, keyboard navigation, and polish. v1.1 (6 phases, 16 plans) shipped open source readiness, visual identity, inventory model, candidate discovery, sidebar grouping/collapse, and publication verification. v1.2 (3 phases, 8 plans) shipped preferences persistence, keyboard shortcuts/type-to-select, and schedule-based grouping.
 
@@ -20,7 +22,7 @@ v1.3 completed 2 phases and 7 plans (plus 1 gap closure plan):
 - **Phase 13:** Signed and notarized DMG with CI pipeline — codesigning with Developer ID and hardened runtime, entitlements file, release script (build, sign, DMG, notarize via notarytool, staple), GitHub Actions release workflow with certificate import and notarization, GitHub Release creation, release process documentation (273 lines), Makefile dmg/release targets
 - **Phase 14:** Sparkle auto-update integration — Sparkle 2 SPM dependency (first external dependency), UpdateStore ObservableObject, Check for Updates menu item, Updates section in native Settings (version display, auto-check toggle, manual check button, graceful error state), EdDSA key generation script, appcast generation in release pipeline, CI injection of SPARKLE_EDDSA_PRIVATE_KEY and SU_PUBLIC_ED_KEY
 
-42/42 self-tests passing. Package.swift includes Sparkle 2.9.1 as the sole external dependency.
+The closing source gate runs 41 self-test cases plus app icon validation. Package.swift includes Sparkle 2.9.1 as the sole external dependency.
 
 ## Requirements
 
@@ -76,7 +78,7 @@ v1.3 completed 2 phases and 7 plans (plus 1 gap closure plan):
 
 ### Active
 
-_None. All requirements for v1.0 through v1.3 are validated. Run `/gsd-new-milestone` to define requirements for the next milestone._
+_None. Development is retired. Historical implementation completion does not replace the runtime verification limits recorded at retirement._
 
 ### Out of Scope
 

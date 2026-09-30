@@ -1,5 +1,7 @@
 # Milestones
 
+Development ended on 2026-09-30 with final maintenance release v1.3.2. The milestones below are historical implementation records. See [the retirement record](../docs/retirement.md) for current verification evidence and remaining limits.
+
 ## v1.3 Shippable Distribution (Shipped: 2026-05-12)
 
 **Phases completed:** 2 phases, 7 plans, 10 tasks

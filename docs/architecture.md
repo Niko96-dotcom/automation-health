@@ -20,12 +20,14 @@ This layer is read-only and has no dependency on SwiftUI. Scanner IO belongs her
 
 ## Presentation Layer
 
-Location: `Sources/AutomationHealth/Models` and `Sources/AutomationHealth/Stores`
+Location: `Sources/AutomationHealthCore` and `Sources/AutomationHealth/Stores`
 
 The presentation layer adapts scanner data for the UI.
 
 - `JobStore` is the main observable state object. It refreshes jobs on a detached task, publishes scan state, remembers the selected job, and stores scan errors.
 - `JobPresentation` wraps `ScheduledJob` with display-ready fields such as source names, human schedule text, relative run text, health summaries, and search text.
+- Grouping, collapse state, and keyboard navigation helpers live in `AutomationHealthCore` so the executable self-test can exercise them without SwiftUI.
+- `PreferencesStore` persists app preferences in UserDefaults. `UpdateStore` retains the Sparkle delegate and uses `UpdatePolicy` to distinguish release builds from development builds.
 
 This layer keeps formatting and selection behavior out of the scanner layer.
 

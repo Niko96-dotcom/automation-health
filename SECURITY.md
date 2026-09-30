@@ -1,10 +1,12 @@
 # Security Policy
 
+Automation Health was retired on 2026-09-30. No versions receive security updates or ongoing security response from this archived repository. Anyone continuing to distribute a fork should establish their own reporting channel and maintenance policy. See [the retirement record](docs/retirement.md).
+
 Automation Health is a local, read-only scanner for scheduled jobs on this Mac. It reads supported scheduler definitions and readable output so users can inspect automation health, but it does not create, edit, enable, disable, or delete jobs.
 
 ## Reporting Security Or Privacy Issues
 
-Please report security or privacy issues through a sanitized GitHub security advisory if available, or through the configured private maintainer contact for the repository.
+For an actively maintained fork, use its private security reporting channel. The guidance below describes how to keep reports safe without exposing local automation data.
 
 Do not include raw logs, screenshots, scheduler output, local paths, hostnames, job names, tokens, secrets, or other private automation details in public issues, discussions, pull requests, or attachments. Summaries and minimal sanitized snippets are much safer.
 
