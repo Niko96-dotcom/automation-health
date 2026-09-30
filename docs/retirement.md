@@ -30,6 +30,21 @@ Sparkle appcast workflow. No new product features were added during retirement.
 - A candidate built from the final source with release-mode metadata completed a
   live Sparkle check and displayed “You're up to date.” This was an ad-hoc runtime
   check, separate from signed release artifact verification.
+- The [v1.3.2 release workflow](https://github.com/Niko96-dotcom/automation-health/actions/runs/36695876414)
+  completed successfully from tag commit `6d489c0`. Both published assets matched
+  GitHub's SHA-256 digests and sizes. The DMG's notarization staple, nested code
+  signatures, and Gatekeeper assessment passed. The appcast's version, enclosure
+  URL, length, and Ed25519 signature verified against the embedded public key,
+  which matches the previous installation.
+- The published DMG was installed directly over the old v1.3 app with a recovery
+  copy retained. The installed v1.3.2 app launched, completed a scan, showed the
+  correct version in Settings, and completed a live Check for Updates with
+  “You're up to date.” This proves direct installation and update checking;
+  Sparkle's update-download/install/relaunch flow was not exercised.
+- A README formatting change initially broke the icon check's exact-text
+  requirement after the release tag was pushed. The original wording was restored
+  on `main` and the focused icon check passed. This correction changes documentation
+  only; the published app's source code is unchanged.
 - No open pull requests or issues remained. PRs #2 and #3 were merged; PR #1 was
   closed as superseded. `main` was the only remaining remote branch.
 - Contributor, support, security, development, architecture, and planning entry
@@ -58,3 +73,10 @@ The GitHub repository is preserved as an archive, including its existing release
 and tags. Retained build/release workflows document reproducibility for forks;
 they are not an ongoing maintenance service. Local private records and recovery
 material are kept separately and are not published with the public source.
+
+## Final Artifact Digests
+
+| Published asset | SHA-256 |
+| --- | --- |
+| `AutomationHealth-1.3.2.dmg` | `b529228132033c3d583526edaa3d7df4dc7718bdccddef279d3461d830430a60` |
+| `appcast.xml` | `1fc8242403549f7c8eed2e97e7c5070408870571944f2c1f071434d6e34e0eb5` |

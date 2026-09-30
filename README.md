@@ -81,7 +81,7 @@ Build the local app bundle:
 
 The generated bundle is written to `dist/AutomationHealth.app`.
 
-App icon assets are generated locally from committed source art; see [development documentation](docs/development.md) for regeneration steps.
+App icon assets are generated locally from committed source art; see docs/development.md for regeneration steps.
 The committed source art lives at `Assets/AppIcon/automation-health-icon-source.png`.
 
 ## Current Distribution Status
